@@ -10,15 +10,12 @@ import {
   Flame,
   ShieldCheck,
   ArrowUp,
-  Send,
-  Heart,
   CookingPot,
-  Sparkles,
   CheckCircle2,
 } from "lucide-react";
 
 export default function Footer() {
-  const { setIsMenuModalOpen, setIsCartOpen } = useRestaurant();
+  const { setIsMenuModalOpen } = useRestaurant();
 
   const scrollTo = (id: string) => {
     const el = document.getElementById(id);

@@ -3,7 +3,8 @@
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import { useRestaurant } from "@/context/RestaurantContext";
-import { X, Plus, ShoppingBag, Phone, Flame, Check } from "lucide-react";
+import { Dish } from "@/data/menu";
+import { X, Plus, ShoppingBag, Phone, Check } from "lucide-react";
 
 export default function MenuModal() {
   const { isMenuModalOpen, setIsMenuModalOpen, dishes, addToCart, setIsCartOpen, cart } = useRestaurant();
@@ -36,7 +37,7 @@ export default function MenuModal() {
     return dish.category === filter;
   });
 
-  const handleAdd = (dish: any) => {
+  const handleAdd = (dish: Dish) => {
     addToCart(dish.name, dish.price, dish.image);
     setAddedDishId(dish.id);
     setTimeout(() => {

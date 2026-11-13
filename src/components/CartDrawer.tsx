@@ -15,17 +15,29 @@ import {
   MapPin,
   Phone,
   User,
-  MessageSquare,
   Flame,
   Copy,
   Check,
-  Smartphone,
   Banknote,
   Send,
 } from "lucide-react";
 
 type DrawerStep = "cart" | "checkout" | "success";
 type PaymentType = "cod" | "easypaisa" | "jazzcash";
+
+interface CompletedOrderSummary {
+  id: string;
+  customerName: string;
+  customerPhone: string;
+  address: string;
+  totalAmount: number;
+  paymentMethod: PaymentType;
+  transactionId?: string;
+}
+
+const createFallbackOrderId = (): string => {
+  return `PK-${Date.now().toString().slice(-4)}`;
+};
 
 const QUICK_AREAS = [
   "Kohinoor City",
@@ -60,7 +72,7 @@ export default function CartDrawer() {
   const [copiedAccount, setCopiedAccount] = useState<string | null>(null);
 
   // Completed Order State for Success Screen
-  const [completedOrder, setCompletedOrder] = useState<any>(null);
+  const [completedOrder, setCompletedOrder] = useState<CompletedOrderSummary | null>(null);
 
   // Form errors
   const [errors, setErrors] = useState<{ name?: string; phone?: string; address?: string }>({});
@@ -100,7 +112,7 @@ export default function CartDrawer() {
     e.preventDefault();
     if (!validateForm()) return;
 
-    const result = await placeOrder({
+    const result = (await placeOrder({
       customerName: customerName.trim(),
       customerPhone: customerPhone.trim(),
       address: address.trim(),
@@ -108,11 +120,11 @@ export default function CartDrawer() {
       paymentMethod,
       transactionId: transactionId.trim() || undefined,
       notes: notes.trim() || undefined,
-    });
+    })) as { id?: string } | undefined;
 
     if (result) {
       setCompletedOrder({
-        id: result.id || `PK-${Math.floor(1000 + Math.random() * 9000)}`,
+        id: result.id || createFallbackOrderId(),
         customerName: customerName.trim(),
         customerPhone: customerPhone.trim(),
         address: address.trim(),

@@ -20,7 +20,6 @@ interface SettingsTabProps {
 export function SettingsTab({
   settings,
   onUpdateSettings,
-  isLoading: _isLoading,
   token,
   onShowToast,
 }: SettingsTabProps) {

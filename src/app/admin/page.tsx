@@ -27,7 +27,6 @@ import {
   AlertCircle,
   LogOut,
   User,
-  ShieldCheck,
   Loader2,
 } from "lucide-react";
 
@@ -41,8 +40,14 @@ interface SessionUser {
   role: string;
 }
 
+const emptySubscribe = () => () => {};
+
 export default function AdminPage() {
-  const [isMounted, setIsMounted] = useState(false);
+  const isMounted = React.useSyncExternalStore(
+    emptySubscribe,
+    () => true,
+    () => false
+  );
   const [activeTab, setActiveTab] = useState<TabType>("overview");
   const [isLoading, setIsLoading] = useState(true);
   const [apiConnected, setApiConnected] = useState(true);
@@ -72,62 +77,67 @@ export default function AdminPage() {
 
   // Mount & Check Session
   useEffect(() => {
-    setIsMounted(true);
-    const stored = localStorage.getItem("pehalwan_admin_session");
-    if (stored) {
-      try {
-        const parsed = JSON.parse(stored);
-        if (parsed.token && parsed.user) {
-          setIsAuthenticated(true);
-          setSessionUser(parsed.user);
-          setAuthToken(parsed.token);
+    const timer = setTimeout(() => {
+      const stored = localStorage.getItem("pehalwan_admin_session");
+      if (stored) {
+        try {
+          const parsed = JSON.parse(stored);
+          if (parsed.token && parsed.user) {
+            setIsAuthenticated(true);
+            setSessionUser(parsed.user);
+            setAuthToken(parsed.token);
+          }
+        } catch {
+          localStorage.removeItem("pehalwan_admin_session");
         }
-      } catch {
-        localStorage.removeItem("pehalwan_admin_session");
       }
-    }
+    }, 0);
+    return () => clearTimeout(timer);
   }, []);
 
   // Fetch all data
-  const fetchData = useCallback(async () => {
+  const fetchData = useCallback(() => {
     setIsLoading(true);
-    try {
-      const [menuData, ordersData, resData, settingsData, statsData] = await Promise.allSettled([
-        api.getMenu(),
-        api.getOrders(),
-        api.getReservations(),
-        api.getSettings(),
-        api.getStats(),
-      ]);
-
-      if (menuData.status === "fulfilled" && menuData.value.length > 0) {
-        setDishes(menuData.value);
-      }
-      if (ordersData.status === "fulfilled") {
-        setOrders(ordersData.value);
-      }
-      if (resData.status === "fulfilled") {
-        setReservations(resData.value);
-      }
-      if (settingsData.status === "fulfilled") {
-        setSettings(settingsData.value);
-      }
-      if (statsData.status === "fulfilled") {
-        setStats(statsData.value);
-      }
-
-      setApiConnected(true);
-    } catch (err) {
-      console.warn("[Admin Console] Backend error, relying on local state:", err);
-      setApiConnected(false);
-    } finally {
-      setIsLoading(false);
-    }
+    return Promise.allSettled([
+      api.getMenu(),
+      api.getOrders(),
+      api.getReservations(),
+      api.getSettings(),
+      api.getStats(),
+    ])
+      .then(([menuData, ordersData, resData, settingsData, statsData]) => {
+        if (menuData.status === "fulfilled" && menuData.value.length > 0) {
+          setDishes(menuData.value);
+        }
+        if (ordersData.status === "fulfilled") {
+          setOrders(ordersData.value);
+        }
+        if (resData.status === "fulfilled") {
+          setReservations(resData.value);
+        }
+        if (settingsData.status === "fulfilled") {
+          setSettings(settingsData.value);
+        }
+        if (statsData.status === "fulfilled") {
+          setStats(statsData.value);
+        }
+        setApiConnected(true);
+      })
+      .catch((err) => {
+        console.warn("[Admin Console] Backend error, relying on local state:", err);
+        setApiConnected(false);
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
   }, []);
 
   useEffect(() => {
     if (isAuthenticated) {
-      fetchData();
+      const timer = setTimeout(() => {
+        fetchData();
+      }, 0);
+      return () => clearTimeout(timer);
     }
   }, [isAuthenticated, fetchData]);
 
@@ -141,7 +151,8 @@ export default function AdminPage() {
       localStorage.setItem("pehalwan_admin_session", JSON.stringify(data));
       showToast(`Welcome back, ${data.user.name || "Master Pehalwan"}!`);
       return { success: true };
-    } catch (err: any) {
+    } catch (err: unknown) {
+      const errorMsg = err instanceof Error ? err.message : "Invalid Username or Password.";
       // Offline fallback: check default credentials if server offline
       if (
         (username === "admin" || username === "admin@pehalwankarahi.com") &&
@@ -162,7 +173,7 @@ export default function AdminPage() {
         showToast("Logged in via Master Credentials (Offline Fallback)");
         return { success: true };
       }
-      return { success: false, error: err.message || "Invalid Username or Password." };
+      return { success: false, error: errorMsg };
     }
   };
 
@@ -181,7 +192,7 @@ export default function AdminPage() {
       const newDish = await api.createDish(dishData);
       setDishes((prev) => [newDish, ...prev]);
       showToast(`🔥 Added "${newDish.name}" to menu!`);
-    } catch (err: any) {
+    } catch {
       const fallbackDish: Dish = {
         id: Math.max(...dishes.map((d) => d.id), 0) + 1,
         ...dishData,
@@ -196,7 +207,7 @@ export default function AdminPage() {
       const updated = await api.updateDish(id, updates);
       setDishes((prev) => prev.map((d) => (d.id === id ? updated : d)));
       showToast(`✅ Dish #${id} updated successfully!`);
-    } catch (err: any) {
+    } catch {
       setDishes((prev) =>
         prev.map((d) => (d.id === id ? ({ ...d, ...updates } as Dish) : d))
       );
@@ -209,7 +220,7 @@ export default function AdminPage() {
       await api.deleteDish(id);
       setDishes((prev) => prev.filter((d) => d.id !== id));
       showToast(`🗑️ Dish #${id} deleted from menu.`);
-    } catch (err: any) {
+    } catch {
       setDishes((prev) => prev.filter((d) => d.id !== id));
       showToast(`🗑️ Dish #${id} deleted from menu.`);
     }
@@ -221,7 +232,7 @@ export default function AdminPage() {
       const updated = await api.updateOrderStatus(id, status);
       setOrders((prev) => prev.map((o) => (o.id === id ? updated : o)));
       showToast(`📦 Order #${id} status changed to ${status.replace(/_/g, " ")}`);
-    } catch (err) {
+    } catch {
       setOrders((prev) => prev.map((o) => (o.id === id ? { ...o, status } : o)));
       showToast(`📦 Order #${id} status changed to ${status.replace(/_/g, " ")}`);
     }
@@ -236,7 +247,7 @@ export default function AdminPage() {
       const updated = await api.updateReservationStatus(id, status);
       setReservations((prev) => prev.map((r) => (r.id === id ? updated : r)));
       showToast(`📅 Reservation #${id} marked as ${status}!`);
-    } catch (err) {
+    } catch {
       setReservations((prev) => prev.map((r) => (r.id === id ? { ...r, status } : r)));
       showToast(`📅 Reservation #${id} marked as ${status}!`);
     }
@@ -248,7 +259,7 @@ export default function AdminPage() {
       const updated = await api.updateSettings(newSettings);
       setSettings(updated);
       showToast("💾 Restaurant info & settings saved successfully!");
-    } catch (err) {
+    } catch {
       setSettings((prev) => ({ ...(prev as RestaurantSettings), ...newSettings }));
       showToast("💾 Restaurant info & settings saved successfully!");
     }
@@ -304,6 +315,12 @@ export default function AdminPage() {
           </div>
 
           <div className="flex items-center gap-2 sm:gap-3">
+            {/* Connection Status */}
+            <div className="hidden sm:flex items-center gap-1.5 bg-white/10 px-3 py-1.5 rounded-full text-xs">
+              <span className={`w-2 h-2 rounded-full ${apiConnected ? "bg-emerald-400" : "bg-amber-400 animate-pulse"}`} />
+              <span className="text-white/80 font-bold">{apiConnected ? "API Online" : "Offline Cache"}</span>
+            </div>
+
             {/* Authenticated User Badge */}
             <div className="hidden md:flex items-center gap-2 bg-white/10 px-3 py-1.5 rounded-full text-xs">
               <User className="w-3.5 h-3.5 text-saffron-400" />

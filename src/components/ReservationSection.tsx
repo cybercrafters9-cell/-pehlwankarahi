@@ -136,9 +136,10 @@ export default function ReservationSection() {
               </button>
               <button
                 type="submit"
-                className="w-full sm:w-1/2 bg-charcoal-900 hover:bg-terracotta-500 text-white font-bold text-xs py-3.5 rounded-full transition-colors shadow-md flex items-center justify-center gap-2 cursor-pointer"
+                disabled={isSubmitting}
+                className="w-full sm:w-1/2 bg-charcoal-900 hover:bg-terracotta-500 text-white font-bold text-xs py-3.5 rounded-full transition-colors shadow-md flex items-center justify-center gap-2 cursor-pointer disabled:opacity-70"
               >
-                <span>Confirm Table</span>
+                <span>{isSubmitting ? "Confirming..." : "Confirm Table"}</span>
                 <CheckCircle className="w-4 h-4" />
               </button>
             </div>

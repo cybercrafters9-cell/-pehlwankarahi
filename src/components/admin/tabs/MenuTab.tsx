@@ -3,7 +3,6 @@
 import React, { useState } from "react";
 import Image from "next/image";
 import { Dish } from "@/data/menu";
-import { Card } from "../ui/Card";
 import { Button } from "../ui/Button";
 import { Input } from "../ui/Input";
 import { Select } from "../ui/Select";
@@ -12,7 +11,7 @@ import { Modal } from "../ui/Modal";
 import { Badge } from "../ui/Badge";
 import { ImagePicker } from "../ui/ImagePicker";
 import { ConfirmDialog } from "../ui/ConfirmDialog";
-import { Plus, Edit2, Trash2, Search, CheckCircle2, XCircle, Star, Flame } from "lucide-react";
+import { Plus, Edit2, Trash2, Search, Star, Flame } from "lucide-react";
 
 interface MenuTabProps {
   dishes: Dish[];
@@ -33,7 +32,6 @@ export function MenuTab({
   onCreateDish,
   onUpdateDish,
   onDeleteDish,
-  isLoading,
 }: MenuTabProps) {
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
@@ -79,7 +77,7 @@ export function MenuTab({
       rating: dish.rating,
       desc: dish.desc,
       image: dish.image,
-      isAvailable: (dish as any).isAvailable !== false,
+      isAvailable: dish.isAvailable !== false,
     });
     setIsModalOpen(true);
   };
@@ -100,7 +98,7 @@ export function MenuTab({
           desc: form.desc,
           image: form.image,
           isAvailable: form.isAvailable,
-        } as any);
+        });
       } else {
         await onCreateDish({
           name: form.name,
@@ -230,7 +228,7 @@ export function MenuTab({
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
           {filteredDishes.map((dish) => {
-            const isAvailable = (dish as any).isAvailable !== false;
+            const isAvailable = dish.isAvailable !== false;
             return (
               <div
                 key={dish.id}

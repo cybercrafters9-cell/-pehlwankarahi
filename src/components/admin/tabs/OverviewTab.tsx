@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import { DashboardStats, OrderRecord, ReservationRecord, RestaurantSettings } from "@/services/api";
 import { StatCard } from "../ui/StatCard";
 import { Card } from "../ui/Card";
-import { Badge } from "../ui/Badge";
+import { Badge, BadgeProps } from "../ui/Badge";
 import { Button } from "../ui/Button";
 import { Flame, DollarSign, ShoppingBag, Calendar, CheckCircle2, RefreshCw } from "lucide-react";
 
@@ -22,7 +22,6 @@ export function OverviewTab({
   stats,
   orders,
   reservations,
-  settings,
   onUpdateOrderStatus,
   onRefresh,
   isLoading,
@@ -41,7 +40,7 @@ export function OverviewTab({
   const recentOrders = orders.slice(0, 5);
   const recentReservations = reservations.slice(0, 5);
 
-  const statusVariant = (status: string) => {
+  const statusVariant = (status: string): BadgeProps["variant"] => {
     switch (status) {
       case "preparing":
         return "warning";
@@ -54,7 +53,7 @@ export function OverviewTab({
       case "cancelled":
         return "danger";
       default:
-        return "charcoal";
+        return "sand";
     }
   };
 
@@ -163,7 +162,7 @@ export function OverviewTab({
                           Rs. {order.total.toLocaleString()}
                         </td>
                         <td className="py-3">
-                          <Badge variant={statusVariant(order.status) as any}>
+                          <Badge variant={statusVariant(order.status)}>
                             {order.status.replace(/_/g, " ")}
                           </Badge>
                         </td>

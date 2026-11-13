@@ -3,11 +3,8 @@
 import React, { useState } from "react";
 import Image from "next/image";
 import { OrderRecord } from "@/services/api";
-import { Card } from "../ui/Card";
 import { Badge } from "../ui/Badge";
-import { Button } from "../ui/Button";
-import { Select } from "../ui/Select";
-import { Search, Phone, Bike, Flame, CheckCircle, Clock } from "lucide-react";
+import { Search, Phone, Bike, Clock } from "lucide-react";
 import { ClientDate } from "../ui/ClientDate";
 
 interface OrdersTabProps {
@@ -24,7 +21,7 @@ const statusOptions = [
   { value: "cancelled", label: "❌ Cancelled" },
 ];
 
-export function OrdersTab({ orders, onUpdateOrderStatus, isLoading }: OrdersTabProps) {
+export function OrdersTab({ orders, onUpdateOrderStatus }: OrdersTabProps) {
   const [filterStatus, setFilterStatus] = useState<string>("all");
   const [search, setSearch] = useState("");
   const [updatingId, setUpdatingId] = useState<string | null>(null);

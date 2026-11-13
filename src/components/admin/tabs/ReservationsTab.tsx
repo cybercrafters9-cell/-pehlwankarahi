@@ -2,7 +2,6 @@
 
 import React, { useState } from "react";
 import { ReservationRecord } from "@/services/api";
-import { Card } from "../ui/Card";
 import { Badge } from "../ui/Badge";
 import { Button } from "../ui/Button";
 import { Calendar, Phone, MessageSquare, Check, X, Clock, Users } from "lucide-react";
@@ -13,7 +12,7 @@ interface ReservationsTabProps {
   isLoading: boolean;
 }
 
-export function ReservationsTab({ reservations, onUpdateStatus, isLoading }: ReservationsTabProps) {
+export function ReservationsTab({ reservations, onUpdateStatus }: ReservationsTabProps) {
   const [filter, setFilter] = useState<string>("all");
   const [updatingId, setUpdatingId] = useState<string | null>(null);
 
