@@ -6,7 +6,13 @@
     "dev": "next dev --webpack",
     "build": "next build --webpack",
     "start": "next start",
+    "build:frontend": "next build --webpack",
+    "start:frontend": "next start",
     "server": "tsx watch server/src/index.ts",
+    "server:dev": "tsx watch server/src/index.ts",
+    "build:server": "tsc -p server",
+    "start:server": "node server/dist/index.js",
+    "build:all": "next build --webpack && tsc -p server",
     "dev:all": "concurrently -k \"pnpm run dev\" \"pnpm run server\"",
     "lint": "eslint"
   },

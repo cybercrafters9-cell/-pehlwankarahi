@@ -2,7 +2,26 @@ import fs from "fs";
 import path from "path";
 import { MenuItem, Order, Reservation, LoyaltyPass, RestaurantSettings, DashboardStats, AdminUser } from "../types";
 
-const DATA_DIR = path.join(process.cwd(), "server", "data");
+const resolveDataDir = (): string => {
+  if (process.env.DATA_DIR) {
+    return path.resolve(process.env.DATA_DIR);
+  }
+  // Try relative to current source/dist location (../../data)
+  const relativeData = path.resolve(__dirname, "../../data");
+  if (fs.existsSync(relativeData)) return relativeData;
+
+  // Try root/server/data
+  const rootData = path.join(process.cwd(), "server", "data");
+  if (fs.existsSync(rootData)) return rootData;
+
+  // Try current working directory data
+  const cwdData = path.join(process.cwd(), "data");
+  if (fs.existsSync(cwdData)) return cwdData;
+
+  return rootData;
+};
+
+const DATA_DIR = resolveDataDir();
 const STORE_FILE = path.join(DATA_DIR, "store.json");
 
 interface DatabaseSchema {
@@ -16,9 +35,9 @@ interface DatabaseSchema {
 
 const defaultAdmin: AdminUser = {
   id: "ADMIN-01",
-  username: "admin",
-  email: "admin@pehalwankarahi.com",
-  password: "pehalwan@123",
+  username: process.env.ADMIN_USERNAME || "admin",
+  email: process.env.ADMIN_EMAIL || "admin@pehalwankarahi.com",
+  password: process.env.ADMIN_PASSWORD || "pehalwan@123",
   name: "Master Pehalwan",
   role: "superadmin",
 };

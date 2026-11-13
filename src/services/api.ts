@@ -1,6 +1,27 @@
 import { Dish, CartItem } from "@/data/menu";
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5050/api";
+// Cleanly resolve API base URL, ensuring /api path and no trailing slashes
+const getApiBaseUrl = (): string => {
+  let url = process.env.NEXT_PUBLIC_API_URL?.trim();
+  if (url) {
+    url = url.replace(/\/+$/, "");
+    if (!url.endsWith("/api")) {
+      url = `${url}/api`;
+    }
+    return url;
+  }
+  // Client-side fallback: if visited on a custom domain without explicit NEXT_PUBLIC_API_URL
+  if (
+    typeof window !== "undefined" &&
+    window.location.hostname !== "localhost" &&
+    window.location.hostname !== "127.0.0.1"
+  ) {
+    return `${window.location.origin}/api`;
+  }
+  return "http://localhost:5050/api";
+};
+
+const API_BASE = getApiBaseUrl();
 
 export interface CreateOrderPayload {
   customerName?: string;
