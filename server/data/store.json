@@ -1,0 +1,294 @@
+{
+  "menu": [
+    {
+      "id": 1,
+      "name": "Peshawari Charsi Mutton Karahi",
+      "category": "karahi",
+      "tag": "Bestseller • Full 1 Kg",
+      "price": 2850,
+      "rating": "4.9",
+      "desc": "Tender dumbay ka gosht cooked in pure animal fat/desi ghee, black pepper, tomatoes & green chilies.",
+      "image": "https://images.unsplash.com/photo-1585937421612-70a008356fbe?auto=format&fit=crop&w=600&q=80",
+      "isAvailable": true
+    },
+    {
+      "id": 2,
+      "name": "Lahori Achari Chicken Karahi",
+      "category": "karahi",
+      "tag": "Desi Ghee Tarka",
+      "price": 1650,
+      "rating": "4.8",
+      "desc": "Wok-seared organic chicken tossed in tangy roasted fennel, kalonji, tomatoes & fresh ginger juliennes.",
+      "image": "https://images.unsplash.com/photo-1603894584373-5ac82b2ae398?auto=format&fit=crop&w=600&q=80",
+      "isAvailable": true
+    },
+    {
+      "id": 3,
+      "name": "Mughlai Chicken Makhni Handi",
+      "category": "karahi",
+      "tag": "Boneless Claypot",
+      "price": 1750,
+      "rating": "4.9",
+      "desc": "Velvety butter, cream, and roasted cashew gravy slow-simmered in a traditional clay handi.",
+      "image": "https://images.unsplash.com/photo-1565557623262-b51c2513a641?auto=format&fit=crop&w=600&q=80",
+      "isAvailable": true
+    },
+    {
+      "id": 4,
+      "name": "Angara Reshmi Seekh Kebab (6 Pcs)",
+      "category": "bbq",
+      "tag": "Live Charcoal",
+      "price": 1150,
+      "rating": "4.9",
+      "desc": "Melt-in-mouth minced beef & chicken skewers infused with fresh coriander, green chili & smoky butter.",
+      "image": "https://images.unsplash.com/photo-1599487488170-d11ec9c172f0?auto=format&fit=crop&w=600&q=80",
+      "isAvailable": true
+    },
+    {
+      "id": 5,
+      "name": "Koyla Chicken Malai Boti (12 Pcs)",
+      "category": "bbq",
+      "tag": "Creamy & Smoky",
+      "price": 1250,
+      "rating": "4.8",
+      "desc": "Boneless chicken cubes marinated in fresh balai, white pepper, green cardamom & grilled over coals.",
+      "image": "https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=600&q=80",
+      "isAvailable": true
+    },
+    {
+      "id": 6,
+      "name": "Karachi Burns Road Beef Bihari Boti",
+      "category": "bbq",
+      "tag": "Mustard Oil & Spice",
+      "price": 1450,
+      "rating": "4.9",
+      "desc": "Thin beef strips marinated in raw papaya, fried onions, and aromatic Bihari masala served with puri paratha.",
+      "image": "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?auto=format&fit=crop&w=600&q=80",
+      "isAvailable": true
+    },
+    {
+      "id": 7,
+      "name": "Matka Sindhi Chicken Dum Biryani",
+      "category": "rice",
+      "tag": "Sealed Clay Matka",
+      "price": 850,
+      "rating": "4.9",
+      "desc": "Long-grain aged basmati rice layered with spicy chicken, dried plums (aloo bukhara), mint & saffron.",
+      "image": "https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?auto=format&fit=crop&w=600&q=80",
+      "isAvailable": true
+    },
+    {
+      "id": 8,
+      "name": "Kabuli Afghani Mutton Pulao",
+      "category": "rice",
+      "tag": "Shank Meat & Raisins",
+      "price": 1550,
+      "rating": "4.8",
+      "desc": "Fragrant yakhni rice topped with caramelized carrots, black raisins, almonds & slow-braised mutton.",
+      "image": "https://images.unsplash.com/photo-1633945274405-b6c8069047b0?auto=format&fit=crop&w=600&q=80",
+      "isAvailable": true
+    },
+    {
+      "id": 9,
+      "name": "Tandoori Garlic & Kalonji Roghni Naan",
+      "category": "tandoor",
+      "tag": "Desi Makhan Brushed",
+      "price": 180,
+      "rating": "5.0",
+      "desc": "Pillow-soft clay oven flatbread topped with roasted garlic, sesame seeds, and warm desi makhan.",
+      "image": "https://images.unsplash.com/photo-1626074353765-517a681e40be?auto=format&fit=crop&w=600&q=80",
+      "isAvailable": true
+    },
+    {
+      "id": 10,
+      "name": "Garma Garam Gulab Jamun & Rabri",
+      "category": "tandoor",
+      "tag": "Shahi Meetha",
+      "price": 550,
+      "rating": "4.9",
+      "desc": "Warm khoya gulab jamuns drowned in thick cardamom-saffron rabri and crushed pistachios.",
+      "image": "https://images.unsplash.com/photo-1589119908995-c6837fa14848?auto=format&fit=crop&w=600&q=80",
+      "isAvailable": true
+    }
+  ],
+  "orders": [
+    {
+      "id": "PK-2344",
+      "createdAt": "2026-11-12T06:20:57.164Z",
+      "customerName": "Guest Foodie",
+      "customerPhone": "0300-1234567",
+      "address": "Dine-in / Hot Delivery",
+      "items": [
+        {
+          "name": "Mutton Karahi",
+          "price": 2850,
+          "qty": 1,
+          "image": "https://images.unsplash.com/photo-1585937421612-70a008356fbe?auto=format&fit=crop&w=300&q=80"
+        },
+        {
+          "name": "Chicken Karahi",
+          "price": 1550,
+          "qty": 1,
+          "image": "https://images.unsplash.com/photo-1603894584373-5ac82b2ae398?auto=format&fit=crop&w=300&q=80"
+        },
+        {
+          "name": "Mughlai Chicken Makhni Handi",
+          "price": 1750,
+          "qty": 1,
+          "image": "https://images.unsplash.com/photo-1565557623262-b51c2513a641?auto=format&fit=crop&w=600&q=80"
+        }
+      ],
+      "subtotal": 6150,
+      "deliveryFee": 0,
+      "discount": 0,
+      "total": 6150,
+      "spiceLevel": "Chatpata Desi",
+      "status": "delivered",
+      "estimatedDeliveryMins": 28
+    },
+    {
+      "id": "PK-1303",
+      "createdAt": "2026-11-12T05:59:32.714Z",
+      "customerName": "Guest Foodie",
+      "customerPhone": "0300-1234567",
+      "address": "Dine-in / Hot Delivery",
+      "items": [
+        {
+          "name": "Mutton Karahi",
+          "price": 2850,
+          "qty": 1,
+          "image": "https://images.unsplash.com/photo-1585937421612-70a008356fbe?auto=format&fit=crop&w=300&q=80"
+        },
+        {
+          "name": "Chicken Karahi",
+          "price": 1550,
+          "qty": 1,
+          "image": "https://images.unsplash.com/photo-1603894584373-5ac82b2ae398?auto=format&fit=crop&w=300&q=80"
+        }
+      ],
+      "subtotal": 4400,
+      "deliveryFee": 0,
+      "discount": 0,
+      "total": 4400,
+      "spiceLevel": "Chatpata Desi",
+      "status": "delivered",
+      "estimatedDeliveryMins": 28
+    },
+    {
+      "id": "PK-7435",
+      "createdAt": "2026-11-11T18:16:35.868Z",
+      "customerName": "Ahmad Tariq",
+      "customerPhone": "0300-1122334",
+      "address": "Dine-in / Takeaway / Fast Delivery",
+      "items": [
+        {
+          "name": "Peshawari Charsi Mutton Karahi",
+          "price": 2850,
+          "qty": 1,
+          "image": "test.jpg"
+        },
+        {
+          "name": "Tandoori Garlic Roghni Naan",
+          "price": 180,
+          "qty": 4,
+          "image": "naan.jpg"
+        }
+      ],
+      "subtotal": 3570,
+      "deliveryFee": 0,
+      "discount": 0,
+      "total": 3570,
+      "spiceLevel": "Full Angara",
+      "status": "preparing",
+      "estimatedDeliveryMins": 28
+    },
+    {
+      "id": "PK-1001",
+      "customerName": "Ali Khan",
+      "customerPhone": "0300-1234567",
+      "items": [
+        {
+          "name": "Peshawari Charsi Mutton Karahi",
+          "price": 2850,
+          "qty": 1,
+          "image": "https://images.unsplash.com/photo-1585937421612-70a008356fbe?auto=format&fit=crop&w=300&q=80"
+        },
+        {
+          "name": "Tandoori Garlic & Kalonji Roghni Naan",
+          "price": 180,
+          "qty": 3,
+          "image": "https://images.unsplash.com/photo-1626074353765-517a681e40be?auto=format&fit=crop&w=600&q=80"
+        }
+      ],
+      "subtotal": 3390,
+      "deliveryFee": 0,
+      "discount": 0,
+      "total": 3390,
+      "spiceLevel": "Chatpata Desi",
+      "status": "delivered",
+      "estimatedDeliveryMins": 28,
+      "createdAt": "2026-11-11T17:05:00.480Z"
+    }
+  ],
+  "reservations": [
+    {
+      "id": "DAWAT-2582",
+      "status": "confirmed",
+      "createdAt": "2026-11-11T18:16:35.878Z",
+      "name": "Hamza Malik",
+      "phone": "0321-7788990",
+      "guests": "10+ Guests (Shahi Dera Takht)",
+      "timeSlot": "Tonight — 9:30 PM (Peak BBQ)"
+    },
+    {
+      "id": "DAWAT-201",
+      "name": "Usman Ghani",
+      "phone": "0321-9876543",
+      "guests": "5-8 Guests (Rooftop Koyla Lawn)",
+      "timeSlot": "Tonight — 9:30 PM (Peak BBQ)",
+      "status": "confirmed",
+      "createdAt": "2026-11-11T18:05:00.484Z"
+    }
+  ],
+  "loyaltyPasses": [
+    {
+      "id": "SHAHI-2628",
+      "phone": "0321-7788990",
+      "name": "Hamza Malik",
+      "tier": "Shahi Member",
+      "bonusPkr": 1000,
+      "discountPercent": 15,
+      "freeItem": "Free Roghni Naan",
+      "activatedAt": "2026-11-11T18:16:35.889Z"
+    }
+  ],
+  "settings": {
+    "restaurantName": "Pehalwan Karahi & DeraGhar",
+    "tagline": "Authentic Pakistani Karahi, Charcoal Bar B Q & Desi Handi",
+    "phone": "0300-1234567",
+    "whatsapp": "0321-9876543",
+    "landline": "041-8899221",
+    "email": "info@pehalwankarahi.com",
+    "address": "Main Boulevard, Kohinoor City / Canal Road Rooftop, Faisalabad, Pakistan",
+    "branches": [
+      "Gulberg / Kohinoor City Branch",
+      "Canal Road Rooftop Family Dera",
+      "Express Takeaway & Cloud Kitchen"
+    ],
+    "timings": "12:00 PM – 02:00 AM Daily",
+    "deliveryFee": 0,
+    "minOrder": 500,
+    "deliveryEstimate": "28–35 mins",
+    "announcement": "🔥 Live Koyla Grill & Freshly slaughtered Halal Meat prepared in pure Desi Ghee!",
+    "isLiveWokActive": true
+  },
+  "adminUser": {
+    "id": "ADMIN-01",
+    "username": "admin",
+    "email": "admin@pehalwankarahi.com",
+    "password": "pehalwan@123",
+    "name": "Master Pehalwan",
+    "role": "superadmin",
+    "lastLogin": "2026-11-12T02:56:59.747Z"
+  }
+}
