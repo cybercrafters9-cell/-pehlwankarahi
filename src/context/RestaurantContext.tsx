@@ -1,8 +1,17 @@
 "use client";
 
-import React, { createContext, useContext, useState, useEffect, ReactNode } from "react";
+import { createContext, useContext, useState, useEffect, useRef, ReactNode } from "react";
 import { Dish, CartItem, menuDishes as initialMenu } from "@/data/menu";
-import { api, CreateOrderPayload, CreateReservationPayload } from "@/services/api";
+import {
+  api,
+  CreateOrderPayload,
+  CreateReservationPayload,
+  OrderRecord,
+  ReservationRecord,
+  LoyaltyPassSummary,
+  RestaurantSettings,
+  getErrorMessage,
+} from "@/services/api";
 
 interface ToastMessage {
   id: number;
@@ -12,8 +21,8 @@ interface ToastMessage {
 interface RestaurantContextType {
   dishes: Dish[];
   cart: CartItem[];
-  addToCart: (name: string, price: number, image: string) => void;
-  updateQty: (index: number, delta: number) => void;
+  addToCart: (id: number, name: string, price: number, image: string) => void;
+  updateQty: (id: number, delta: number) => void;
   clearCart: () => void;
   isCartOpen: boolean;
   setIsCartOpen: (open: boolean) => void;
@@ -29,30 +38,42 @@ interface RestaurantContextType {
   setSpiceLevel: (level: string) => void;
   toasts: ToastMessage[];
   showToast: (message: string) => void;
-  placeOrder: (customerData?: Partial<CreateOrderPayload>) => Promise<unknown>;
-  reserveTable: (payload: CreateReservationPayload) => Promise<unknown>;
-  activateLoyalty: (phone?: string, name?: string) => Promise<unknown>;
+  placeOrder: (customerData?: Partial<CreateOrderPayload>) => Promise<OrderRecord>;
+  reserveTable: (payload: CreateReservationPayload) => Promise<ReservationRecord>;
+  activateLoyalty: (phone: string, name?: string) => Promise<LoyaltyPassSummary>;
   isSubmittingOrder: boolean;
 }
 
 const RestaurantContext = createContext<RestaurantContextType | undefined>(undefined);
 
+function revalidateCartItems(
+  stored: Array<{ id: number; qty: number }>,
+  menuList: Dish[]
+): CartItem[] {
+  if (!Array.isArray(stored) || !Array.isArray(menuList)) return [];
+  const valid: CartItem[] = [];
+  for (const item of stored) {
+    if (!item || typeof item.id !== "number" || typeof item.qty !== "number" || item.qty <= 0) {
+      continue;
+    }
+    const dish = menuList.find((d) => d.id === item.id);
+    if (dish && dish.isAvailable !== false) {
+      valid.push({
+        id: dish.id,
+        name: dish.name,
+        price: dish.price,
+        qty: item.qty,
+        image: dish.image,
+      });
+    }
+  }
+  return valid;
+}
+
 export function RestaurantProvider({ children }: { children: ReactNode }) {
   const [dishes, setDishes] = useState<Dish[]>(initialMenu);
-  const [cart, setCart] = useState<CartItem[]>([
-    {
-      name: "Mutton Karahi",
-      price: 2850,
-      qty: 1,
-      image: "https://images.unsplash.com/photo-1585937421612-70a008356fbe?auto=format&fit=crop&w=300&q=80",
-    },
-    {
-      name: "Chicken Karahi",
-      price: 1550,
-      qty: 1,
-      image: "https://images.unsplash.com/photo-1603894584373-5ac82b2ae398?auto=format&fit=crop&w=300&q=80",
-    },
-  ]);
+  const [cart, setCart] = useState<CartItem[]>([]);
+  const isHydratedRef = useRef(false);
 
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isVideoOpen, setIsVideoOpen] = useState(false);
@@ -62,8 +83,41 @@ export function RestaurantProvider({ children }: { children: ReactNode }) {
   const [spiceLevel, setSpiceLevel] = useState("Chatpata Desi");
   const [toasts, setToasts] = useState<ToastMessage[]>([]);
   const [isSubmittingOrder, setIsSubmittingOrder] = useState(false);
+  const [settings, setSettings] = useState<RestaurantSettings | null>(null);
 
-  // Fetch dishes from Express backend on mount
+  // 1. SSR-safe cart hydration from localStorage on mount
+  useEffect(() => {
+    const frame = requestAnimationFrame(() => {
+      try {
+        const raw = localStorage.getItem("pk_cart");
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          if (Array.isArray(parsed)) {
+            setCart(revalidateCartItems(parsed, initialMenu));
+          }
+        }
+      } catch {
+        // Ignore invalid stored json
+      } finally {
+        isHydratedRef.current = true;
+      }
+    });
+
+    return () => cancelAnimationFrame(frame);
+  }, []);
+
+  // 2. Persist cart to localStorage on cart change
+  useEffect(() => {
+    if (!isHydratedRef.current) return;
+    try {
+      const minimal = cart.map((item) => ({ id: item.id, qty: item.qty }));
+      localStorage.setItem("pk_cart", JSON.stringify(minimal));
+    } catch {
+      // Storage quota or localStorage disabled
+    }
+  }, [cart]);
+
+  // 3. Fetch dishes and restaurant settings from Express backend on mount
   useEffect(() => {
     let isMounted = true;
     api
@@ -71,16 +125,47 @@ export function RestaurantProvider({ children }: { children: ReactNode }) {
       .then((data) => {
         if (isMounted && data && data.length > 0) {
           setDishes(data);
+          // Revalidate cart against fetched menu to drop unavailable/removed dishes
+          setCart((prevCart) => {
+            let minimal = prevCart.map((i) => ({ id: i.id, qty: i.qty }));
+            if (minimal.length === 0 && typeof window !== "undefined") {
+              try {
+                const raw = localStorage.getItem("pk_cart");
+                if (raw) {
+                  const parsed = JSON.parse(raw);
+                  if (Array.isArray(parsed) && parsed.length > 0) {
+                    minimal = parsed;
+                  }
+                }
+              } catch {
+                // Ignore
+              }
+            }
+            return revalidateCartItems(minimal, data);
+          });
         }
       })
       .catch(() => {
         // Fallback already defaults to initialMenu
       });
 
+    api
+      .getSettings()
+      .then((data) => {
+        if (isMounted && data) {
+          setSettings(data);
+        }
+      })
+      .catch(() => {
+        // Silently keep null
+      });
+
     return () => {
       isMounted = false;
     };
   }, []);
+
+  const getCallHint = () => (settings?.phone ? ` Please call us at ${settings.phone}.` : "");
 
   const showToast = (message: string) => {
     const id = Date.now() + Math.random();
@@ -90,27 +175,30 @@ export function RestaurantProvider({ children }: { children: ReactNode }) {
     }, 3200);
   };
 
-  const addToCart = (name: string, price: number, image: string) => {
+  const addToCart = (id: number, name: string, price: number, image: string) => {
     setCart((prev) => {
-      const idx = prev.findIndex((item) => item.name === name);
-      if (idx > -1) {
-        const updated = [...prev];
-        updated[idx] = { ...updated[idx], qty: updated[idx].qty + 1 };
-        return updated;
+      const exists = prev.some((item) => item.id === id);
+      if (exists) {
+        return prev.map((item) =>
+          item.id === id ? { ...item, qty: item.qty + 1 } : item
+        );
       }
-      return [...prev, { name, price, qty: 1, image }];
+      return [...prev, { id, name, price, qty: 1, image }];
     });
     showToast(`🔥 Added "${name}" to your Dastarkhwan!`);
   };
 
-  const updateQty = (index: number, delta: number) => {
+  const updateQty = (id: number, delta: number) => {
     setCart((prev) => {
-      const updated = [...prev];
-      updated[index].qty += delta;
-      if (updated[index].qty <= 0) {
-        return updated.filter((_, i) => i !== index);
+      const target = prev.find((item) => item.id === id);
+      if (!target) return prev;
+      const newQty = target.qty + delta;
+      if (newQty <= 0) {
+        return prev.filter((item) => item.id !== id);
       }
-      return updated;
+      return prev.map((item) =>
+        item.id === id ? { ...item, qty: newQty } : item
+      );
     });
   };
 
@@ -119,19 +207,19 @@ export function RestaurantProvider({ children }: { children: ReactNode }) {
   };
 
   // Connect to Express backend for order submission
-  const placeOrder = async (customerData?: Partial<CreateOrderPayload>) => {
+  const placeOrder = async (customerData?: Partial<CreateOrderPayload>): Promise<OrderRecord> => {
     if (cart.length === 0) {
       showToast("Please add items to your Dastarkhwan first!");
-      return null;
+      throw new Error("Cart is empty");
     }
 
     setIsSubmittingOrder(true);
     try {
       const payload: CreateOrderPayload = {
-        customerName: customerData?.customerName || "Guest Foodie",
-        customerPhone: customerData?.customerPhone || "0300-1234567",
-        address: customerData?.address || "Dine-in / Hot Delivery",
-        items: cart,
+        customerName: customerData?.customerName?.trim() || "",
+        customerPhone: customerData?.customerPhone?.trim() || "",
+        address: customerData?.address?.trim() || "",
+        items: cart.map((item) => ({ id: item.id, qty: item.qty })),
         spiceLevel: customerData?.spiceLevel || spiceLevel,
         paymentMethod: customerData?.paymentMethod || "cod",
         transactionId: customerData?.transactionId,
@@ -140,45 +228,48 @@ export function RestaurantProvider({ children }: { children: ReactNode }) {
       };
 
       const result = await api.placeOrder(payload);
-      const orderId = result?.data?.id || `PK-${Math.floor(1000 + Math.random() * 9000)}`;
-      
+      if (!result?.id) {
+        throw new Error("Failed to receive order confirmation from kitchen.");
+      }
+
       clearCart();
-      showToast(`✅ Order #${orderId} Dispatched to Wok & Tandoor! (ETA: 28 mins)`);
-      return result?.data || { id: orderId, ...payload };
-    } catch {
-      // Graceful offline fallback
-      const fallbackId = `PK-${Math.floor(1000 + Math.random() * 9000)}`;
-      clearCart();
-      showToast(`✅ Order #${fallbackId} Sent to Live Kitchen! (ETA: 28 mins)`);
-      return { id: fallbackId, ...(customerData || {}) };
+      showToast(`✅ Order #${result.id} Dispatched to Wok & Tandoor! (ETA: 28 mins)`);
+      return result;
+    } catch (err: unknown) {
+      const msg = getErrorMessage(err, "Failed to place order");
+      showToast(`❌ ${msg}.${getCallHint()}`);
+      throw err;
     } finally {
       setIsSubmittingOrder(false);
     }
   };
 
   // Connect to Express backend for table reservations
-  const reserveTable = async (payload: CreateReservationPayload) => {
+  const reserveTable = async (payload: CreateReservationPayload): Promise<ReservationRecord> => {
     try {
       const result = await api.reserveTable(payload);
-      const bookingId = result?.data?.id || `DAWAT-${Math.floor(1000 + Math.random() * 9000)}`;
-      showToast(`🎉 Dawat Booked for ${payload.name} (${bookingId})!`);
+      if (!result?.id) {
+        throw new Error("Failed to receive booking confirmation from desk.");
+      }
+      showToast(`🎉 Dawat Booked for ${payload.name} (${result.id})!`);
       return result;
-    } catch {
-      const fallbackBookingId = `DAWAT-${Math.floor(1000 + Math.random() * 9000)}`;
-      showToast(`🎉 Dawat Booked for ${payload.name} (${fallbackBookingId})!`);
-      return { success: true, data: { id: fallbackBookingId } };
+    } catch (err: unknown) {
+      const msg = getErrorMessage(err, "Failed to reserve table");
+      showToast(`❌ ${msg}.${getCallHint()}`);
+      throw err;
     }
   };
 
   // Connect to Express backend for loyalty activation
-  const activateLoyalty = async (phone = "0300-8888888", name = "Shahi Mehmaan") => {
+  const activateLoyalty = async (phone: string, name = "Shahi Mehmaan"): Promise<LoyaltyPassSummary> => {
     try {
       const result = await api.activateLoyaltyPass(phone, name);
-      showToast("👑 Shahi Loyalty Pass Activated! (PKR 1,000 Bonus + 15% Off)");
+      showToast("👑 Shahi Loyalty Pass Activated! (15% Off on Karahi)");
       return result;
-    } catch {
-      showToast("👑 Shahi Loyalty Pass Activated! (PKR 1,000 Bonus + 15% Off)");
-      return { success: true };
+    } catch (err: unknown) {
+      const msg = getErrorMessage(err, "Failed to activate loyalty pass");
+      showToast(`❌ ${msg}.${getCallHint()}`);
+      throw err;
     }
   };
 

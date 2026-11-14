@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import { useState } from "react";
 import Image from "next/image";
 import { Dish } from "@/data/menu";
 import { Button } from "../ui/Button";
@@ -11,7 +11,7 @@ import { Modal } from "../ui/Modal";
 import { Badge } from "../ui/Badge";
 import { ImagePicker } from "../ui/ImagePicker";
 import { ConfirmDialog } from "../ui/ConfirmDialog";
-import { Plus, Edit2, Trash2, Search, Star, Flame } from "lucide-react";
+import { Plus, Edit2, Trash2, Search, Star, Flame, Loader2 } from "lucide-react";
 
 interface MenuTabProps {
   dishes: Dish[];
@@ -32,6 +32,7 @@ export function MenuTab({
   onCreateDish,
   onUpdateDish,
   onDeleteDish,
+  isLoading,
 }: MenuTabProps) {
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
@@ -209,7 +210,12 @@ export function MenuTab({
       </div>
 
       {/* Dish Cards Grid */}
-      {filteredDishes.length === 0 ? (
+      {isLoading && dishes.length === 0 ? (
+        <div className="bg-sand-50 border border-sand-200 rounded-3xl p-12 text-center">
+          <Loader2 className="w-10 h-10 animate-spin text-terracotta-500 mx-auto mb-2" />
+          <p className="font-display font-bold text-base text-charcoal-900">Loading dishes...</p>
+        </div>
+      ) : filteredDishes.length === 0 ? (
         <div className="bg-sand-50 border border-sand-200 rounded-3xl p-12 text-center">
           <Flame className="w-12 h-12 mx-auto text-terracotta-500 mb-2 opacity-60" />
           <p className="font-display font-bold text-base text-charcoal-900">No dishes matched your filter.</p>

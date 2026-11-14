@@ -1,5 +1,6 @@
 import express from "express";
 import cors from "cors";
+import helmet from "helmet";
 import morgan from "morgan";
 import dotenv from "dotenv";
 import path from "path";
@@ -7,6 +8,7 @@ import fs from "fs";
 import apiRoutes from "./routes";
 import { errorHandler } from "./middleware/errorHandler";
 import { getJwtSecret } from "./middleware/requireAuth";
+import { globalLimiter } from "./middleware/rateLimiter";
 
 // Load environment variables (.env from cwd and optionally server/.env if running from root)
 dotenv.config();
@@ -21,6 +23,21 @@ getJwtSecret();
 const app = express();
 const PORT = Number(process.env.PORT) || 5050;
 const HOST = process.env.HOST || "0.0.0.0";
+
+// Configure trust proxy via env if behind a proxy
+if (process.env.TRUST_PROXY) {
+  const tp = process.env.TRUST_PROXY.trim().toLowerCase();
+  if (tp === "true" || tp === "1") {
+    app.set("trust proxy", true);
+  } else if (!isNaN(Number(tp))) {
+    app.set("trust proxy", Number(tp));
+  } else {
+    app.set("trust proxy", process.env.TRUST_PROXY);
+  }
+}
+
+// Security headers with Helmet defaults
+app.use(helmet());
 
 // CORS Configuration
 const rawClientUrl = process.env.CLIENT_URL || "http://localhost:3000";
@@ -60,8 +77,7 @@ app.use(
 );
 
 // Body parser with safe payload limits
-app.use(express.json({ limit: "10mb" }));
-app.use(express.urlencoded({ extended: true, limit: "10mb" }));
+app.use(express.json({ limit: "100kb" }));
 app.use(morgan(process.env.NODE_ENV === "production" ? "combined" : "dev"));
 
 // Root Server Info Endpoint
@@ -94,14 +110,14 @@ app.get("/api/health", (_req, res) => {
   });
 });
 
-// Mount API Routes
-app.use("/api", apiRoutes);
+// Mount API Routes with global rate limiting
+app.use("/api", globalLimiter, apiRoutes);
 
 // 404 Handler
 app.use((_req, res) => {
   res.status(404).json({
     success: false,
-    error: "API endpoint not found. Available routes: /api/menu, /api/orders, /api/reservations, /api/loyalty",
+    error: "API endpoint not found",
   });
 });
 

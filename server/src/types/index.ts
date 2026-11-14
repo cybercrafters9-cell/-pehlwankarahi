@@ -72,6 +72,11 @@ export interface LoyaltyPass {
   activatedAt: string;
 }
 
+export interface LoyaltyPassSummary {
+  tier: string;
+  discountPercent: number;
+}
+
 export interface RestaurantSettings {
   restaurantName: string;
   tagline: string;

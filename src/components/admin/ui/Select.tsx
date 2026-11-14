@@ -1,6 +1,6 @@
 "use client";
 
-import React, { SelectHTMLAttributes, forwardRef } from "react";
+import { SelectHTMLAttributes, forwardRef } from "react";
 import { clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 

@@ -104,6 +104,7 @@ export default function Hero() {
             <div
               onClick={() =>
                 addToCart(
+                  2,
                   "Mutton Karahi",
                   2850,
                   "https://images.unsplash.com/photo-1585937421612-70a008356fbe?auto=format&fit=crop&w=600&q=80"
@@ -130,6 +131,7 @@ export default function Hero() {
             <div
               onClick={() =>
                 addToCart(
+                  1,
                   "Chicken Karahi",
                   1550,
                   "https://images.unsplash.com/photo-1603894584373-5ac82b2ae398?auto=format&fit=crop&w=600&q=80"
@@ -156,6 +158,7 @@ export default function Hero() {
             <div
               onClick={() =>
                 addToCart(
+                  6,
                   "Mutton Chops Karahi",
                   3200,
                   "https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=900&q=85"

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import { useState } from "react";
 import Image from "next/image";
 import { Input } from "./Input";
 import { Sparkles, Check } from "lucide-react";

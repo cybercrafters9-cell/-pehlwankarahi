@@ -2,6 +2,7 @@ import fs from "fs";
 import path from "path";
 import bcrypt from "bcryptjs";
 import { MenuItem, Order, Reservation, LoyaltyPass, RestaurantSettings, DashboardStats, AdminUser } from "../types";
+import { normalizePhone } from "../validators";
 
 const resolveDataDir = (): string => {
   if (process.env.DATA_DIR) {
@@ -25,6 +26,11 @@ const resolveDataDir = (): string => {
 const DATA_DIR = resolveDataDir();
 const STORE_FILE = path.join(DATA_DIR, "store.json");
 
+interface StoreCounters {
+  order: number;
+  reservation: number;
+}
+
 interface DatabaseSchema {
   menu: MenuItem[];
   orders: Order[];
@@ -32,6 +38,7 @@ interface DatabaseSchema {
   loyaltyPasses: LoyaltyPass[];
   settings: RestaurantSettings;
   adminUser: AdminUser;
+  counters: StoreCounters;
 }
 
 const createInitialAdmin = (): AdminUser => {
@@ -186,35 +193,82 @@ class Database {
   }
 
   private loadData(): DatabaseSchema {
-    try {
-      if (fs.existsSync(STORE_FILE)) {
-        const fileContent = fs.readFileSync(STORE_FILE, "utf-8");
-        const parsed = JSON.parse(fileContent);
-        let saveNeeded = false;
+    if (fs.existsSync(STORE_FILE)) {
+      const fileContent = fs.readFileSync(STORE_FILE, "utf-8");
+      const parsed = JSON.parse(fileContent);
+      let saveNeeded = false;
 
-        if (!parsed.settings) {
-          parsed.settings = defaultSettings;
-          saveNeeded = true;
-        }
-
-        if (!parsed.adminUser) {
-          parsed.adminUser = createInitialAdmin();
-          saveNeeded = true;
-        } else if (parsed.adminUser.password) {
-          // Migration: hash plain password, save passwordHash, remove plain password
-          parsed.adminUser.passwordHash = bcrypt.hashSync(parsed.adminUser.password, 10);
-          delete parsed.adminUser.password;
-          saveNeeded = true;
-        }
-
-        if (saveNeeded) {
-          this.saveData(parsed);
-        }
-
-        return parsed;
+      if (!parsed.settings) {
+        parsed.settings = defaultSettings;
+        saveNeeded = true;
       }
-    } catch (err) {
-      console.error("[Database] Error reading store.json, re-initializing:", err);
+
+      if (!parsed.adminUser) {
+        parsed.adminUser = createInitialAdmin();
+        saveNeeded = true;
+      } else if (parsed.adminUser.password) {
+        // Migration: hash plain password, save passwordHash, remove plain password
+        parsed.adminUser.passwordHash = bcrypt.hashSync(parsed.adminUser.password, 10);
+        delete parsed.adminUser.password;
+        saveNeeded = true;
+      }
+
+      if (parsed.loyaltyPasses && Array.isArray(parsed.loyaltyPasses)) {
+        for (const pass of parsed.loyaltyPasses) {
+          if (pass.phone && (pass.phone.includes("-") || pass.phone.includes(" "))) {
+            pass.phone = normalizePhone(pass.phone);
+            saveNeeded = true;
+          }
+        }
+      }
+
+      // Migration: initialize incrementing counters from current max
+      if (
+        !parsed.counters ||
+        typeof parsed.counters.order !== "number" ||
+        typeof parsed.counters.reservation !== "number"
+      ) {
+        let maxOrder = 1000;
+        if (Array.isArray(parsed.orders)) {
+          for (const o of parsed.orders) {
+            if (typeof o?.id === "string") {
+              const m = o.id.match(/^PK-(\d+)$/i);
+              if (m) {
+                const val = parseInt(m[1], 10);
+                if (!isNaN(val) && val > maxOrder) maxOrder = val;
+              }
+            }
+          }
+        }
+
+        let maxReservation = 200;
+        if (Array.isArray(parsed.reservations)) {
+          for (const r of parsed.reservations) {
+            if (typeof r?.id === "string") {
+              const m = r.id.match(/^DAWAT-(\d+)$/i);
+              if (m) {
+                const val = parseInt(m[1], 10);
+                if (!isNaN(val) && val > maxReservation) maxReservation = val;
+              }
+            }
+          }
+        }
+
+        parsed.counters = {
+          order: typeof parsed.counters?.order === "number" ? parsed.counters.order : maxOrder,
+          reservation:
+            typeof parsed.counters?.reservation === "number"
+              ? parsed.counters.reservation
+              : maxReservation,
+        };
+        saveNeeded = true;
+      }
+
+      if (saveNeeded) {
+        this.saveData(parsed);
+      }
+
+      return parsed;
     }
 
     const defaultData: DatabaseSchema = {
@@ -262,17 +316,54 @@ class Database {
       loyaltyPasses: [],
       settings: defaultSettings,
       adminUser: createInitialAdmin(),
+      counters: {
+        order: 1001,
+        reservation: 201,
+      },
     };
 
     this.saveData(defaultData);
     return defaultData;
   }
 
-  private saveData(data: DatabaseSchema) {
+  private saveData(data: DatabaseSchema): void {
+    const tempFile = path.join(
+      DATA_DIR,
+      `.store.tmp.${Date.now()}.${Math.random().toString(36).slice(2, 8)}`
+    );
     try {
-      fs.writeFileSync(STORE_FILE, JSON.stringify(data, null, 2), "utf-8");
+      fs.writeFileSync(tempFile, JSON.stringify(data, null, 2), "utf-8");
+
+      // On Windows, rapid atomic renames can transiently encounter EPERM / EBUSY / EACCES
+      // while file watchers (tsx, Next.js, AV) briefly lock the replaced file.
+      let retries = 5;
+      while (true) {
+        try {
+          fs.renameSync(tempFile, STORE_FILE);
+          break;
+        } catch (renameErr: unknown) {
+          const errCode = (renameErr as { code?: string })?.code;
+          if (
+            retries > 0 &&
+            (errCode === "EPERM" || errCode === "EBUSY" || errCode === "EACCES")
+          ) {
+            retries--;
+            Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 15);
+            continue;
+          }
+          throw renameErr;
+        }
+      }
     } catch (err) {
+      if (fs.existsSync(tempFile)) {
+        try {
+          fs.unlinkSync(tempFile);
+        } catch {
+          // Ignore temp cleanup error
+        }
+      }
       console.error("[Database] Error saving to store.json:", err);
+      throw err;
     }
   }
 
@@ -311,7 +402,7 @@ class Database {
 
   // --- Order Operations ---
   public getOrders(): Order[] {
-    return this.data.orders.sort(
+    return [...this.data.orders].sort(
       (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
     );
   }
@@ -321,9 +412,9 @@ class Database {
   }
 
   public createOrder(order: Omit<Order, "id" | "createdAt">): Order {
-    const randomSuffix = Math.floor(1000 + Math.random() * 9000);
+    this.data.counters.order += 1;
     const newOrder: Order = {
-      id: `PK-${randomSuffix}`,
+      id: `PK-${this.data.counters.order}`,
       createdAt: new Date().toISOString(),
       ...order,
     };
@@ -342,7 +433,7 @@ class Database {
 
   // --- Reservation Operations ---
   public getReservations(): Reservation[] {
-    return this.data.reservations.sort(
+    return [...this.data.reservations].sort(
       (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
     );
   }
@@ -352,9 +443,9 @@ class Database {
   }
 
   public createReservation(res: Omit<Reservation, "id" | "createdAt" | "status">): Reservation {
-    const randomCode = Math.floor(1000 + Math.random() * 9000);
+    this.data.counters.reservation += 1;
     const newReservation: Reservation = {
-      id: `DAWAT-${randomCode}`,
+      id: `DAWAT-${this.data.counters.reservation}`,
       status: "confirmed",
       createdAt: new Date().toISOString(),
       ...res,
@@ -374,13 +465,14 @@ class Database {
 
   // --- Loyalty Operations ---
   public activateLoyalty(phone: string, name?: string): LoyaltyPass {
-    const existing = this.data.loyaltyPasses.find((p) => p.phone === phone);
+    const normalized = normalizePhone(phone);
+    const existing = this.data.loyaltyPasses.find((p) => normalizePhone(p.phone) === normalized);
     if (existing) {
       return existing;
     }
     const pass: LoyaltyPass = {
       id: `SHAHI-${Math.floor(1000 + Math.random() * 9000)}`,
-      phone,
+      phone: normalized,
       name: name || "Shahi Mehmaan",
       tier: "Shahi Member",
       bonusPkr: 1000,
@@ -394,7 +486,8 @@ class Database {
   }
 
   public getLoyalty(phone: string): LoyaltyPass | undefined {
-    return this.data.loyaltyPasses.find((p) => p.phone === phone);
+    const normalized = normalizePhone(phone);
+    return this.data.loyaltyPasses.find((p) => normalizePhone(p.phone) === normalized);
   }
 
   // --- Restaurant Settings Operations ---
@@ -463,7 +556,7 @@ class Database {
     const matchesId =
       admin.username.toLowerCase() === idLower || admin.email.toLowerCase() === idLower;
     const matchesPassword =
-      Boolean(admin.passwordHash) && bcrypt.compareSync(password, admin.passwordHash);
+      Boolean(admin.passwordHash && bcrypt.compareSync(password, admin.passwordHash));
 
     if (matchesId && matchesPassword) {
       admin.lastLogin = new Date().toISOString();

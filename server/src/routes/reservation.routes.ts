@@ -6,12 +6,18 @@ import {
   updateReservationStatus,
 } from "../controllers/reservation.controller";
 import { requireAuth } from "../middleware/requireAuth";
+import { validate } from "../middleware/validate";
+import { submissionLimiter } from "../middleware/rateLimiter";
+import {
+  createReservationSchema,
+  updateReservationStatusSchema,
+} from "../validators";
 
 const router = Router();
 
-router.post("/", createReservation);
+router.post("/", submissionLimiter, validate(createReservationSchema), createReservation);
 router.get("/", requireAuth, getReservations);
 router.get("/:id", requireAuth, getReservationById);
-router.patch("/:id/status", requireAuth, updateReservationStatus);
+router.patch("/:id/status", requireAuth, validate(updateReservationStatusSchema), updateReservationStatus);
 
 export default router;

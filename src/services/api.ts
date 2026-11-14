@@ -23,11 +23,16 @@ const getApiBaseUrl = (): string => {
 
 const API_BASE = getApiBaseUrl();
 
+export interface CreateOrderItemPayload {
+  id: number;
+  qty: number;
+}
+
 export interface CreateOrderPayload {
   customerName?: string;
   customerPhone?: string;
   address?: string;
-  items: CartItem[];
+  items: CreateOrderItemPayload[];
   spiceLevel?: string;
   paymentMethod?: "cod" | "easypaisa" | "jazzcash" | string;
   paymentStatus?: "pending" | "paid" | string;
@@ -87,6 +92,7 @@ export interface OrderRecord {
   estimatedDeliveryMins: number;
   notes?: string;
   createdAt: string;
+  data?: OrderRecord;
 }
 
 export interface ReservationRecord {
@@ -97,219 +103,201 @@ export interface ReservationRecord {
   timeSlot: string;
   status: "confirmed" | "completed" | "cancelled";
   createdAt: string;
+  data?: ReservationRecord;
 }
 
-function getAuthHeaders(): HeadersInit {
-  if (typeof window !== "undefined") {
-    try {
-      const stored = localStorage.getItem("pehalwan_admin_session");
-      if (stored) {
-        const parsed = JSON.parse(stored);
-        if (parsed.token) {
-          return { Authorization: `Bearer ${parsed.token}` };
-        }
-      }
-    } catch {
-      // ignore
+export interface LoyaltyPassSummary {
+  tier: string;
+  discountPercent: number;
+}
+
+const SESSION_KEY = "pehalwan_admin_session";
+
+function getToken(): string | null {
+  if (typeof window === "undefined") return null;
+  try {
+    const raw = localStorage.getItem(SESSION_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    return typeof parsed?.token === "string" ? parsed.token : null;
+  } catch {
+    return null;
+  }
+}
+
+function clearSession(): void {
+  if (typeof window === "undefined") return;
+  try {
+    localStorage.removeItem(SESSION_KEY);
+  } catch {
+    // ignore
+  }
+}
+
+export class ApiError extends Error {
+  status: number;
+  code: string;
+  isAuthExpired: boolean;
+
+  constructor(message: string, status: number, isAuthExpired = false) {
+    super(message);
+    this.name = "ApiError";
+    this.status = status;
+    this.isAuthExpired = isAuthExpired;
+    this.code = isAuthExpired ? "AUTH_EXPIRED" : `HTTP_${status}`;
+  }
+}
+
+export const isAuthExpiredError = (err: unknown): boolean => {
+  if (!err || typeof err !== "object") return false;
+  return (
+    ("isAuthExpired" in err && Boolean((err as { isAuthExpired: unknown }).isAuthExpired)) ||
+    ("code" in err && (err as { code: unknown }).code === "AUTH_EXPIRED") ||
+    ("status" in err && (err as { status: unknown }).status === 401)
+  );
+};
+
+export function getErrorMessage(err: unknown, fallback = "Something went wrong"): string {
+  if (err instanceof Error && err.message) return err.message;
+  if (typeof err === "string" && err.trim()) return err;
+  return fallback;
+}
+
+interface RequestOptions {
+  method?: string;
+  body?: unknown;
+  auth?: boolean;
+  token?: string;
+}
+
+async function request<T>(path: string, options: RequestOptions = {}): Promise<T> {
+  const { method = "GET", body, auth, token } = options;
+  const headers: Record<string, string> = {};
+
+  if (body !== undefined) {
+    headers["Content-Type"] = "application/json";
+  }
+
+  if (auth) {
+    const activeToken = token || getToken();
+    if (activeToken) {
+      headers["Authorization"] = `Bearer ${activeToken}`;
     }
   }
-  return {};
+
+  const url = `${API_BASE}${path.startsWith("/") ? path : `/${path}`}`;
+  const res = await fetch(url, {
+    method,
+    headers,
+    body: body !== undefined ? JSON.stringify(body) : undefined,
+    cache: "no-store",
+  });
+
+  const json = await res.json().catch(() => ({}));
+
+  if (!res.ok) {
+    if (res.status === 401 && auth) {
+      clearSession();
+      throw new ApiError(json.error || "Session expired", 401, true);
+    }
+    throw new ApiError(json.error || `Request failed with status ${res.status}`, res.status);
+  }
+
+  const data = json.data !== undefined ? json.data : json;
+  if (data && typeof data === "object" && !Array.isArray(data) && !("data" in data)) {
+    Object.defineProperty(data, "data", {
+      value: data,
+      writable: true,
+      configurable: true,
+      enumerable: false,
+    });
+  }
+
+  return data as T;
 }
 
 export const api = {
   // --- Menu ---
-  async getMenu(category?: string, search?: string): Promise<Dish[]> {
-    try {
-      const params = new URLSearchParams();
-      if (category && category !== "all") params.append("category", category);
-      if (search && search.trim() !== "") params.append("search", search.trim());
+  getMenu: (category?: string, search?: string) =>
+    request<Dish[]>(
+      `/menu${
+        category || search
+          ? `?${new URLSearchParams({
+              ...(category && category !== "all" ? { category } : {}),
+              ...(search?.trim() ? { search: search.trim() } : {}),
+            })}`
+          : ""
+      }`
+    ),
 
-      const url = `${API_BASE}/menu${params.toString() ? `?${params.toString()}` : ""}`;
-      const res = await fetch(url, { cache: "no-store" });
-      if (!res.ok) throw new Error("Failed to fetch menu");
-      const json = await res.json();
-      return json.data || [];
-    } catch (err) {
-      console.warn("[API Service] Could not connect to Express backend for menu:", err);
-      throw err;
-    }
-  },
+  createDish: (dish: Omit<Dish, "id">) =>
+    request<Dish>("/menu", { method: "POST", body: dish, auth: true }),
 
-  async createDish(dish: Omit<Dish, "id">): Promise<Dish> {
-    const res = await fetch(`${API_BASE}/menu`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json", ...getAuthHeaders() },
-      body: JSON.stringify(dish),
-    });
-    const json = await res.json();
-    if (!res.ok) throw new Error(json.error || "Failed to create dish");
-    return json.data;
-  },
+  updateDish: (id: number, updates: Partial<Dish>) =>
+    request<Dish>(`/menu/${id}`, { method: "PUT", body: updates, auth: true }),
 
-  async updateDish(id: number, updates: Partial<Dish>): Promise<Dish> {
-    const res = await fetch(`${API_BASE}/menu/${id}`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json", ...getAuthHeaders() },
-      body: JSON.stringify(updates),
-    });
-    const json = await res.json();
-    if (!res.ok) throw new Error(json.error || "Failed to update dish");
-    return json.data;
-  },
-
-  async deleteDish(id: number): Promise<boolean> {
-    const res = await fetch(`${API_BASE}/menu/${id}`, {
-      method: "DELETE",
-      headers: { ...getAuthHeaders() },
-    });
-    const json = await res.json();
-    if (!res.ok) throw new Error(json.error || "Failed to delete dish");
-    return true;
-  },
+  deleteDish: (id: number) =>
+    request<unknown>(`/menu/${id}`, { method: "DELETE", auth: true }).then(() => true),
 
   // --- Orders ---
-  async placeOrder(payload: CreateOrderPayload) {
-    const res = await fetch(`${API_BASE}/orders`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    });
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.error || "Order placement failed");
-    return data;
-  },
+  placeOrder: (payload: CreateOrderPayload) =>
+    request<OrderRecord>("/orders", { method: "POST", body: payload }),
 
-  async getOrders(): Promise<OrderRecord[]> {
-    const res = await fetch(`${API_BASE}/orders`, {
-      cache: "no-store",
-      headers: { ...getAuthHeaders() },
-    });
-    const json = await res.json();
-    if (!res.ok) throw new Error(json.error || "Failed to fetch orders");
-    return json.data || [];
-  },
+  getOrders: () =>
+    request<OrderRecord[]>("/orders", { auth: true }),
 
-  async updateOrderStatus(id: string, status: OrderRecord["status"]): Promise<OrderRecord> {
-    const res = await fetch(`${API_BASE}/orders/${id}/status`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json", ...getAuthHeaders() },
-      body: JSON.stringify({ status }),
-    });
-    const json = await res.json();
-    if (!res.ok) throw new Error(json.error || "Failed to update order status");
-    return json.data;
-  },
+  updateOrderStatus: (id: string, status: OrderRecord["status"]) =>
+    request<OrderRecord>(`/orders/${id}/status`, { method: "PATCH", body: { status }, auth: true }),
 
   // --- Reservations ---
-  async reserveTable(payload: CreateReservationPayload) {
-    const res = await fetch(`${API_BASE}/reservations`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    });
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.error || "Reservation failed");
-    return data;
-  },
+  reserveTable: (payload: CreateReservationPayload) =>
+    request<ReservationRecord>("/reservations", { method: "POST", body: payload }),
 
-  async getReservations(): Promise<ReservationRecord[]> {
-    const res = await fetch(`${API_BASE}/reservations`, {
-      cache: "no-store",
-      headers: { ...getAuthHeaders() },
-    });
-    const json = await res.json();
-    if (!res.ok) throw new Error(json.error || "Failed to fetch reservations");
-    return json.data || [];
-  },
+  getReservations: () =>
+    request<ReservationRecord[]>("/reservations", { auth: true }),
 
-  async updateReservationStatus(id: string, status: ReservationRecord["status"]): Promise<ReservationRecord> {
-    const res = await fetch(`${API_BASE}/reservations/${id}/status`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json", ...getAuthHeaders() },
-      body: JSON.stringify({ status }),
-    });
-    const json = await res.json();
-    if (!res.ok) throw new Error(json.error || "Failed to update reservation status");
-    return json.data;
-  },
+  updateReservationStatus: (id: string, status: ReservationRecord["status"]) =>
+    request<ReservationRecord>(`/reservations/${id}/status`, { method: "PATCH", body: { status }, auth: true }),
 
   // --- Settings ---
-  async getSettings(): Promise<RestaurantSettings> {
-    const res = await fetch(`${API_BASE}/settings`, { cache: "no-store" });
-    const json = await res.json();
-    if (!res.ok) throw new Error(json.error || "Failed to fetch settings");
-    return json.data;
-  },
+  getSettings: () =>
+    request<RestaurantSettings>("/settings"),
 
-  async updateSettings(settings: Partial<RestaurantSettings>): Promise<RestaurantSettings> {
-    const res = await fetch(`${API_BASE}/settings`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json", ...getAuthHeaders() },
-      body: JSON.stringify(settings),
-    });
-    const json = await res.json();
-    if (!res.ok) throw new Error(json.error || "Failed to update settings");
-    return json.data;
-  },
+  updateSettings: (settings: Partial<RestaurantSettings>) =>
+    request<RestaurantSettings>("/settings", { method: "PUT", body: settings, auth: true }),
 
   // --- Stats ---
-  async getStats(): Promise<DashboardStats> {
-    const res = await fetch(`${API_BASE}/stats`, {
-      cache: "no-store",
-      headers: { ...getAuthHeaders() },
-    });
-    const json = await res.json();
-    if (!res.ok) throw new Error(json.error || "Failed to fetch dashboard stats");
-    return json.data;
-  },
+  getStats: () =>
+    request<DashboardStats>("/stats", { auth: true }),
 
   // --- Loyalty ---
-  async activateLoyaltyPass(phone?: string, name?: string) {
-    const res = await fetch(`${API_BASE}/loyalty/activate`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ phone, name }),
-    });
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.error || "Failed to activate pass");
-    return data;
-  },
+  activateLoyaltyPass: (phone: string, name?: string) =>
+    request<LoyaltyPassSummary>("/loyalty/activate", { method: "POST", body: { phone, name } }),
+
+  getLoyaltyPass: (phone: string) =>
+    request<LoyaltyPassSummary>(`/loyalty/${encodeURIComponent(phone)}`),
 
   // --- Authentication ---
-  async login(username: string, password: string) {
-    const res = await fetch(`${API_BASE}/auth/login`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ username, password }),
-    });
-    const json = await res.json();
-    if (!res.ok) throw new Error(json.error || "Login failed");
-    return json.data;
-  },
+  login: (username: string, password: string) =>
+    request<{ token: string; user: { id: string; username: string; email: string; name: string; role: string } }>(
+      "/auth/login",
+      { method: "POST", body: { username, password } }
+    ),
 
-  async verifyAuth(token: string) {
-    const res = await fetch(`${API_BASE}/auth/verify`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    const json = await res.json();
-    if (!res.ok) throw new Error(json.error || "Session invalid");
-    return json.data;
-  },
+  verifyAuth: (token?: string) =>
+    request<{ user: { id: string; username: string; email: string; name: string; role: string } }>(
+      "/auth/verify",
+      { auth: true, token }
+    ),
 
-  async updateAdminCredentials(
+  updateAdminCredentials: (
     data: { currentPassword?: string; newPassword?: string; newUsername?: string; newEmail?: string; newName?: string },
     token?: string
-  ) {
-    const res = await fetch(`${API_BASE}/auth/credentials`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        ...(token ? { Authorization: `Bearer ${token}` } : {}),
-      },
-      body: JSON.stringify(data),
-    });
-    const json = await res.json();
-    if (!res.ok) throw new Error(json.error || "Failed to update credentials");
-    return json.data;
-  },
+  ) =>
+    request<{ user: { id: string; username: string; email: string; name: string; role: string } }>(
+      "/auth/credentials",
+      { method: "PUT", body: data, auth: true, token }
+    ),
 };
+
+export { clearSession, getToken };

@@ -113,6 +113,1466 @@
   ],
   "orders": [
     {
+      "id": "PK-7495",
+      "createdAt": "2026-11-14T11:17:05.219Z",
+      "customerName": "Customer 20",
+      "customerPhone": "0300-1234567",
+      "address": "Street 20",
+      "items": [
+        {
+          "id": 1,
+          "name": "Peshawari Charsi Mutton Karahi",
+          "price": 2850,
+          "qty": 1,
+          "image": "https://images.unsplash.com/photo-1585937421612-70a008356fbe?auto=format&fit=crop&w=600&q=80"
+        }
+      ],
+      "subtotal": 2850,
+      "deliveryFee": 0,
+      "discount": 0,
+      "total": 2850,
+      "spiceLevel": "Chatpata Desi",
+      "status": "preparing",
+      "paymentMethod": "cod",
+      "paymentStatus": "pending",
+      "estimatedDeliveryMins": 28
+    },
+    {
+      "id": "PK-7494",
+      "createdAt": "2026-11-14T11:17:05.210Z",
+      "customerName": "Customer 19",
+      "customerPhone": "0300-1234567",
+      "address": "Street 19",
+      "items": [
+        {
+          "id": 1,
+          "name": "Peshawari Charsi Mutton Karahi",
+          "price": 2850,
+          "qty": 1,
+          "image": "https://images.unsplash.com/photo-1585937421612-70a008356fbe?auto=format&fit=crop&w=600&q=80"
+        }
+      ],
+      "subtotal": 2850,
+      "deliveryFee": 0,
+      "discount": 0,
+      "total": 2850,
+      "spiceLevel": "Chatpata Desi",
+      "status": "preparing",
+      "paymentMethod": "cod",
+      "paymentStatus": "pending",
+      "estimatedDeliveryMins": 28
+    },
+    {
+      "id": "PK-7493",
+      "createdAt": "2026-11-14T11:17:05.203Z",
+      "customerName": "Customer 18",
+      "customerPhone": "0300-1234567",
+      "address": "Street 18",
+      "items": [
+        {
+          "id": 1,
+          "name": "Peshawari Charsi Mutton Karahi",
+          "price": 2850,
+          "qty": 1,
+          "image": "https://images.unsplash.com/photo-1585937421612-70a008356fbe?auto=format&fit=crop&w=600&q=80"
+        }
+      ],
+      "subtotal": 2850,
+      "deliveryFee": 0,
+      "discount": 0,
+      "total": 2850,
+      "spiceLevel": "Chatpata Desi",
+      "status": "preparing",
+      "paymentMethod": "cod",
+      "paymentStatus": "pending",
+      "estimatedDeliveryMins": 28
+    },
+    {
+      "id": "PK-7492",
+      "createdAt": "2026-11-14T11:17:05.195Z",
+      "customerName": "Customer 17",
+      "customerPhone": "0300-1234567",
+      "address": "Street 17",
+      "items": [
+        {
+          "id": 1,
+          "name": "Peshawari Charsi Mutton Karahi",
+          "price": 2850,
+          "qty": 1,
+          "image": "https://images.unsplash.com/photo-1585937421612-70a008356fbe?auto=format&fit=crop&w=600&q=80"
+        }
+      ],
+      "subtotal": 2850,
+      "deliveryFee": 0,
+      "discount": 0,
+      "total": 2850,
+      "spiceLevel": "Chatpata Desi",
+      "status": "preparing",
+      "paymentMethod": "cod",
+      "paymentStatus": "pending",
+      "estimatedDeliveryMins": 28
+    },
+    {
+      "id": "PK-7491",
+      "createdAt": "2026-11-14T11:17:05.189Z",
+      "customerName": "Customer 16",
+      "customerPhone": "0300-1234567",
+      "address": "Street 16",
+      "items": [
+        {
+          "id": 1,
+          "name": "Peshawari Charsi Mutton Karahi",
+          "price": 2850,
+          "qty": 1,
+          "image": "https://images.unsplash.com/photo-1585937421612-70a008356fbe?auto=format&fit=crop&w=600&q=80"
+        }
+      ],
+      "subtotal": 2850,
+      "deliveryFee": 0,
+      "discount": 0,
+      "total": 2850,
+      "spiceLevel": "Chatpata Desi",
+      "status": "preparing",
+      "paymentMethod": "cod",
+      "paymentStatus": "pending",
+      "estimatedDeliveryMins": 28
+    },
+    {
+      "id": "PK-7490",
+      "createdAt": "2026-11-14T11:17:05.181Z",
+      "customerName": "Customer 15",
+      "customerPhone": "0300-1234567",
+      "address": "Street 15",
+      "items": [
+        {
+          "id": 1,
+          "name": "Peshawari Charsi Mutton Karahi",
+          "price": 2850,
+          "qty": 1,
+          "image": "https://images.unsplash.com/photo-1585937421612-70a008356fbe?auto=format&fit=crop&w=600&q=80"
+        }
+      ],
+      "subtotal": 2850,
+      "deliveryFee": 0,
+      "discount": 0,
+      "total": 2850,
+      "spiceLevel": "Chatpata Desi",
+      "status": "preparing",
+      "paymentMethod": "cod",
+      "paymentStatus": "pending",
+      "estimatedDeliveryMins": 28
+    },
+    {
+      "id": "PK-7489",
+      "createdAt": "2026-11-14T11:17:05.174Z",
+      "customerName": "Customer 14",
+      "customerPhone": "0300-1234567",
+      "address": "Street 14",
+      "items": [
+        {
+          "id": 1,
+          "name": "Peshawari Charsi Mutton Karahi",
+          "price": 2850,
+          "qty": 1,
+          "image": "https://images.unsplash.com/photo-1585937421612-70a008356fbe?auto=format&fit=crop&w=600&q=80"
+        }
+      ],
+      "subtotal": 2850,
+      "deliveryFee": 0,
+      "discount": 0,
+      "total": 2850,
+      "spiceLevel": "Chatpata Desi",
+      "status": "preparing",
+      "paymentMethod": "cod",
+      "paymentStatus": "pending",
+      "estimatedDeliveryMins": 28
+    },
+    {
+      "id": "PK-7488",
+      "createdAt": "2026-11-14T11:17:05.163Z",
+      "customerName": "Customer 13",
+      "customerPhone": "0300-1234567",
+      "address": "Street 13",
+      "items": [
+        {
+          "id": 1,
+          "name": "Peshawari Charsi Mutton Karahi",
+          "price": 2850,
+          "qty": 1,
+          "image": "https://images.unsplash.com/photo-1585937421612-70a008356fbe?auto=format&fit=crop&w=600&q=80"
+        }
+      ],
+      "subtotal": 2850,
+      "deliveryFee": 0,
+      "discount": 0,
+      "total": 2850,
+      "spiceLevel": "Chatpata Desi",
+      "status": "preparing",
+      "paymentMethod": "cod",
+      "paymentStatus": "pending",
+      "estimatedDeliveryMins": 28
+    },
+    {
+      "id": "PK-7487",
+      "createdAt": "2026-11-14T11:17:05.149Z",
+      "customerName": "Customer 12",
+      "customerPhone": "0300-1234567",
+      "address": "Street 12",
+      "items": [
+        {
+          "id": 1,
+          "name": "Peshawari Charsi Mutton Karahi",
+          "price": 2850,
+          "qty": 1,
+          "image": "https://images.unsplash.com/photo-1585937421612-70a008356fbe?auto=format&fit=crop&w=600&q=80"
+        }
+      ],
+      "subtotal": 2850,
+      "deliveryFee": 0,
+      "discount": 0,
+      "total": 2850,
+      "spiceLevel": "Chatpata Desi",
+      "status": "preparing",
+      "paymentMethod": "cod",
+      "paymentStatus": "pending",
+      "estimatedDeliveryMins": 28
+    },
+    {
+      "id": "PK-7486",
+      "createdAt": "2026-11-14T11:17:05.141Z",
+      "customerName": "Customer 11",
+      "customerPhone": "0300-1234567",
+      "address": "Street 11",
+      "items": [
+        {
+          "id": 1,
+          "name": "Peshawari Charsi Mutton Karahi",
+          "price": 2850,
+          "qty": 1,
+          "image": "https://images.unsplash.com/photo-1585937421612-70a008356fbe?auto=format&fit=crop&w=600&q=80"
+        }
+      ],
+      "subtotal": 2850,
+      "deliveryFee": 0,
+      "discount": 0,
+      "total": 2850,
+      "spiceLevel": "Chatpata Desi",
+      "status": "preparing",
+      "paymentMethod": "cod",
+      "paymentStatus": "pending",
+      "estimatedDeliveryMins": 28
+    },
+    {
+      "id": "PK-7485",
+      "createdAt": "2026-11-14T11:17:05.131Z",
+      "customerName": "Customer 10",
+      "customerPhone": "0300-1234567",
+      "address": "Street 10",
+      "items": [
+        {
+          "id": 1,
+          "name": "Peshawari Charsi Mutton Karahi",
+          "price": 2850,
+          "qty": 1,
+          "image": "https://images.unsplash.com/photo-1585937421612-70a008356fbe?auto=format&fit=crop&w=600&q=80"
+        }
+      ],
+      "subtotal": 2850,
+      "deliveryFee": 0,
+      "discount": 0,
+      "total": 2850,
+      "spiceLevel": "Chatpata Desi",
+      "status": "preparing",
+      "paymentMethod": "cod",
+      "paymentStatus": "pending",
+      "estimatedDeliveryMins": 28
+    },
+    {
+      "id": "PK-7484",
+      "createdAt": "2026-11-14T11:17:05.122Z",
+      "customerName": "Customer 9",
+      "customerPhone": "0300-1234567",
+      "address": "Street 9",
+      "items": [
+        {
+          "id": 1,
+          "name": "Peshawari Charsi Mutton Karahi",
+          "price": 2850,
+          "qty": 1,
+          "image": "https://images.unsplash.com/photo-1585937421612-70a008356fbe?auto=format&fit=crop&w=600&q=80"
+        }
+      ],
+      "subtotal": 2850,
+      "deliveryFee": 0,
+      "discount": 0,
+      "total": 2850,
+      "spiceLevel": "Chatpata Desi",
+      "status": "preparing",
+      "paymentMethod": "cod",
+      "paymentStatus": "pending",
+      "estimatedDeliveryMins": 28
+    },
+    {
+      "id": "PK-7483",
+      "createdAt": "2026-11-14T11:17:05.115Z",
+      "customerName": "Customer 8",
+      "customerPhone": "0300-1234567",
+      "address": "Street 8",
+      "items": [
+        {
+          "id": 1,
+          "name": "Peshawari Charsi Mutton Karahi",
+          "price": 2850,
+          "qty": 1,
+          "image": "https://images.unsplash.com/photo-1585937421612-70a008356fbe?auto=format&fit=crop&w=600&q=80"
+        }
+      ],
+      "subtotal": 2850,
+      "deliveryFee": 0,
+      "discount": 0,
+      "total": 2850,
+      "spiceLevel": "Chatpata Desi",
+      "status": "preparing",
+      "paymentMethod": "cod",
+      "paymentStatus": "pending",
+      "estimatedDeliveryMins": 28
+    },
+    {
+      "id": "PK-7482",
+      "createdAt": "2026-11-14T11:17:05.106Z",
+      "customerName": "Customer 7",
+      "customerPhone": "0300-1234567",
+      "address": "Street 7",
+      "items": [
+        {
+          "id": 1,
+          "name": "Peshawari Charsi Mutton Karahi",
+          "price": 2850,
+          "qty": 1,
+          "image": "https://images.unsplash.com/photo-1585937421612-70a008356fbe?auto=format&fit=crop&w=600&q=80"
+        }
+      ],
+      "subtotal": 2850,
+      "deliveryFee": 0,
+      "discount": 0,
+      "total": 2850,
+      "spiceLevel": "Chatpata Desi",
+      "status": "preparing",
+      "paymentMethod": "cod",
+      "paymentStatus": "pending",
+      "estimatedDeliveryMins": 28
+    },
+    {
+      "id": "PK-7481",
+      "createdAt": "2026-11-14T11:17:05.097Z",
+      "customerName": "Customer 6",
+      "customerPhone": "0300-1234567",
+      "address": "Street 6",
+      "items": [
+        {
+          "id": 1,
+          "name": "Peshawari Charsi Mutton Karahi",
+          "price": 2850,
+          "qty": 1,
+          "image": "https://images.unsplash.com/photo-1585937421612-70a008356fbe?auto=format&fit=crop&w=600&q=80"
+        }
+      ],
+      "subtotal": 2850,
+      "deliveryFee": 0,
+      "discount": 0,
+      "total": 2850,
+      "spiceLevel": "Chatpata Desi",
+      "status": "preparing",
+      "paymentMethod": "cod",
+      "paymentStatus": "pending",
+      "estimatedDeliveryMins": 28
+    },
+    {
+      "id": "PK-7480",
+      "createdAt": "2026-11-14T11:17:05.090Z",
+      "customerName": "Customer 5",
+      "customerPhone": "0300-1234567",
+      "address": "Street 5",
+      "items": [
+        {
+          "id": 1,
+          "name": "Peshawari Charsi Mutton Karahi",
+          "price": 2850,
+          "qty": 1,
+          "image": "https://images.unsplash.com/photo-1585937421612-70a008356fbe?auto=format&fit=crop&w=600&q=80"
+        }
+      ],
+      "subtotal": 2850,
+      "deliveryFee": 0,
+      "discount": 0,
+      "total": 2850,
+      "spiceLevel": "Chatpata Desi",
+      "status": "preparing",
+      "paymentMethod": "cod",
+      "paymentStatus": "pending",
+      "estimatedDeliveryMins": 28
+    },
+    {
+      "id": "PK-7479",
+      "createdAt": "2026-11-14T11:17:05.078Z",
+      "customerName": "Customer 4",
+      "customerPhone": "0300-1234567",
+      "address": "Street 4",
+      "items": [
+        {
+          "id": 1,
+          "name": "Peshawari Charsi Mutton Karahi",
+          "price": 2850,
+          "qty": 1,
+          "image": "https://images.unsplash.com/photo-1585937421612-70a008356fbe?auto=format&fit=crop&w=600&q=80"
+        }
+      ],
+      "subtotal": 2850,
+      "deliveryFee": 0,
+      "discount": 0,
+      "total": 2850,
+      "spiceLevel": "Chatpata Desi",
+      "status": "preparing",
+      "paymentMethod": "cod",
+      "paymentStatus": "pending",
+      "estimatedDeliveryMins": 28
+    },
+    {
+      "id": "PK-7478",
+      "createdAt": "2026-11-14T11:17:05.069Z",
+      "customerName": "Customer 3",
+      "customerPhone": "0300-1234567",
+      "address": "Street 3",
+      "items": [
+        {
+          "id": 1,
+          "name": "Peshawari Charsi Mutton Karahi",
+          "price": 2850,
+          "qty": 1,
+          "image": "https://images.unsplash.com/photo-1585937421612-70a008356fbe?auto=format&fit=crop&w=600&q=80"
+        }
+      ],
+      "subtotal": 2850,
+      "deliveryFee": 0,
+      "discount": 0,
+      "total": 2850,
+      "spiceLevel": "Chatpata Desi",
+      "status": "preparing",
+      "paymentMethod": "cod",
+      "paymentStatus": "pending",
+      "estimatedDeliveryMins": 28
+    },
+    {
+      "id": "PK-7477",
+      "createdAt": "2026-11-14T11:17:05.058Z",
+      "customerName": "Customer 2",
+      "customerPhone": "0300-1234567",
+      "address": "Street 2",
+      "items": [
+        {
+          "id": 1,
+          "name": "Peshawari Charsi Mutton Karahi",
+          "price": 2850,
+          "qty": 1,
+          "image": "https://images.unsplash.com/photo-1585937421612-70a008356fbe?auto=format&fit=crop&w=600&q=80"
+        }
+      ],
+      "subtotal": 2850,
+      "deliveryFee": 0,
+      "discount": 0,
+      "total": 2850,
+      "spiceLevel": "Chatpata Desi",
+      "status": "preparing",
+      "paymentMethod": "cod",
+      "paymentStatus": "pending",
+      "estimatedDeliveryMins": 28
+    },
+    {
+      "id": "PK-7476",
+      "createdAt": "2026-11-14T11:17:05.028Z",
+      "customerName": "Customer 1",
+      "customerPhone": "0300-1234567",
+      "address": "Street 1",
+      "items": [
+        {
+          "id": 1,
+          "name": "Peshawari Charsi Mutton Karahi",
+          "price": 2850,
+          "qty": 1,
+          "image": "https://images.unsplash.com/photo-1585937421612-70a008356fbe?auto=format&fit=crop&w=600&q=80"
+        }
+      ],
+      "subtotal": 2850,
+      "deliveryFee": 0,
+      "discount": 0,
+      "total": 2850,
+      "spiceLevel": "Chatpata Desi",
+      "status": "preparing",
+      "paymentMethod": "cod",
+      "paymentStatus": "pending",
+      "estimatedDeliveryMins": 28
+    },
+    {
+      "id": "PK-7475",
+      "createdAt": "2026-11-14T11:13:30.638Z",
+      "customerName": "Customer 20",
+      "customerPhone": "0300-1234567",
+      "address": "Street 20",
+      "items": [
+        {
+          "id": 1,
+          "name": "Peshawari Charsi Mutton Karahi",
+          "price": 2850,
+          "qty": 1,
+          "image": "https://images.unsplash.com/photo-1585937421612-70a008356fbe?auto=format&fit=crop&w=600&q=80"
+        }
+      ],
+      "subtotal": 2850,
+      "deliveryFee": 0,
+      "discount": 0,
+      "total": 2850,
+      "spiceLevel": "Chatpata Desi",
+      "status": "preparing",
+      "paymentMethod": "cod",
+      "paymentStatus": "pending",
+      "estimatedDeliveryMins": 28
+    },
+    {
+      "id": "PK-7474",
+      "createdAt": "2026-11-14T11:13:30.631Z",
+      "customerName": "Customer 19",
+      "customerPhone": "0300-1234567",
+      "address": "Street 19",
+      "items": [
+        {
+          "id": 1,
+          "name": "Peshawari Charsi Mutton Karahi",
+          "price": 2850,
+          "qty": 1,
+          "image": "https://images.unsplash.com/photo-1585937421612-70a008356fbe?auto=format&fit=crop&w=600&q=80"
+        }
+      ],
+      "subtotal": 2850,
+      "deliveryFee": 0,
+      "discount": 0,
+      "total": 2850,
+      "spiceLevel": "Chatpata Desi",
+      "status": "preparing",
+      "paymentMethod": "cod",
+      "paymentStatus": "pending",
+      "estimatedDeliveryMins": 28
+    },
+    {
+      "id": "PK-7473",
+      "createdAt": "2026-11-14T11:13:30.621Z",
+      "customerName": "Customer 18",
+      "customerPhone": "0300-1234567",
+      "address": "Street 18",
+      "items": [
+        {
+          "id": 1,
+          "name": "Peshawari Charsi Mutton Karahi",
+          "price": 2850,
+          "qty": 1,
+          "image": "https://images.unsplash.com/photo-1585937421612-70a008356fbe?auto=format&fit=crop&w=600&q=80"
+        }
+      ],
+      "subtotal": 2850,
+      "deliveryFee": 0,
+      "discount": 0,
+      "total": 2850,
+      "spiceLevel": "Chatpata Desi",
+      "status": "preparing",
+      "paymentMethod": "cod",
+      "paymentStatus": "pending",
+      "estimatedDeliveryMins": 28
+    },
+    {
+      "id": "PK-7472",
+      "createdAt": "2026-11-14T11:13:30.615Z",
+      "customerName": "Customer 17",
+      "customerPhone": "0300-1234567",
+      "address": "Street 17",
+      "items": [
+        {
+          "id": 1,
+          "name": "Peshawari Charsi Mutton Karahi",
+          "price": 2850,
+          "qty": 1,
+          "image": "https://images.unsplash.com/photo-1585937421612-70a008356fbe?auto=format&fit=crop&w=600&q=80"
+        }
+      ],
+      "subtotal": 2850,
+      "deliveryFee": 0,
+      "discount": 0,
+      "total": 2850,
+      "spiceLevel": "Chatpata Desi",
+      "status": "preparing",
+      "paymentMethod": "cod",
+      "paymentStatus": "pending",
+      "estimatedDeliveryMins": 28
+    },
+    {
+      "id": "PK-7471",
+      "createdAt": "2026-11-14T11:13:30.606Z",
+      "customerName": "Customer 16",
+      "customerPhone": "0300-1234567",
+      "address": "Street 16",
+      "items": [
+        {
+          "id": 1,
+          "name": "Peshawari Charsi Mutton Karahi",
+          "price": 2850,
+          "qty": 1,
+          "image": "https://images.unsplash.com/photo-1585937421612-70a008356fbe?auto=format&fit=crop&w=600&q=80"
+        }
+      ],
+      "subtotal": 2850,
+      "deliveryFee": 0,
+      "discount": 0,
+      "total": 2850,
+      "spiceLevel": "Chatpata Desi",
+      "status": "preparing",
+      "paymentMethod": "cod",
+      "paymentStatus": "pending",
+      "estimatedDeliveryMins": 28
+    },
+    {
+      "id": "PK-7470",
+      "createdAt": "2026-11-14T11:13:30.599Z",
+      "customerName": "Customer 15",
+      "customerPhone": "0300-1234567",
+      "address": "Street 15",
+      "items": [
+        {
+          "id": 1,
+          "name": "Peshawari Charsi Mutton Karahi",
+          "price": 2850,
+          "qty": 1,
+          "image": "https://images.unsplash.com/photo-1585937421612-70a008356fbe?auto=format&fit=crop&w=600&q=80"
+        }
+      ],
+      "subtotal": 2850,
+      "deliveryFee": 0,
+      "discount": 0,
+      "total": 2850,
+      "spiceLevel": "Chatpata Desi",
+      "status": "preparing",
+      "paymentMethod": "cod",
+      "paymentStatus": "pending",
+      "estimatedDeliveryMins": 28
+    },
+    {
+      "id": "PK-7469",
+      "createdAt": "2026-11-14T11:13:30.591Z",
+      "customerName": "Customer 14",
+      "customerPhone": "0300-1234567",
+      "address": "Street 14",
+      "items": [
+        {
+          "id": 1,
+          "name": "Peshawari Charsi Mutton Karahi",
+          "price": 2850,
+          "qty": 1,
+          "image": "https://images.unsplash.com/photo-1585937421612-70a008356fbe?auto=format&fit=crop&w=600&q=80"
+        }
+      ],
+      "subtotal": 2850,
+      "deliveryFee": 0,
+      "discount": 0,
+      "total": 2850,
+      "spiceLevel": "Chatpata Desi",
+      "status": "preparing",
+      "paymentMethod": "cod",
+      "paymentStatus": "pending",
+      "estimatedDeliveryMins": 28
+    },
+    {
+      "id": "PK-7468",
+      "createdAt": "2026-11-14T11:13:30.584Z",
+      "customerName": "Customer 13",
+      "customerPhone": "0300-1234567",
+      "address": "Street 13",
+      "items": [
+        {
+          "id": 1,
+          "name": "Peshawari Charsi Mutton Karahi",
+          "price": 2850,
+          "qty": 1,
+          "image": "https://images.unsplash.com/photo-1585937421612-70a008356fbe?auto=format&fit=crop&w=600&q=80"
+        }
+      ],
+      "subtotal": 2850,
+      "deliveryFee": 0,
+      "discount": 0,
+      "total": 2850,
+      "spiceLevel": "Chatpata Desi",
+      "status": "preparing",
+      "paymentMethod": "cod",
+      "paymentStatus": "pending",
+      "estimatedDeliveryMins": 28
+    },
+    {
+      "id": "PK-7467",
+      "createdAt": "2026-11-14T11:13:30.576Z",
+      "customerName": "Customer 12",
+      "customerPhone": "0300-1234567",
+      "address": "Street 12",
+      "items": [
+        {
+          "id": 1,
+          "name": "Peshawari Charsi Mutton Karahi",
+          "price": 2850,
+          "qty": 1,
+          "image": "https://images.unsplash.com/photo-1585937421612-70a008356fbe?auto=format&fit=crop&w=600&q=80"
+        }
+      ],
+      "subtotal": 2850,
+      "deliveryFee": 0,
+      "discount": 0,
+      "total": 2850,
+      "spiceLevel": "Chatpata Desi",
+      "status": "preparing",
+      "paymentMethod": "cod",
+      "paymentStatus": "pending",
+      "estimatedDeliveryMins": 28
+    },
+    {
+      "id": "PK-7466",
+      "createdAt": "2026-11-14T11:13:30.569Z",
+      "customerName": "Customer 11",
+      "customerPhone": "0300-1234567",
+      "address": "Street 11",
+      "items": [
+        {
+          "id": 1,
+          "name": "Peshawari Charsi Mutton Karahi",
+          "price": 2850,
+          "qty": 1,
+          "image": "https://images.unsplash.com/photo-1585937421612-70a008356fbe?auto=format&fit=crop&w=600&q=80"
+        }
+      ],
+      "subtotal": 2850,
+      "deliveryFee": 0,
+      "discount": 0,
+      "total": 2850,
+      "spiceLevel": "Chatpata Desi",
+      "status": "preparing",
+      "paymentMethod": "cod",
+      "paymentStatus": "pending",
+      "estimatedDeliveryMins": 28
+    },
+    {
+      "id": "PK-7465",
+      "createdAt": "2026-11-14T11:13:30.563Z",
+      "customerName": "Customer 10",
+      "customerPhone": "0300-1234567",
+      "address": "Street 10",
+      "items": [
+        {
+          "id": 1,
+          "name": "Peshawari Charsi Mutton Karahi",
+          "price": 2850,
+          "qty": 1,
+          "image": "https://images.unsplash.com/photo-1585937421612-70a008356fbe?auto=format&fit=crop&w=600&q=80"
+        }
+      ],
+      "subtotal": 2850,
+      "deliveryFee": 0,
+      "discount": 0,
+      "total": 2850,
+      "spiceLevel": "Chatpata Desi",
+      "status": "preparing",
+      "paymentMethod": "cod",
+      "paymentStatus": "pending",
+      "estimatedDeliveryMins": 28
+    },
+    {
+      "id": "PK-7464",
+      "createdAt": "2026-11-14T11:13:30.555Z",
+      "customerName": "Customer 9",
+      "customerPhone": "0300-1234567",
+      "address": "Street 9",
+      "items": [
+        {
+          "id": 1,
+          "name": "Peshawari Charsi Mutton Karahi",
+          "price": 2850,
+          "qty": 1,
+          "image": "https://images.unsplash.com/photo-1585937421612-70a008356fbe?auto=format&fit=crop&w=600&q=80"
+        }
+      ],
+      "subtotal": 2850,
+      "deliveryFee": 0,
+      "discount": 0,
+      "total": 2850,
+      "spiceLevel": "Chatpata Desi",
+      "status": "preparing",
+      "paymentMethod": "cod",
+      "paymentStatus": "pending",
+      "estimatedDeliveryMins": 28
+    },
+    {
+      "id": "PK-7463",
+      "createdAt": "2026-11-14T11:13:30.547Z",
+      "customerName": "Customer 8",
+      "customerPhone": "0300-1234567",
+      "address": "Street 8",
+      "items": [
+        {
+          "id": 1,
+          "name": "Peshawari Charsi Mutton Karahi",
+          "price": 2850,
+          "qty": 1,
+          "image": "https://images.unsplash.com/photo-1585937421612-70a008356fbe?auto=format&fit=crop&w=600&q=80"
+        }
+      ],
+      "subtotal": 2850,
+      "deliveryFee": 0,
+      "discount": 0,
+      "total": 2850,
+      "spiceLevel": "Chatpata Desi",
+      "status": "preparing",
+      "paymentMethod": "cod",
+      "paymentStatus": "pending",
+      "estimatedDeliveryMins": 28
+    },
+    {
+      "id": "PK-7462",
+      "createdAt": "2026-11-14T11:13:30.536Z",
+      "customerName": "Customer 7",
+      "customerPhone": "0300-1234567",
+      "address": "Street 7",
+      "items": [
+        {
+          "id": 1,
+          "name": "Peshawari Charsi Mutton Karahi",
+          "price": 2850,
+          "qty": 1,
+          "image": "https://images.unsplash.com/photo-1585937421612-70a008356fbe?auto=format&fit=crop&w=600&q=80"
+        }
+      ],
+      "subtotal": 2850,
+      "deliveryFee": 0,
+      "discount": 0,
+      "total": 2850,
+      "spiceLevel": "Chatpata Desi",
+      "status": "preparing",
+      "paymentMethod": "cod",
+      "paymentStatus": "pending",
+      "estimatedDeliveryMins": 28
+    },
+    {
+      "id": "PK-7461",
+      "createdAt": "2026-11-14T11:13:30.528Z",
+      "customerName": "Customer 6",
+      "customerPhone": "0300-1234567",
+      "address": "Street 6",
+      "items": [
+        {
+          "id": 1,
+          "name": "Peshawari Charsi Mutton Karahi",
+          "price": 2850,
+          "qty": 1,
+          "image": "https://images.unsplash.com/photo-1585937421612-70a008356fbe?auto=format&fit=crop&w=600&q=80"
+        }
+      ],
+      "subtotal": 2850,
+      "deliveryFee": 0,
+      "discount": 0,
+      "total": 2850,
+      "spiceLevel": "Chatpata Desi",
+      "status": "preparing",
+      "paymentMethod": "cod",
+      "paymentStatus": "pending",
+      "estimatedDeliveryMins": 28
+    },
+    {
+      "id": "PK-7460",
+      "createdAt": "2026-11-14T11:13:30.502Z",
+      "customerName": "Customer 5",
+      "customerPhone": "0300-1234567",
+      "address": "Street 5",
+      "items": [
+        {
+          "id": 1,
+          "name": "Peshawari Charsi Mutton Karahi",
+          "price": 2850,
+          "qty": 1,
+          "image": "https://images.unsplash.com/photo-1585937421612-70a008356fbe?auto=format&fit=crop&w=600&q=80"
+        }
+      ],
+      "subtotal": 2850,
+      "deliveryFee": 0,
+      "discount": 0,
+      "total": 2850,
+      "spiceLevel": "Chatpata Desi",
+      "status": "preparing",
+      "paymentMethod": "cod",
+      "paymentStatus": "pending",
+      "estimatedDeliveryMins": 28
+    },
+    {
+      "id": "PK-7459",
+      "createdAt": "2026-11-14T11:13:30.489Z",
+      "customerName": "Customer 4",
+      "customerPhone": "0300-1234567",
+      "address": "Street 4",
+      "items": [
+        {
+          "id": 1,
+          "name": "Peshawari Charsi Mutton Karahi",
+          "price": 2850,
+          "qty": 1,
+          "image": "https://images.unsplash.com/photo-1585937421612-70a008356fbe?auto=format&fit=crop&w=600&q=80"
+        }
+      ],
+      "subtotal": 2850,
+      "deliveryFee": 0,
+      "discount": 0,
+      "total": 2850,
+      "spiceLevel": "Chatpata Desi",
+      "status": "preparing",
+      "paymentMethod": "cod",
+      "paymentStatus": "pending",
+      "estimatedDeliveryMins": 28
+    },
+    {
+      "id": "PK-7458",
+      "createdAt": "2026-11-14T11:13:30.480Z",
+      "customerName": "Customer 3",
+      "customerPhone": "0300-1234567",
+      "address": "Street 3",
+      "items": [
+        {
+          "id": 1,
+          "name": "Peshawari Charsi Mutton Karahi",
+          "price": 2850,
+          "qty": 1,
+          "image": "https://images.unsplash.com/photo-1585937421612-70a008356fbe?auto=format&fit=crop&w=600&q=80"
+        }
+      ],
+      "subtotal": 2850,
+      "deliveryFee": 0,
+      "discount": 0,
+      "total": 2850,
+      "spiceLevel": "Chatpata Desi",
+      "status": "preparing",
+      "paymentMethod": "cod",
+      "paymentStatus": "pending",
+      "estimatedDeliveryMins": 28
+    },
+    {
+      "id": "PK-7457",
+      "createdAt": "2026-11-14T11:13:30.469Z",
+      "customerName": "Customer 2",
+      "customerPhone": "0300-1234567",
+      "address": "Street 2",
+      "items": [
+        {
+          "id": 1,
+          "name": "Peshawari Charsi Mutton Karahi",
+          "price": 2850,
+          "qty": 1,
+          "image": "https://images.unsplash.com/photo-1585937421612-70a008356fbe?auto=format&fit=crop&w=600&q=80"
+        }
+      ],
+      "subtotal": 2850,
+      "deliveryFee": 0,
+      "discount": 0,
+      "total": 2850,
+      "spiceLevel": "Chatpata Desi",
+      "status": "preparing",
+      "paymentMethod": "cod",
+      "paymentStatus": "pending",
+      "estimatedDeliveryMins": 28
+    },
+    {
+      "id": "PK-7456",
+      "createdAt": "2026-11-14T11:13:30.441Z",
+      "customerName": "Customer 1",
+      "customerPhone": "0300-1234567",
+      "address": "Street 1",
+      "items": [
+        {
+          "id": 1,
+          "name": "Peshawari Charsi Mutton Karahi",
+          "price": 2850,
+          "qty": 1,
+          "image": "https://images.unsplash.com/photo-1585937421612-70a008356fbe?auto=format&fit=crop&w=600&q=80"
+        }
+      ],
+      "subtotal": 2850,
+      "deliveryFee": 0,
+      "discount": 0,
+      "total": 2850,
+      "spiceLevel": "Chatpata Desi",
+      "status": "preparing",
+      "paymentMethod": "cod",
+      "paymentStatus": "pending",
+      "estimatedDeliveryMins": 28
+    },
+    {
+      "id": "PK-7455",
+      "createdAt": "2026-11-14T10:54:52.819Z",
+      "customerName": "Customer 20",
+      "customerPhone": "0300-1112239",
+      "address": "Test Sector 20",
+      "items": [
+        {
+          "id": 1,
+          "name": "Chicken Karahi",
+          "price": 1550,
+          "qty": 1,
+          "image": "test.jpg"
+        }
+      ],
+      "subtotal": 1550,
+      "deliveryFee": 0,
+      "discount": 0,
+      "total": 1550,
+      "spiceLevel": "Chatpata Desi",
+      "status": "preparing",
+      "estimatedDeliveryMins": 28
+    },
+    {
+      "id": "PK-7454",
+      "createdAt": "2026-11-14T10:54:52.811Z",
+      "customerName": "Customer 19",
+      "customerPhone": "0300-1112238",
+      "address": "Test Sector 19",
+      "items": [
+        {
+          "id": 1,
+          "name": "Chicken Karahi",
+          "price": 1550,
+          "qty": 1,
+          "image": "test.jpg"
+        }
+      ],
+      "subtotal": 1550,
+      "deliveryFee": 0,
+      "discount": 0,
+      "total": 1550,
+      "spiceLevel": "Chatpata Desi",
+      "status": "preparing",
+      "estimatedDeliveryMins": 28
+    },
+    {
+      "id": "PK-7453",
+      "createdAt": "2026-11-14T10:54:52.807Z",
+      "customerName": "Customer 18",
+      "customerPhone": "0300-1112237",
+      "address": "Test Sector 18",
+      "items": [
+        {
+          "id": 1,
+          "name": "Chicken Karahi",
+          "price": 1550,
+          "qty": 1,
+          "image": "test.jpg"
+        }
+      ],
+      "subtotal": 1550,
+      "deliveryFee": 0,
+      "discount": 0,
+      "total": 1550,
+      "spiceLevel": "Chatpata Desi",
+      "status": "preparing",
+      "estimatedDeliveryMins": 28
+    },
+    {
+      "id": "PK-7452",
+      "createdAt": "2026-11-14T10:54:52.803Z",
+      "customerName": "Customer 17",
+      "customerPhone": "0300-1112236",
+      "address": "Test Sector 17",
+      "items": [
+        {
+          "id": 1,
+          "name": "Chicken Karahi",
+          "price": 1550,
+          "qty": 1,
+          "image": "test.jpg"
+        }
+      ],
+      "subtotal": 1550,
+      "deliveryFee": 0,
+      "discount": 0,
+      "total": 1550,
+      "spiceLevel": "Chatpata Desi",
+      "status": "preparing",
+      "estimatedDeliveryMins": 28
+    },
+    {
+      "id": "PK-7451",
+      "createdAt": "2026-11-14T10:54:52.800Z",
+      "customerName": "Customer 16",
+      "customerPhone": "0300-1112235",
+      "address": "Test Sector 16",
+      "items": [
+        {
+          "id": 1,
+          "name": "Chicken Karahi",
+          "price": 1550,
+          "qty": 1,
+          "image": "test.jpg"
+        }
+      ],
+      "subtotal": 1550,
+      "deliveryFee": 0,
+      "discount": 0,
+      "total": 1550,
+      "spiceLevel": "Chatpata Desi",
+      "status": "preparing",
+      "estimatedDeliveryMins": 28
+    },
+    {
+      "id": "PK-7450",
+      "createdAt": "2026-11-14T10:54:52.792Z",
+      "customerName": "Customer 15",
+      "customerPhone": "0300-1112234",
+      "address": "Test Sector 15",
+      "items": [
+        {
+          "id": 1,
+          "name": "Chicken Karahi",
+          "price": 1550,
+          "qty": 1,
+          "image": "test.jpg"
+        }
+      ],
+      "subtotal": 1550,
+      "deliveryFee": 0,
+      "discount": 0,
+      "total": 1550,
+      "spiceLevel": "Chatpata Desi",
+      "status": "preparing",
+      "estimatedDeliveryMins": 28
+    },
+    {
+      "id": "PK-7449",
+      "createdAt": "2026-11-14T10:54:52.788Z",
+      "customerName": "Customer 14",
+      "customerPhone": "0300-1112233",
+      "address": "Test Sector 14",
+      "items": [
+        {
+          "id": 1,
+          "name": "Chicken Karahi",
+          "price": 1550,
+          "qty": 1,
+          "image": "test.jpg"
+        }
+      ],
+      "subtotal": 1550,
+      "deliveryFee": 0,
+      "discount": 0,
+      "total": 1550,
+      "spiceLevel": "Chatpata Desi",
+      "status": "preparing",
+      "estimatedDeliveryMins": 28
+    },
+    {
+      "id": "PK-7448",
+      "createdAt": "2026-11-14T10:54:52.784Z",
+      "customerName": "Customer 13",
+      "customerPhone": "0300-1112232",
+      "address": "Test Sector 13",
+      "items": [
+        {
+          "id": 1,
+          "name": "Chicken Karahi",
+          "price": 1550,
+          "qty": 1,
+          "image": "test.jpg"
+        }
+      ],
+      "subtotal": 1550,
+      "deliveryFee": 0,
+      "discount": 0,
+      "total": 1550,
+      "spiceLevel": "Chatpata Desi",
+      "status": "preparing",
+      "estimatedDeliveryMins": 28
+    },
+    {
+      "id": "PK-7447",
+      "createdAt": "2026-11-14T10:54:52.775Z",
+      "customerName": "Customer 12",
+      "customerPhone": "0300-1112231",
+      "address": "Test Sector 12",
+      "items": [
+        {
+          "id": 1,
+          "name": "Chicken Karahi",
+          "price": 1550,
+          "qty": 1,
+          "image": "test.jpg"
+        }
+      ],
+      "subtotal": 1550,
+      "deliveryFee": 0,
+      "discount": 0,
+      "total": 1550,
+      "spiceLevel": "Chatpata Desi",
+      "status": "preparing",
+      "estimatedDeliveryMins": 28
+    },
+    {
+      "id": "PK-7446",
+      "createdAt": "2026-11-14T10:54:52.771Z",
+      "customerName": "Customer 11",
+      "customerPhone": "0300-1112230",
+      "address": "Test Sector 11",
+      "items": [
+        {
+          "id": 1,
+          "name": "Chicken Karahi",
+          "price": 1550,
+          "qty": 1,
+          "image": "test.jpg"
+        }
+      ],
+      "subtotal": 1550,
+      "deliveryFee": 0,
+      "discount": 0,
+      "total": 1550,
+      "spiceLevel": "Chatpata Desi",
+      "status": "preparing",
+      "estimatedDeliveryMins": 28
+    },
+    {
+      "id": "PK-7445",
+      "createdAt": "2026-11-14T10:54:52.767Z",
+      "customerName": "Customer 10",
+      "customerPhone": "0300-1112239",
+      "address": "Test Sector 10",
+      "items": [
+        {
+          "id": 1,
+          "name": "Chicken Karahi",
+          "price": 1550,
+          "qty": 1,
+          "image": "test.jpg"
+        }
+      ],
+      "subtotal": 1550,
+      "deliveryFee": 0,
+      "discount": 0,
+      "total": 1550,
+      "spiceLevel": "Chatpata Desi",
+      "status": "preparing",
+      "estimatedDeliveryMins": 28
+    },
+    {
+      "id": "PK-7444",
+      "createdAt": "2026-11-14T10:54:52.763Z",
+      "customerName": "Customer 9",
+      "customerPhone": "0300-1112238",
+      "address": "Test Sector 9",
+      "items": [
+        {
+          "id": 1,
+          "name": "Chicken Karahi",
+          "price": 1550,
+          "qty": 1,
+          "image": "test.jpg"
+        }
+      ],
+      "subtotal": 1550,
+      "deliveryFee": 0,
+      "discount": 0,
+      "total": 1550,
+      "spiceLevel": "Chatpata Desi",
+      "status": "preparing",
+      "estimatedDeliveryMins": 28
+    },
+    {
+      "id": "PK-7443",
+      "createdAt": "2026-11-14T10:54:52.759Z",
+      "customerName": "Customer 8",
+      "customerPhone": "0300-1112237",
+      "address": "Test Sector 8",
+      "items": [
+        {
+          "id": 1,
+          "name": "Chicken Karahi",
+          "price": 1550,
+          "qty": 1,
+          "image": "test.jpg"
+        }
+      ],
+      "subtotal": 1550,
+      "deliveryFee": 0,
+      "discount": 0,
+      "total": 1550,
+      "spiceLevel": "Chatpata Desi",
+      "status": "preparing",
+      "estimatedDeliveryMins": 28
+    },
+    {
+      "id": "PK-7442",
+      "createdAt": "2026-11-14T10:54:52.756Z",
+      "customerName": "Customer 7",
+      "customerPhone": "0300-1112236",
+      "address": "Test Sector 7",
+      "items": [
+        {
+          "id": 1,
+          "name": "Chicken Karahi",
+          "price": 1550,
+          "qty": 1,
+          "image": "test.jpg"
+        }
+      ],
+      "subtotal": 1550,
+      "deliveryFee": 0,
+      "discount": 0,
+      "total": 1550,
+      "spiceLevel": "Chatpata Desi",
+      "status": "preparing",
+      "estimatedDeliveryMins": 28
+    },
+    {
+      "id": "PK-7441",
+      "createdAt": "2026-11-14T10:54:52.752Z",
+      "customerName": "Customer 6",
+      "customerPhone": "0300-1112235",
+      "address": "Test Sector 6",
+      "items": [
+        {
+          "id": 1,
+          "name": "Chicken Karahi",
+          "price": 1550,
+          "qty": 1,
+          "image": "test.jpg"
+        }
+      ],
+      "subtotal": 1550,
+      "deliveryFee": 0,
+      "discount": 0,
+      "total": 1550,
+      "spiceLevel": "Chatpata Desi",
+      "status": "preparing",
+      "estimatedDeliveryMins": 28
+    },
+    {
+      "id": "PK-7440",
+      "createdAt": "2026-11-14T10:54:52.749Z",
+      "customerName": "Customer 5",
+      "customerPhone": "0300-1112234",
+      "address": "Test Sector 5",
+      "items": [
+        {
+          "id": 1,
+          "name": "Chicken Karahi",
+          "price": 1550,
+          "qty": 1,
+          "image": "test.jpg"
+        }
+      ],
+      "subtotal": 1550,
+      "deliveryFee": 0,
+      "discount": 0,
+      "total": 1550,
+      "spiceLevel": "Chatpata Desi",
+      "status": "preparing",
+      "estimatedDeliveryMins": 28
+    },
+    {
+      "id": "PK-7439",
+      "createdAt": "2026-11-14T10:54:52.744Z",
+      "customerName": "Customer 4",
+      "customerPhone": "0300-1112233",
+      "address": "Test Sector 4",
+      "items": [
+        {
+          "id": 1,
+          "name": "Chicken Karahi",
+          "price": 1550,
+          "qty": 1,
+          "image": "test.jpg"
+        }
+      ],
+      "subtotal": 1550,
+      "deliveryFee": 0,
+      "discount": 0,
+      "total": 1550,
+      "spiceLevel": "Chatpata Desi",
+      "status": "preparing",
+      "estimatedDeliveryMins": 28
+    },
+    {
+      "id": "PK-7438",
+      "createdAt": "2026-11-14T10:54:52.739Z",
+      "customerName": "Customer 3",
+      "customerPhone": "0300-1112232",
+      "address": "Test Sector 3",
+      "items": [
+        {
+          "id": 1,
+          "name": "Chicken Karahi",
+          "price": 1550,
+          "qty": 1,
+          "image": "test.jpg"
+        }
+      ],
+      "subtotal": 1550,
+      "deliveryFee": 0,
+      "discount": 0,
+      "total": 1550,
+      "spiceLevel": "Chatpata Desi",
+      "status": "preparing",
+      "estimatedDeliveryMins": 28
+    },
+    {
+      "id": "PK-7437",
+      "createdAt": "2026-11-14T10:54:52.735Z",
+      "customerName": "Customer 2",
+      "customerPhone": "0300-1112231",
+      "address": "Test Sector 2",
+      "items": [
+        {
+          "id": 1,
+          "name": "Chicken Karahi",
+          "price": 1550,
+          "qty": 1,
+          "image": "test.jpg"
+        }
+      ],
+      "subtotal": 1550,
+      "deliveryFee": 0,
+      "discount": 0,
+      "total": 1550,
+      "spiceLevel": "Chatpata Desi",
+      "status": "preparing",
+      "estimatedDeliveryMins": 28
+    },
+    {
+      "id": "PK-7436",
+      "createdAt": "2026-11-14T10:54:52.723Z",
+      "customerName": "Customer 1",
+      "customerPhone": "0300-1112230",
+      "address": "Test Sector 1",
+      "items": [
+        {
+          "id": 1,
+          "name": "Chicken Karahi",
+          "price": 1550,
+          "qty": 1,
+          "image": "test.jpg"
+        }
+      ],
+      "subtotal": 1550,
+      "deliveryFee": 0,
+      "discount": 0,
+      "total": 1550,
+      "spiceLevel": "Chatpata Desi",
+      "status": "preparing",
+      "estimatedDeliveryMins": 28
+    },
+    {
       "id": "PK-2344",
       "createdAt": "2026-11-12T06:20:57.164Z",
       "customerName": "Guest Foodie",
@@ -232,6 +1692,51 @@
   ],
   "reservations": [
     {
+      "id": "DAWAT-2587",
+      "status": "confirmed",
+      "createdAt": "2026-11-14T10:54:52.848Z",
+      "name": "Guest 5",
+      "phone": "0321-5556674",
+      "guests": "2-4 Guests (Indoor Family Hall)",
+      "timeSlot": "Tomorrow — 8:00 PM"
+    },
+    {
+      "id": "DAWAT-2586",
+      "status": "confirmed",
+      "createdAt": "2026-11-14T10:54:52.843Z",
+      "name": "Guest 4",
+      "phone": "0321-5556673",
+      "guests": "2-4 Guests (Indoor Family Hall)",
+      "timeSlot": "Tomorrow — 8:00 PM"
+    },
+    {
+      "id": "DAWAT-2585",
+      "status": "confirmed",
+      "createdAt": "2026-11-14T10:54:52.839Z",
+      "name": "Guest 3",
+      "phone": "0321-5556672",
+      "guests": "2-4 Guests (Indoor Family Hall)",
+      "timeSlot": "Tomorrow — 8:00 PM"
+    },
+    {
+      "id": "DAWAT-2584",
+      "status": "confirmed",
+      "createdAt": "2026-11-14T10:54:52.832Z",
+      "name": "Guest 2",
+      "phone": "0321-5556671",
+      "guests": "2-4 Guests (Indoor Family Hall)",
+      "timeSlot": "Tomorrow — 8:00 PM"
+    },
+    {
+      "id": "DAWAT-2583",
+      "status": "confirmed",
+      "createdAt": "2026-11-14T10:54:52.825Z",
+      "name": "Guest 1",
+      "phone": "0321-5556670",
+      "guests": "2-4 Guests (Indoor Family Hall)",
+      "timeSlot": "Tomorrow — 8:00 PM"
+    },
+    {
       "id": "DAWAT-2582",
       "status": "confirmed",
       "createdAt": "2026-11-11T18:16:35.878Z",
@@ -253,13 +1758,23 @@
   "loyaltyPasses": [
     {
       "id": "SHAHI-2628",
-      "phone": "0321-7788990",
+      "phone": "03217788990",
       "name": "Hamza Malik",
       "tier": "Shahi Member",
       "bonusPkr": 1000,
       "discountPercent": 15,
       "freeItem": "Free Roghni Naan",
       "activatedAt": "2026-11-11T18:16:35.889Z"
+    },
+    {
+      "id": "SHAHI-2449",
+      "phone": "03001234567",
+      "name": "Tariq Mehmood",
+      "tier": "Shahi Member",
+      "bonusPkr": 1000,
+      "discountPercent": 15,
+      "freeItem": "Free Roghni Naan",
+      "activatedAt": "2026-11-14T10:46:57.503Z"
     }
   ],
   "settings": {
@@ -290,5 +1805,9 @@
     "role": "superadmin",
     "lastLogin": "2026-11-14T06:09:06.843Z",
     "passwordHash": "$2b$10$qI1W08SaA9WH25Agleex4uTPomz0iMHlIN7Br5jV7X75vN4zWgqfK"
+  },
+  "counters": {
+    "order": 7495,
+    "reservation": 2587
   }
 }

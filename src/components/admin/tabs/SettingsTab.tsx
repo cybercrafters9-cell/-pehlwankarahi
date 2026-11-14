@@ -1,13 +1,13 @@
 "use client";
 
-import React, { useState } from "react";
+import { useState } from "react";
 import { RestaurantSettings, api } from "@/services/api";
 import { Card } from "../ui/Card";
 import { Input } from "../ui/Input";
 import { Textarea } from "../ui/Textarea";
 import { Button } from "../ui/Button";
 import { Badge } from "../ui/Badge";
-import { Save, Plus, Trash2, Store, Phone, MapPin, Truck, ShieldCheck, KeyRound } from "lucide-react";
+import { Save, Plus, Trash2, Store, Phone, MapPin, Truck, ShieldCheck, KeyRound, Loader2 } from "lucide-react";
 
 interface SettingsTabProps {
   settings: RestaurantSettings | null;
@@ -17,35 +17,30 @@ interface SettingsTabProps {
   onShowToast?: (msg: string, type?: "success" | "error") => void;
 }
 
-export function SettingsTab({
+const DEFAULT_SETTINGS: RestaurantSettings = {
+  restaurantName: "Pehalwan Karahi & DeraGhar",
+  tagline: "Authentic Pakistani Karahi, Charcoal Bar B Q & Desi Handi",
+  phone: "0300-1234567",
+  whatsapp: "0321-9876543",
+  landline: "041-8899221",
+  email: "info@pehalwankarahi.com",
+  address: "Main Boulevard, Kohinoor City / Canal Road Rooftop, Faisalabad, Pakistan",
+  branches: ["Gulberg / Kohinoor City Branch", "Canal Road Rooftop Family Dera", "Express Takeaway Kitchen"],
+  timings: "12:00 PM – 02:00 AM Daily",
+  deliveryFee: 0,
+  minOrder: 500,
+  deliveryEstimate: "28–35 mins",
+  announcement: "🔥 Live Koyla Grill & Freshly slaughtered Halal Meat prepared in pure Desi Ghee!",
+  isLiveWokActive: true,
+};
+
+function SettingsForm({
   settings,
   onUpdateSettings,
   token,
   onShowToast,
-}: SettingsTabProps) {
-  const [prevSettings, setPrevSettings] = useState(settings);
-  const [form, setForm] = useState<RestaurantSettings>(() => settings || {
-    restaurantName: "Pehalwan Karahi & DeraGhar",
-    tagline: "Authentic Pakistani Karahi, Charcoal Bar B Q & Desi Handi",
-    phone: "0300-1234567",
-    whatsapp: "0321-9876543",
-    landline: "041-8899221",
-    email: "info@pehalwankarahi.com",
-    address: "Main Boulevard, Kohinoor City / Canal Road Rooftop, Faisalabad, Pakistan",
-    branches: ["Gulberg / Kohinoor City Branch", "Canal Road Rooftop Family Dera", "Express Takeaway Kitchen"],
-    timings: "12:00 PM – 02:00 AM Daily",
-    deliveryFee: 0,
-    minOrder: 500,
-    deliveryEstimate: "28–35 mins",
-    announcement: "🔥 Live Koyla Grill & Freshly slaughtered Halal Meat prepared in pure Desi Ghee!",
-    isLiveWokActive: true,
-  });
-
-  if (settings && settings !== prevSettings) {
-    setPrevSettings(settings);
-    setForm(settings);
-  }
-
+}: Omit<SettingsTabProps, "isLoading">) {
+  const [form, setForm] = useState<RestaurantSettings>(() => settings || DEFAULT_SETTINGS);
   const [newBranch, setNewBranch] = useState("");
   const [isSaving, setIsSaving] = useState(false);
 
@@ -355,5 +350,32 @@ export function SettingsTab({
         </form>
       </Card>
     </div>
+  );
+}
+
+export function SettingsTab({
+  settings,
+  onUpdateSettings,
+  isLoading,
+  token,
+  onShowToast,
+}: SettingsTabProps) {
+  if (isLoading && !settings) {
+    return (
+      <div className="bg-sand-50 border border-sand-200 rounded-3xl p-12 text-center">
+        <Loader2 className="w-10 h-10 animate-spin text-terracotta-500 mx-auto mb-2" />
+        <p className="font-display font-bold text-base text-charcoal-900">Loading settings...</p>
+      </div>
+    );
+  }
+
+  return (
+    <SettingsForm
+      key={settings?.restaurantName || "default-settings"}
+      settings={settings}
+      onUpdateSettings={onUpdateSettings}
+      token={token}
+      onShowToast={onShowToast}
+    />
   );
 }

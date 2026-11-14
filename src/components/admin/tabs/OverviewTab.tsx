@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import { useState } from "react";
 import { DashboardStats, OrderRecord, ReservationRecord, RestaurantSettings } from "@/services/api";
 import { StatCard } from "../ui/StatCard";
 import { Card } from "../ui/Card";

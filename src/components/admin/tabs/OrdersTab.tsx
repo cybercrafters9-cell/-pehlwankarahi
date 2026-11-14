@@ -1,10 +1,10 @@
 "use client";
 
-import React, { useState } from "react";
+import { useState } from "react";
 import Image from "next/image";
 import { OrderRecord } from "@/services/api";
 import { Badge } from "../ui/Badge";
-import { Search, Phone, Bike, Clock } from "lucide-react";
+import { Search, Phone, Bike, Clock, Loader2 } from "lucide-react";
 import { ClientDate } from "../ui/ClientDate";
 
 interface OrdersTabProps {
@@ -21,7 +21,7 @@ const statusOptions = [
   { value: "cancelled", label: "❌ Cancelled" },
 ];
 
-export function OrdersTab({ orders, onUpdateOrderStatus }: OrdersTabProps) {
+export function OrdersTab({ orders, onUpdateOrderStatus, isLoading }: OrdersTabProps) {
   const [filterStatus, setFilterStatus] = useState<string>("all");
   const [search, setSearch] = useState("");
   const [updatingId, setUpdatingId] = useState<string | null>(null);
@@ -117,7 +117,12 @@ export function OrdersTab({ orders, onUpdateOrderStatus }: OrdersTabProps) {
       </div>
 
       {/* Orders List */}
-      {filteredOrders.length === 0 ? (
+      {isLoading && orders.length === 0 ? (
+        <div className="bg-sand-50 border border-sand-200 rounded-3xl p-12 text-center">
+          <Loader2 className="w-10 h-10 animate-spin text-terracotta-500 mx-auto mb-2" />
+          <p className="font-display font-bold text-base text-charcoal-900">Loading live orders...</p>
+        </div>
+      ) : filteredOrders.length === 0 ? (
         <div className="bg-sand-50 border border-sand-200 rounded-3xl p-12 text-center">
           <Bike className="w-12 h-12 mx-auto text-charcoal-700/40 mb-2" />
           <p className="font-display font-bold text-base text-charcoal-900">No orders match this status.</p>

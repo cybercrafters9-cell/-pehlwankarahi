@@ -1,6 +1,5 @@
 "use client";
 
-import React from "react";
 import { RestaurantProvider } from "@/context/RestaurantContext";
 import Navbar from "@/components/Navbar";
 import Hero from "@/components/Hero";

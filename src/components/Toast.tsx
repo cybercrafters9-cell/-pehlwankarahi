@@ -1,6 +1,5 @@
 "use client";
 
-import React from "react";
 import { useRestaurant } from "@/context/RestaurantContext";
 
 export default function ToastContainer() {

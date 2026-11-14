@@ -1,6 +1,5 @@
 "use client";
 
-import React from "react";
 import Image from "next/image";
 import { useRestaurant } from "@/context/RestaurantContext";
 import { Plus, ArrowRight, ArrowUpRight, Flame } from "lucide-react";
@@ -56,6 +55,7 @@ export default function BentoGrid() {
             <button
               onClick={() =>
                 addToCart(
+                  6,
                   "Mutton Chops Karahi",
                   3200,
                   "https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=600&q=80"
@@ -85,6 +85,7 @@ export default function BentoGrid() {
             <button
               onClick={() =>
                 addToCart(
+                  2,
                   "Mutton Karahi",
                   2850,
                   "https://images.unsplash.com/photo-1585937421612-70a008356fbe?auto=format&fit=crop&w=600&q=80"
@@ -132,6 +133,7 @@ export default function BentoGrid() {
             <button
               onClick={() =>
                 addToCart(
+                  8,
                   "Desi Murgh Karahi",
                   2400,
                   "https://images.unsplash.com/photo-1603894584373-5ac82b2ae398?auto=format&fit=crop&w=600&q=80"
@@ -182,6 +184,7 @@ export default function BentoGrid() {
           <button
             onClick={() =>
               addToCart(
+                9,
                 "Mutton Muscles (Machli) Karahi",
                 3100,
                 "https://images.unsplash.com/photo-1585937421612-70a008356fbe?auto=format&fit=crop&w=600&q=80"
@@ -214,6 +217,7 @@ export default function BentoGrid() {
             <button
               onClick={() =>
                 addToCart(
+                  5,
                   "Boneless Chicken Karahi",
                   1750,
                   "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?auto=format&fit=crop&w=600&q=80"

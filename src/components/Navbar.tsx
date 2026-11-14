@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import { useState } from "react";
 import { useRestaurant } from "@/context/RestaurantContext";
 import { ShoppingBag, ArrowUpRight, Menu, X } from "lucide-react";
 

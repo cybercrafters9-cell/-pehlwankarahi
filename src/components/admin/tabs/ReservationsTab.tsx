@@ -1,10 +1,10 @@
 "use client";
 
-import React, { useState } from "react";
+import { useState } from "react";
 import { ReservationRecord } from "@/services/api";
 import { Badge } from "../ui/Badge";
 import { Button } from "../ui/Button";
-import { Calendar, Phone, MessageSquare, Check, X, Clock, Users } from "lucide-react";
+import { Calendar, Phone, MessageSquare, Check, X, Clock, Users, Loader2 } from "lucide-react";
 
 interface ReservationsTabProps {
   reservations: ReservationRecord[];
@@ -12,7 +12,7 @@ interface ReservationsTabProps {
   isLoading: boolean;
 }
 
-export function ReservationsTab({ reservations, onUpdateStatus }: ReservationsTabProps) {
+export function ReservationsTab({ reservations, onUpdateStatus, isLoading }: ReservationsTabProps) {
   const [filter, setFilter] = useState<string>("all");
   const [updatingId, setUpdatingId] = useState<string | null>(null);
 
@@ -73,7 +73,12 @@ export function ReservationsTab({ reservations, onUpdateStatus }: ReservationsTa
       </div>
 
       {/* Bookings List */}
-      {filtered.length === 0 ? (
+      {isLoading && reservations.length === 0 ? (
+        <div className="bg-sand-50 border border-sand-200 rounded-3xl p-12 text-center">
+          <Loader2 className="w-10 h-10 animate-spin text-terracotta-500 mx-auto mb-2" />
+          <p className="font-display font-bold text-base text-charcoal-900">Loading reservations...</p>
+        </div>
+      ) : filtered.length === 0 ? (
         <div className="bg-sand-50 border border-sand-200 rounded-3xl p-12 text-center">
           <Calendar className="w-12 h-12 mx-auto text-charcoal-700/40 mb-2" />
           <p className="font-display font-bold text-base text-charcoal-900">No reservations found.</p>

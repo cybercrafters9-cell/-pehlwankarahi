@@ -8,6 +8,8 @@ import {
   OrderRecord,
   ReservationRecord,
   RestaurantSettings,
+  isAuthExpiredError,
+  getErrorMessage,
 } from "@/services/api";
 import { Dish, menuDishes as fallbackMenu } from "@/data/menu";
 import { AdminLogin } from "@/components/admin/AdminLogin";
@@ -55,7 +57,6 @@ export default function AdminPage() {
   // Authentication State
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [sessionUser, setSessionUser] = useState<SessionUser | null>(null);
-  const [authToken, setAuthToken] = useState<string>("");
 
   // Data States
   const [stats, setStats] = useState<DashboardStats | null>(null);
@@ -75,6 +76,29 @@ export default function AdminPage() {
     }, 3500);
   };
 
+  // Logout Handler
+  const handleLogout = useCallback((isExpired: boolean | unknown = false) => {
+    setIsAuthenticated(false);
+    setSessionUser(null);
+    localStorage.removeItem("pehalwan_admin_session");
+    if (isExpired === true) {
+      showToast("Session expired", "error");
+    } else {
+      showToast("You have been signed out successfully.");
+    }
+  }, []);
+
+  const checkAuthExpired = useCallback(
+    (err: unknown): boolean => {
+      if (isAuthExpiredError(err)) {
+        handleLogout(true);
+        return true;
+      }
+      return false;
+    },
+    [handleLogout]
+  );
+
   // Mount & Check Session
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -85,7 +109,6 @@ export default function AdminPage() {
           if (parsed.token && parsed.user) {
             setIsAuthenticated(true);
             setSessionUser(parsed.user);
-            setAuthToken(parsed.token);
           }
         } catch {
           localStorage.removeItem("pehalwan_admin_session");
@@ -106,6 +129,15 @@ export default function AdminPage() {
       api.getStats(),
     ])
       .then(([menuData, ordersData, resData, settingsData, statsData]) => {
+        const authResults = [ordersData, resData, statsData];
+        const expired = authResults.some(
+          (r) => r.status === "rejected" && isAuthExpiredError(r.reason)
+        );
+        if (expired) {
+          handleLogout(true);
+          return;
+        }
+
         if (menuData.status === "fulfilled" && menuData.value.length > 0) {
           setDishes(menuData.value);
         }
@@ -124,13 +156,14 @@ export default function AdminPage() {
         setApiConnected(true);
       })
       .catch((err) => {
+        if (checkAuthExpired(err)) return;
         console.warn("[Admin Console] Backend error, relying on local state:", err);
         setApiConnected(false);
       })
       .finally(() => {
         setIsLoading(false);
       });
-  }, []);
+  }, [handleLogout, checkAuthExpired]);
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -147,7 +180,6 @@ export default function AdminPage() {
       const data = await api.login(username, pass);
       setIsAuthenticated(true);
       setSessionUser(data.user);
-      setAuthToken(data.token);
       localStorage.setItem("pehalwan_admin_session", JSON.stringify(data));
       showToast(`Welcome back, ${data.user.name || "Master Pehalwan"}!`);
       return { success: true };
@@ -157,28 +189,15 @@ export default function AdminPage() {
     }
   };
 
-  // Logout Handler
-  const handleLogout = () => {
-    setIsAuthenticated(false);
-    setSessionUser(null);
-    setAuthToken("");
-    localStorage.removeItem("pehalwan_admin_session");
-    showToast("You have been signed out successfully.");
-  };
-
   // --- Handlers for Menu Tab ---
   const handleCreateDish = async (dishData: Omit<Dish, "id">) => {
     try {
       const newDish = await api.createDish(dishData);
       setDishes((prev) => [newDish, ...prev]);
       showToast(`🔥 Added "${newDish.name}" to menu!`);
-    } catch {
-      const fallbackDish: Dish = {
-        id: Math.max(...dishes.map((d) => d.id), 0) + 1,
-        ...dishData,
-      };
-      setDishes((prev) => [fallbackDish, ...prev]);
-      showToast(`🔥 Added "${fallbackDish.name}" to menu!`);
+    } catch (err: unknown) {
+      if (checkAuthExpired(err)) return;
+      showToast(getErrorMessage(err, "Failed to create dish"), "error");
     }
   };
 
@@ -187,11 +206,9 @@ export default function AdminPage() {
       const updated = await api.updateDish(id, updates);
       setDishes((prev) => prev.map((d) => (d.id === id ? updated : d)));
       showToast(`✅ Dish #${id} updated successfully!`);
-    } catch {
-      setDishes((prev) =>
-        prev.map((d) => (d.id === id ? ({ ...d, ...updates } as Dish) : d))
-      );
-      showToast(`✅ Dish #${id} updated successfully!`);
+    } catch (err: unknown) {
+      if (checkAuthExpired(err)) return;
+      showToast(getErrorMessage(err, `Failed to update dish #${id}`), "error");
     }
   };
 
@@ -200,9 +217,9 @@ export default function AdminPage() {
       await api.deleteDish(id);
       setDishes((prev) => prev.filter((d) => d.id !== id));
       showToast(`🗑️ Dish #${id} deleted from menu.`);
-    } catch {
-      setDishes((prev) => prev.filter((d) => d.id !== id));
-      showToast(`🗑️ Dish #${id} deleted from menu.`);
+    } catch (err: unknown) {
+      if (checkAuthExpired(err)) return;
+      showToast(getErrorMessage(err, `Failed to delete dish #${id}`), "error");
     }
   };
 
@@ -212,9 +229,9 @@ export default function AdminPage() {
       const updated = await api.updateOrderStatus(id, status);
       setOrders((prev) => prev.map((o) => (o.id === id ? updated : o)));
       showToast(`📦 Order #${id} status changed to ${status.replace(/_/g, " ")}`);
-    } catch {
-      setOrders((prev) => prev.map((o) => (o.id === id ? { ...o, status } : o)));
-      showToast(`📦 Order #${id} status changed to ${status.replace(/_/g, " ")}`);
+    } catch (err: unknown) {
+      if (checkAuthExpired(err)) return;
+      showToast(getErrorMessage(err, `Failed to update order #${id}`), "error");
     }
   };
 
@@ -227,9 +244,9 @@ export default function AdminPage() {
       const updated = await api.updateReservationStatus(id, status);
       setReservations((prev) => prev.map((r) => (r.id === id ? updated : r)));
       showToast(`📅 Reservation #${id} marked as ${status}!`);
-    } catch {
-      setReservations((prev) => prev.map((r) => (r.id === id ? { ...r, status } : r)));
-      showToast(`📅 Reservation #${id} marked as ${status}!`);
+    } catch (err: unknown) {
+      if (checkAuthExpired(err)) return;
+      showToast(getErrorMessage(err, `Failed to update reservation #${id}`), "error");
     }
   };
 
@@ -239,9 +256,9 @@ export default function AdminPage() {
       const updated = await api.updateSettings(newSettings);
       setSettings(updated);
       showToast("💾 Restaurant info & settings saved successfully!");
-    } catch {
-      setSettings((prev) => ({ ...(prev as RestaurantSettings), ...newSettings }));
-      showToast("💾 Restaurant info & settings saved successfully!");
+    } catch (err: unknown) {
+      if (checkAuthExpired(err)) return;
+      showToast(getErrorMessage(err, "Failed to update settings"), "error");
     }
   };
 
@@ -311,7 +328,7 @@ export default function AdminPage() {
 
             {/* Logout Button */}
             <button
-              onClick={handleLogout}
+              onClick={() => handleLogout()}
               className="bg-red-500/20 hover:bg-red-600 text-red-200 hover:text-white border border-red-500/40 text-xs font-bold px-3 py-1.5 rounded-full transition-all flex items-center gap-1.5 cursor-pointer"
               title="Sign out of Admin Console"
             >
@@ -410,7 +427,6 @@ export default function AdminPage() {
             settings={settings}
             onUpdateSettings={handleUpdateSettings}
             isLoading={isLoading}
-            token={authToken}
             onShowToast={showToast}
           />
         )}

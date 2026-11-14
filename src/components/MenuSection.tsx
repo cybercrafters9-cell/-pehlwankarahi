@@ -1,6 +1,5 @@
 "use client";
 
-import React from "react";
 import Image from "next/image";
 import { useRestaurant } from "@/context/RestaurantContext";
 import { Star, Plus, X } from "lucide-react";
@@ -143,7 +142,7 @@ export default function MenuSection() {
                   </span>
                 </div>
                 <button
-                  onClick={() => addToCart(dish.name, dish.price, dish.image)}
+                  onClick={() => addToCart(dish.id, dish.name, dish.price, dish.image)}
                   className="bg-charcoal-900 hover:bg-terracotta-500 text-white text-xs font-bold px-4 py-2.5 rounded-full transition-colors flex items-center gap-1.5 shadow cursor-pointer"
                 >
                   <span>Add</span>

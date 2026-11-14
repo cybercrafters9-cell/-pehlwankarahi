@@ -1,6 +1,5 @@
 "use client";
 
-import React from "react";
 import Image from "next/image";
 import { useRestaurant } from "@/context/RestaurantContext";
 import { Sparkles, Crown } from "lucide-react";
@@ -47,7 +46,12 @@ export default function EditorialShowcase() {
             <div className="mt-3 pt-2 border-t border-white/10 flex items-center justify-between text-[10px] text-saffron-400">
               <span>PKR 1,000 Bonus</span>
               <button
-                onClick={() => activateLoyalty()}
+                onClick={async () => {
+                  const phone = window.prompt("Enter your Pakistani mobile number to activate Shahi VIP Pass (e.g. 0300-1234567):");
+                  if (phone?.trim()) {
+                    await activateLoyalty(phone.trim()).catch(() => {});
+                  }
+                }}
                 className="underline font-bold hover:text-white transition-colors cursor-pointer"
               >
                 Activate

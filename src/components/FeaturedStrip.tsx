@@ -1,11 +1,11 @@
 "use client";
 
-import React from "react";
 import Image from "next/image";
 import { useRestaurant } from "@/context/RestaurantContext";
 
 const featuredItems = [
   {
+    id: 2,
     name: "Mutton Karahi",
     category: "Shinwari 1 Kg",
     price: 2850,
@@ -17,6 +17,7 @@ const featuredItems = [
     isDarkCard: false,
   },
   {
+    id: 1,
     name: "Chicken Karahi",
     category: "Desi Ghee Classic",
     price: 1550,
@@ -28,6 +29,7 @@ const featuredItems = [
     isDarkCard: false,
   },
   {
+    id: 6,
     name: "Mutton Chops Karahi",
     category: "Royal Chaamp",
     price: 3200,
@@ -39,6 +41,7 @@ const featuredItems = [
     isDarkCard: false,
   },
   {
+    id: 9,
     name: "Mutton Muscles (Machli) Karahi",
     category: "Special Shank",
     price: 3100,
@@ -61,7 +64,7 @@ export default function FeaturedStrip() {
           {featuredItems.map((item, idx) => (
             <div
               key={idx}
-              onClick={() => addToCart(item.name, item.price, item.image)}
+              onClick={() => addToCart(item.id, item.name, item.price, item.image)}
               className={`flex items-center gap-3.5 group cursor-pointer p-2 rounded-full transition-all ${
                 item.isDarkCard
                   ? "bg-charcoal-900/20 hover:bg-charcoal-900/35"

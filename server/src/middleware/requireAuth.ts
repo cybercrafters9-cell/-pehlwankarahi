@@ -6,12 +6,9 @@ export interface JwtAdminPayload {
   role: "superadmin" | "manager";
 }
 
-declare global {
-  // eslint-disable-next-line @typescript-eslint/no-namespace
-  namespace Express {
-    interface Request {
-      admin?: JwtAdminPayload;
-    }
+declare module "express" {
+  interface Request {
+    admin?: JwtAdminPayload;
   }
 }
 

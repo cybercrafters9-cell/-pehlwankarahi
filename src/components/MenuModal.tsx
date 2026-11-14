@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import { useRestaurant } from "@/context/RestaurantContext";
 import { Dish } from "@/data/menu";
@@ -38,7 +38,7 @@ export default function MenuModal() {
   });
 
   const handleAdd = (dish: Dish) => {
-    addToCart(dish.name, dish.price, dish.image);
+    addToCart(dish.id, dish.name, dish.price, dish.image);
     setAddedDishId(dish.id);
     setTimeout(() => {
       setAddedDishId(null);

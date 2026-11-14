@@ -198,6 +198,7 @@ export default function ReservationSection() {
           <button
             onClick={() =>
               addToCart(
+                6,
                 "Smoky Lamb Chops & Sajji Platter",
                 2450,
                 "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?auto=format&fit=crop&w=600&q=80"
