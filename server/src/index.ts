@@ -9,12 +9,14 @@ import apiRoutes from "./routes";
 import { errorHandler } from "./middleware/errorHandler";
 import { getJwtSecret } from "./middleware/requireAuth";
 import { globalLimiter } from "./middleware/rateLimiter";
+import { validateDbEnv, checkDbHealth, closePool } from "./db/pool";
+import { runMigrations } from "./db/migrate";
 
 // Load environment variables (.env from cwd and optionally server/.env if running from root)
 dotenv.config();
 const serverEnvPath = path.resolve(process.cwd(), "server", ".env");
 if (fs.existsSync(serverEnvPath)) {
-  dotenv.config({ path: serverEnvPath }); 
+  dotenv.config({ path: serverEnvPath });
 }
 
 // Ensure critical secrets are configured at startup
@@ -100,9 +102,12 @@ app.get("/", (_req, res) => {
 });
 
 // Health Check Endpoint
-app.get("/api/health", (_req, res) => {
-  res.json({
-    status: "ok",
+app.get("/api/health", async (_req, res) => {
+  const isDbUp = await checkDbHealth();
+  const statusCode = isDbUp ? 200 : 503;
+  res.status(statusCode).json({
+    status: isDbUp ? "ok" : "degraded",
+    db: isDbUp ? "up" : "down",
     service: "Pehalwan Karahi & Bar B Q API",
     version: "1.0.0",
     uptime: Math.floor(process.uptime()),
@@ -124,9 +129,26 @@ app.use((_req, res) => {
 // Global Error Handler
 app.use(errorHandler);
 
-// Start Server listening on 0.0.0.0
-export const server = app.listen(PORT, HOST, () => {
-  console.log(`
+let server: ReturnType<typeof app.listen> | null = null;
+
+async function bootstrap() {
+  validateDbEnv();
+
+  try {
+    await runMigrations();
+    console.log("[DB] Migrations verified successfully.");
+  } catch (err) {
+    console.error(
+      "[DB] Migration warning/error on startup:",
+      err instanceof Error ? err.message : err
+    );
+    if (process.env.NODE_ENV === "production") {
+      process.exit(1);
+    }
+  }
+
+  server = app.listen(PORT, HOST, () => {
+    console.log(`
   ======================================================
   🔥 PEHALWAN KARAHI & DERA GHAR — EXPRESS BACKEND 🔥
   ======================================================
@@ -140,23 +162,33 @@ export const server = app.listen(PORT, HOST, () => {
   ❤️ Health Check:     http://${HOST === "0.0.0.0" ? "localhost" : HOST}:${PORT}/api/health
   🌐 Allowed Origins:  ${allowedOrigins.join(", ")}
   ======================================================
-  `);
-});
-
-// Graceful shutdown handling for container/process managers
-process.on("SIGTERM", () => {
-  console.log("[Express] SIGTERM received. Gracefully shutting down HTTP server...");
-  server.close(() => {
-    console.log("[Express] HTTP server closed.");
+    `);
   });
+}
+
+bootstrap().catch((err) => {
+  console.error("[Startup] Fatal error during bootstrap:", err);
+  if (process.env.NODE_ENV === "production") {
+    process.exit(1);
+  }
 });
 
-process.on("SIGINT", () => {
-  console.log("[Express] SIGINT received. Shutting down HTTP server...");
-  server.close(() => {
-    console.log("[Express] HTTP server closed.");
-  });
-});
+const handleShutdown = (signal: string) => {
+  console.log(`[Express] ${signal} received. Gracefully shutting down HTTP server...`);
+  if (server) {
+    server.close(async () => {
+      console.log("[Express] HTTP server closed.");
+      await closePool();
+      console.log("[DB] Connection pool closed.");
+      process.exit(0);
+    });
+  } else {
+    closePool().then(() => process.exit(0));
+  }
+};
 
-export { app };
+process.on("SIGTERM", () => handleShutdown("SIGTERM"));
+process.on("SIGINT", () => handleShutdown("SIGINT"));
+
+export { app, server };
 export default app;

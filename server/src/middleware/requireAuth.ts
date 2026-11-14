@@ -1,9 +1,11 @@
 import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
+import { adminRepository } from "../repositories/admin.repository";
 
 export interface JwtAdminPayload {
   id: string;
   role: "superadmin" | "manager";
+  tokenVersion?: number;
 }
 
 declare module "express" {
@@ -22,11 +24,11 @@ export const getJwtSecret = (): string => {
   return secret.trim();
 };
 
-export const requireAuth = (
+export const requireAuth = async (
   req: Request,
   res: Response,
   next: NextFunction
-): void => {
+): Promise<void> => {
   const authHeader = req.headers.authorization;
 
   if (!authHeader || !authHeader.startsWith("Bearer ")) {
@@ -55,6 +57,19 @@ export const requireAuth = (
       });
       return;
     }
+
+    // Verify token version against database
+    if (decoded.tokenVersion !== undefined) {
+      const currentVersion = await adminRepository.getTokenVersion(decoded.id);
+      if (currentVersion === null || currentVersion !== decoded.tokenVersion) {
+        res.status(401).json({
+          success: false,
+          error: "Access denied. Token has been invalidated. Please log in again.",
+        });
+        return;
+      }
+    }
+
     req.admin = decoded;
     next();
   } catch {

@@ -1,7 +1,6 @@
 import { Request, Response } from "express";
 import jwt from "jsonwebtoken";
-import bcrypt from "bcryptjs";
-import { db } from "../data/db";
+import { adminRepository } from "../repositories/admin.repository";
 import { ApiResponse, AuthSession, AdminUser } from "../types";
 import { getJwtSecret } from "../middleware/requireAuth";
 import { asyncHandler } from "../middleware/asyncHandler";
@@ -14,10 +13,10 @@ const sanitizeAdmin = (admin: AdminUser): Omit<AdminUser, "password" | "password
   return sanitized;
 };
 
-export const login = asyncHandler((req: Request, res: Response<ApiResponse<AuthSession>>) => {
+export const login = asyncHandler(async (req: Request, res: Response<ApiResponse<AuthSession>>) => {
   const { username, password } = req.body;
 
-  const admin = db.verifyAdmin(username, password);
+  const admin = await adminRepository.verifyCredentials(username, password);
 
   if (!admin) {
     return res.status(401).json({
@@ -27,7 +26,7 @@ export const login = asyncHandler((req: Request, res: Response<ApiResponse<AuthS
   }
 
   const token = jwt.sign(
-    { id: admin.id, role: admin.role },
+    { id: admin.id, role: admin.role, tokenVersion: admin.tokenVersion },
     getJwtSecret(),
     { expiresIn: "8h" }
   );
@@ -43,7 +42,7 @@ export const login = asyncHandler((req: Request, res: Response<ApiResponse<AuthS
   });
 });
 
-export const verifySession = asyncHandler((
+export const verifySession = asyncHandler(async (
   req: Request,
   res: Response<ApiResponse<{ user: Omit<AdminUser, "password" | "passwordHash"> }>>
 ) => {
@@ -77,7 +76,7 @@ export const verifySession = asyncHandler((
     }
   }
 
-  const admin = db.getAdmin();
+  const admin = await adminRepository.getById(adminId);
   if (!admin || admin.id !== adminId) {
     return res.status(401).json({
       success: false,
@@ -93,35 +92,43 @@ export const verifySession = asyncHandler((
   });
 });
 
-export const updateCredentials = asyncHandler((
+export const updateCredentials = asyncHandler(async (
   req: Request,
   res: Response<ApiResponse<{ user: Omit<AdminUser, "password" | "passwordHash"> }>>
 ) => {
-  const { currentPassword, newPassword, newUsername, newEmail, newName } = req.body;
-  const admin = db.getAdmin();
+  const { currentPassword, newPassword, newUsername, newEmail } = req.body;
+  const adminId = req.admin?.id || (await adminRepository.get())?.id;
 
-  const isCurrentValid =
-    Boolean(admin.passwordHash && bcrypt.compareSync(currentPassword, admin.passwordHash));
-
-  if (!isCurrentValid) {
-    return res.status(400).json({
+  if (!adminId) {
+    return res.status(401).json({
       success: false,
-      error: "Current password is incorrect.",
+      error: "Admin account not found.",
     });
   }
 
-  const updates: Partial<AdminUser> = {};
-  if (newPassword) updates.passwordHash = bcrypt.hashSync(newPassword, 10);
-  if (newUsername) updates.username = newUsername;
-  if (newEmail) updates.email = newEmail;
-  if (newName) updates.name = newName;
+  try {
+    const updated = await adminRepository.updateCredentials(
+      adminId,
+      currentPassword,
+      {
+        newPassword,
+        newUsername,
+        newEmail,
+      }
+    );
 
-  const updated = db.updateAdmin(updates);
-  const sanitizedUser = sanitizeAdmin(updated);
+    const sanitizedUser = sanitizeAdmin(updated);
 
-  res.json({
-    success: true,
-    message: "Admin credentials updated successfully!",
-    data: { user: sanitizedUser },
-  });
+    res.json({
+      success: true,
+      message: "Admin credentials updated successfully!",
+      data: { user: sanitizedUser },
+    });
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : "Failed to update credentials";
+    return res.status(400).json({
+      success: false,
+      error: message,
+    });
+  }
 });

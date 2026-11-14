@@ -92,6 +92,9 @@ export interface RestaurantSettings {
   deliveryEstimate: string;
   announcement: string;
   isLiveWokActive: boolean;
+  easypaisaNumber?: string;
+  jazzcashNumber?: string;
+  paymentAccountTitle?: string;
 }
 
 export interface DashboardStats {
