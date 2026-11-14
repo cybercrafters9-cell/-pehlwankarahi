@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { Button } from "./ui/Button";
 import { Input } from "./ui/Input";
-import { ShieldCheck, Lock, Eye, EyeOff, ArrowLeft, KeyRound, AlertCircle, Sparkles } from "lucide-react";
+import { ShieldCheck, Lock, Eye, EyeOff, ArrowLeft, AlertCircle } from "lucide-react";
 
 interface AdminLoginProps {
   onLogin: (username: string, pass: string) => Promise<{ success: boolean; error?: string }>;
@@ -37,12 +37,6 @@ export function AdminLogin({ onLogin }: AdminLoginProps) {
     } finally {
       setIsLoading(false);
     }
-  };
-
-  const handleFillDemo = () => {
-    setUsername("admin");
-    setPassword("pehalwan@123");
-    setError(null);
   };
 
   return (
@@ -141,26 +135,6 @@ export function AdminLogin({ onLogin }: AdminLoginProps) {
             Authenticate &amp; Enter Console
           </Button>
         </form>
-
-        {/* Owner Credentials Quick Fill Badge */}
-        <div className="p-3 bg-sand-100 rounded-2xl border border-sand-200/90 text-center space-y-1.5">
-          <p className="text-[11px] font-bold text-charcoal-800 flex items-center justify-center gap-1">
-            <KeyRound className="w-3.5 h-3.5 text-saffron-500" />
-            <span>Default Master Credentials</span>
-          </p>
-          <p className="text-[11px] text-charcoal-700/70 font-mono">
-            Username: <strong className="text-charcoal-900">admin</strong> • Pass:{" "}
-            <strong className="text-charcoal-900">pehalwan@123</strong>
-          </p>
-          <button
-            type="button"
-            onClick={handleFillDemo}
-            className="text-[11px] font-extrabold text-terracotta-500 hover:underline inline-flex items-center gap-1 cursor-pointer"
-          >
-            <Sparkles className="w-3 h-3" />
-            <span>Click to Auto-fill Demo Credentials</span>
-          </button>
-        </div>
       </div>
     </div>
   );

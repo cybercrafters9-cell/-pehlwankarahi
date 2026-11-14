@@ -153,26 +153,6 @@ export default function AdminPage() {
       return { success: true };
     } catch (err: unknown) {
       const errorMsg = err instanceof Error ? err.message : "Invalid Username or Password.";
-      // Offline fallback: check default credentials if server offline
-      if (
-        (username === "admin" || username === "admin@pehalwankarahi.com") &&
-        pass === "pehalwan@123"
-      ) {
-        const dummyUser: SessionUser = {
-          id: "ADMIN-01",
-          username: "admin",
-          email: "admin@pehalwankarahi.com",
-          name: "Pehalwan Admin (Offline Mode)",
-          role: "superadmin",
-        };
-        const dummySession = { token: "pk_sec_offline", user: dummyUser };
-        setIsAuthenticated(true);
-        setSessionUser(dummyUser);
-        setAuthToken("pk_sec_offline");
-        localStorage.setItem("pehalwan_admin_session", JSON.stringify(dummySession));
-        showToast("Logged in via Master Credentials (Offline Fallback)");
-        return { success: true };
-      }
       return { success: false, error: errorMsg };
     }
   };

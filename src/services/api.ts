@@ -99,6 +99,23 @@ export interface ReservationRecord {
   createdAt: string;
 }
 
+function getAuthHeaders(): HeadersInit {
+  if (typeof window !== "undefined") {
+    try {
+      const stored = localStorage.getItem("pehalwan_admin_session");
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        if (parsed.token) {
+          return { Authorization: `Bearer ${parsed.token}` };
+        }
+      }
+    } catch {
+      // ignore
+    }
+  }
+  return {};
+}
+
 export const api = {
   // --- Menu ---
   async getMenu(category?: string, search?: string): Promise<Dish[]> {
@@ -121,7 +138,7 @@ export const api = {
   async createDish(dish: Omit<Dish, "id">): Promise<Dish> {
     const res = await fetch(`${API_BASE}/menu`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", ...getAuthHeaders() },
       body: JSON.stringify(dish),
     });
     const json = await res.json();
@@ -132,7 +149,7 @@ export const api = {
   async updateDish(id: number, updates: Partial<Dish>): Promise<Dish> {
     const res = await fetch(`${API_BASE}/menu/${id}`, {
       method: "PUT",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", ...getAuthHeaders() },
       body: JSON.stringify(updates),
     });
     const json = await res.json();
@@ -143,6 +160,7 @@ export const api = {
   async deleteDish(id: number): Promise<boolean> {
     const res = await fetch(`${API_BASE}/menu/${id}`, {
       method: "DELETE",
+      headers: { ...getAuthHeaders() },
     });
     const json = await res.json();
     if (!res.ok) throw new Error(json.error || "Failed to delete dish");
@@ -162,7 +180,10 @@ export const api = {
   },
 
   async getOrders(): Promise<OrderRecord[]> {
-    const res = await fetch(`${API_BASE}/orders`, { cache: "no-store" });
+    const res = await fetch(`${API_BASE}/orders`, {
+      cache: "no-store",
+      headers: { ...getAuthHeaders() },
+    });
     const json = await res.json();
     if (!res.ok) throw new Error(json.error || "Failed to fetch orders");
     return json.data || [];
@@ -171,7 +192,7 @@ export const api = {
   async updateOrderStatus(id: string, status: OrderRecord["status"]): Promise<OrderRecord> {
     const res = await fetch(`${API_BASE}/orders/${id}/status`, {
       method: "PATCH",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", ...getAuthHeaders() },
       body: JSON.stringify({ status }),
     });
     const json = await res.json();
@@ -192,7 +213,10 @@ export const api = {
   },
 
   async getReservations(): Promise<ReservationRecord[]> {
-    const res = await fetch(`${API_BASE}/reservations`, { cache: "no-store" });
+    const res = await fetch(`${API_BASE}/reservations`, {
+      cache: "no-store",
+      headers: { ...getAuthHeaders() },
+    });
     const json = await res.json();
     if (!res.ok) throw new Error(json.error || "Failed to fetch reservations");
     return json.data || [];
@@ -201,7 +225,7 @@ export const api = {
   async updateReservationStatus(id: string, status: ReservationRecord["status"]): Promise<ReservationRecord> {
     const res = await fetch(`${API_BASE}/reservations/${id}/status`, {
       method: "PATCH",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", ...getAuthHeaders() },
       body: JSON.stringify({ status }),
     });
     const json = await res.json();
@@ -220,7 +244,7 @@ export const api = {
   async updateSettings(settings: Partial<RestaurantSettings>): Promise<RestaurantSettings> {
     const res = await fetch(`${API_BASE}/settings`, {
       method: "PUT",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", ...getAuthHeaders() },
       body: JSON.stringify(settings),
     });
     const json = await res.json();
@@ -230,7 +254,10 @@ export const api = {
 
   // --- Stats ---
   async getStats(): Promise<DashboardStats> {
-    const res = await fetch(`${API_BASE}/stats`, { cache: "no-store" });
+    const res = await fetch(`${API_BASE}/stats`, {
+      cache: "no-store",
+      headers: { ...getAuthHeaders() },
+    });
     const json = await res.json();
     if (!res.ok) throw new Error(json.error || "Failed to fetch dashboard stats");
     return json.data;

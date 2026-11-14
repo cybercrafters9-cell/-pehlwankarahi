@@ -89,8 +89,8 @@ export function SettingsTab({
       if (onShowToast) onShowToast("Please enter current password to confirm changes.", "error");
       return;
     }
-    if (pwForm.newPassword && pwForm.newPassword.length < 6) {
-      if (onShowToast) onShowToast("New password must be at least 6 characters.", "error");
+    if (pwForm.newPassword && pwForm.newPassword.length < 8) {
+      if (onShowToast) onShowToast("New password must be at least 8 characters.", "error");
       return;
     }
 
@@ -327,7 +327,7 @@ export function SettingsTab({
               onChange={(e) => setPwForm({ ...pwForm, newUsername: e.target.value })}
             />
             <Input
-              label="New Password (min 6 chars)"
+              label="New Password (min 8 chars)"
               type="password"
               placeholder="••••••••••••"
               value={pwForm.newPassword}
@@ -339,7 +339,7 @@ export function SettingsTab({
             label="Current Password (required to save changes) *"
             type="password"
             required
-            placeholder="Enter current password (default: pehalwan@123)"
+            placeholder="Enter current password to authorize changes"
             value={pwForm.currentPassword}
             onChange={(e) => setPwForm({ ...pwForm, currentPassword: e.target.value })}
           />

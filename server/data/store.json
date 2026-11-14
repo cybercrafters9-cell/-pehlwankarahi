@@ -286,9 +286,9 @@
     "id": "ADMIN-01",
     "username": "admin",
     "email": "admin@pehalwankarahi.com",
-    "password": "pehalwan@123",
     "name": "Master Pehalwan",
     "role": "superadmin",
-    "lastLogin": "2026-11-12T02:56:59.747Z"
+    "lastLogin": "2026-11-14T06:09:06.843Z",
+    "passwordHash": "$2b$10$qI1W08SaA9WH25Agleex4uTPomz0iMHlIN7Br5jV7X75vN4zWgqfK"
   }
 }

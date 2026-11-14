@@ -1,5 +1,6 @@
 import fs from "fs";
 import path from "path";
+import bcrypt from "bcryptjs";
 import { MenuItem, Order, Reservation, LoyaltyPass, RestaurantSettings, DashboardStats, AdminUser } from "../types";
 
 const resolveDataDir = (): string => {
@@ -33,13 +34,22 @@ interface DatabaseSchema {
   adminUser: AdminUser;
 }
 
-const defaultAdmin: AdminUser = {
-  id: "ADMIN-01",
-  username: process.env.ADMIN_USERNAME || "admin",
-  email: process.env.ADMIN_EMAIL || "admin@pehalwankarahi.com",
-  password: process.env.ADMIN_PASSWORD || "pehalwan@123",
-  name: "Master Pehalwan",
-  role: "superadmin",
+const createInitialAdmin = (): AdminUser => {
+  const password = process.env.ADMIN_PASSWORD;
+  if (!password) {
+    throw new Error(
+      "[Database] ADMIN_PASSWORD environment variable is required to seed the initial admin user. Please set ADMIN_PASSWORD in your environment."
+    );
+  }
+  const passwordHash = bcrypt.hashSync(password, 10);
+  return {
+    id: "ADMIN-01",
+    username: process.env.ADMIN_USERNAME || "admin",
+    email: process.env.ADMIN_EMAIL || "admin@pehalwankarahi.com",
+    passwordHash,
+    name: "Master Pehalwan",
+    role: "superadmin",
+  };
 };
 
 const defaultSettings: RestaurantSettings = {
@@ -180,8 +190,27 @@ class Database {
       if (fs.existsSync(STORE_FILE)) {
         const fileContent = fs.readFileSync(STORE_FILE, "utf-8");
         const parsed = JSON.parse(fileContent);
-        if (!parsed.settings) parsed.settings = defaultSettings;
-        if (!parsed.adminUser) parsed.adminUser = defaultAdmin;
+        let saveNeeded = false;
+
+        if (!parsed.settings) {
+          parsed.settings = defaultSettings;
+          saveNeeded = true;
+        }
+
+        if (!parsed.adminUser) {
+          parsed.adminUser = createInitialAdmin();
+          saveNeeded = true;
+        } else if (parsed.adminUser.password) {
+          // Migration: hash plain password, save passwordHash, remove plain password
+          parsed.adminUser.passwordHash = bcrypt.hashSync(parsed.adminUser.password, 10);
+          delete parsed.adminUser.password;
+          saveNeeded = true;
+        }
+
+        if (saveNeeded) {
+          this.saveData(parsed);
+        }
+
         return parsed;
       }
     } catch (err) {
@@ -232,7 +261,7 @@ class Database {
       ],
       loyaltyPasses: [],
       settings: defaultSettings,
-      adminUser: defaultAdmin,
+      adminUser: createInitialAdmin(),
     };
 
     this.saveData(defaultData);
@@ -422,7 +451,7 @@ class Database {
   // --- Admin Authentication Operations ---
   public getAdmin(): AdminUser {
     if (!this.data.adminUser) {
-      this.data.adminUser = defaultAdmin;
+      this.data.adminUser = createInitialAdmin();
       this.saveData(this.data);
     }
     return this.data.adminUser;
@@ -433,7 +462,8 @@ class Database {
     const idLower = identifier.trim().toLowerCase();
     const matchesId =
       admin.username.toLowerCase() === idLower || admin.email.toLowerCase() === idLower;
-    const matchesPassword = admin.password === password;
+    const matchesPassword =
+      Boolean(admin.passwordHash) && bcrypt.compareSync(password, admin.passwordHash);
 
     if (matchesId && matchesPassword) {
       admin.lastLogin = new Date().toISOString();
@@ -444,7 +474,10 @@ class Database {
   }
 
   public updateAdmin(updates: Partial<AdminUser>): AdminUser {
-    this.data.adminUser = { ...this.getAdmin(), ...updates };
+    const current = this.getAdmin();
+    const updated = { ...current, ...updates };
+    delete updated.password;
+    this.data.adminUser = updated;
     this.saveData(this.data);
     return this.data.adminUser;
   }

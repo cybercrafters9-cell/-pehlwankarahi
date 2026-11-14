@@ -13,7 +13,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="scroll-smooth antialiased">
+    <html
+      lang="en"
+      className="scroll-smooth antialiased"
+      data-scroll-behavior="smooth"
+      suppressHydrationWarning
+    >
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
@@ -23,7 +28,10 @@ export default function RootLayout({
           rel="stylesheet"
         />
       </head>
-      <body className="min-h-screen bg-sand-100 text-charcoal-900 selection:bg-terracotta-500 selection:text-white relative">
+      <body
+        suppressHydrationWarning
+        className="min-h-screen bg-sand-100 text-charcoal-900 selection:bg-terracotta-500 selection:text-white relative"
+      >
         {/* Subtle Ambient Paper Texture Overlay */}
         <div
           className="fixed inset-0 pointer-events-none opacity-[0.03] z-50"

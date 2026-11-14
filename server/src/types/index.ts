@@ -103,6 +103,7 @@ export interface AdminUser {
   username: string;
   email: string;
   password?: string;
+  passwordHash?: string;
   name: string;
   role: "superadmin" | "manager";
   lastLogin?: string;
@@ -110,7 +111,7 @@ export interface AdminUser {
 
 export interface AuthSession {
   token: string;
-  user: Omit<AdminUser, "password">;
+  user: Omit<AdminUser, "password" | "passwordHash">;
 }
 
 export interface ApiResponse<T = unknown> {

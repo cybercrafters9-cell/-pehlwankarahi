@@ -6,6 +6,7 @@ import path from "path";
 import fs from "fs";
 import apiRoutes from "./routes";
 import { errorHandler } from "./middleware/errorHandler";
+import { getJwtSecret } from "./middleware/requireAuth";
 
 // Load environment variables (.env from cwd and optionally server/.env if running from root)
 dotenv.config();
@@ -13,6 +14,9 @@ const serverEnvPath = path.resolve(process.cwd(), "server", ".env");
 if (fs.existsSync(serverEnvPath)) {
   dotenv.config({ path: serverEnvPath }); 
 }
+
+// Ensure critical secrets are configured at startup
+getJwtSecret();
 
 const app = express();
 const PORT = Number(process.env.PORT) || 5050;

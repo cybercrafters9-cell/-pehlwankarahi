@@ -6,13 +6,14 @@ import {
   updateDish,
   deleteDish,
 } from "../controllers/menu.controller";
+import { requireAuth } from "../middleware/requireAuth";
 
 const router = Router();
 
 router.get("/", getMenu);
 router.get("/:id", getDishById);
-router.post("/", createDish);
-router.put("/:id", updateDish);
-router.delete("/:id", deleteDish);
+router.post("/", requireAuth, createDish);
+router.put("/:id", requireAuth, updateDish);
+router.delete("/:id", requireAuth, deleteDish);
 
 export default router;
