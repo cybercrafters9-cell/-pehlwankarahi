@@ -3,11 +3,44 @@
 import React, { useState } from "react";
 import Image from "next/image";
 import { useRestaurant } from "@/context/RestaurantContext";
+import { useSlot } from "@/context/SiteContentContext";
 import { Flame, Play, Star, Bike, Plus, Search, ChevronRight } from "lucide-react";
 
 export default function Hero() {
-  const { addToCart, setIsVideoOpen, setSearchQuery, setIsMenuModalOpen } = useRestaurant();
+  const { addToCart, setIsVideoOpen, setSearchQuery, setIsMenuModalOpen, dishes } = useRestaurant();
   const [localSearch, setLocalSearch] = useState("");
+
+  const plate1 = useSlot("hero.plate1", {
+    url: "https://images.unsplash.com/photo-1585937421612-70a008356fbe?auto=format&fit=crop&w=600&q=80",
+    alt: "Mutton Karahi",
+    dishId: 2,
+  });
+
+  const plate2 = useSlot("hero.plate2", {
+    url: "https://images.unsplash.com/photo-1603894584373-5ac82b2ae398?auto=format&fit=crop&w=600&q=80",
+    alt: "Chicken Karahi",
+    dishId: 1,
+  });
+
+  const plate3 = useSlot("hero.plate3", {
+    url: "https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=900&q=85",
+    alt: "Mutton Chops Karahi",
+    dishId: 6,
+  });
+
+  const handlePlateClick = (
+    dishId: number | null | undefined,
+    fallbackName: string,
+    fallbackPrice: number,
+    fallbackImage: string
+  ) => {
+    const dish = dishes.find((d) => d.id === dishId);
+    if (dish) {
+      addToCart(dish.id, dish.name, dish.price, dish.image);
+    } else {
+      addToCart(dishId || 1, fallbackName, fallbackPrice, fallbackImage);
+    }
+  };
 
   const scrollTo = (id: string) => {
     const el = document.getElementById(id);
@@ -103,26 +136,27 @@ export default function Hero() {
             {/* Plate 1: Top-Left — Mutton Karahi */}
             <div
               onClick={() =>
-                addToCart(
-                  2,
-                  "Mutton Karahi",
+                handlePlateClick(
+                  plate1.dishId,
+                  plate1.alt,
                   2850,
-                  "https://images.unsplash.com/photo-1585937421612-70a008356fbe?auto=format&fit=crop&w=600&q=80"
+                  plate1.url
                 )
               }
               className="cursor-pointer group absolute -top-1 left-2 sm:left-4 w-36 h-36 sm:w-44 sm:h-44 rounded-full bg-sand-50 p-2 shadow-2xl animate-float transition-transform"
             >
               <div className="relative w-full h-full rounded-full overflow-hidden">
                 <Image
-                  src="https://images.unsplash.com/photo-1585937421612-70a008356fbe?auto=format&fit=crop&w=600&q=80"
-                  alt="Mutton Karahi"
+                  src={plate1.url}
+                  alt={plate1.alt}
                   fill
+                  unoptimized={plate1.url.includes("/api/media/")}
                   sizes="(max-width: 640px) 144px, 176px"
                   className="object-cover group-hover:scale-105 transition-transform duration-300"
                 />
               </div>
               <span className="absolute bottom-1 right-1 bg-charcoal-900 text-white text-[10px] font-bold px-2.5 py-0.5 rounded-full shadow flex items-center gap-1">
-                <span>Mutton Karahi</span>
+                <span>{plate1.alt}</span>
                 <Plus className="w-3 h-3 text-saffron-400" />
               </span>
             </div>
@@ -130,26 +164,27 @@ export default function Hero() {
             {/* Plate 2: Top-Right — Chicken Karahi */}
             <div
               onClick={() =>
-                addToCart(
-                  1,
-                  "Chicken Karahi",
+                handlePlateClick(
+                  plate2.dishId,
+                  plate2.alt,
                   1550,
-                  "https://images.unsplash.com/photo-1603894584373-5ac82b2ae398?auto=format&fit=crop&w=600&q=80"
+                  plate2.url
                 )
               }
               className="cursor-pointer group absolute top-2 right-2 sm:right-4 w-32 h-32 sm:w-40 sm:h-40 rounded-full bg-sand-50 p-2 shadow-2xl animate-float-delayed transition-transform"
             >
               <div className="relative w-full h-full rounded-full overflow-hidden">
                 <Image
-                  src="https://images.unsplash.com/photo-1603894584373-5ac82b2ae398?auto=format&fit=crop&w=600&q=80"
-                  alt="Chicken Karahi"
+                  src={plate2.url}
+                  alt={plate2.alt}
                   fill
+                  unoptimized={plate2.url.includes("/api/media/")}
                   sizes="(max-width: 640px) 128px, 160px"
                   className="object-cover group-hover:scale-105 transition-transform duration-300"
                 />
               </div>
               <span className="absolute -bottom-1 left-2 bg-terracotta-500 text-white text-[10px] font-bold px-2.5 py-0.5 rounded-full shadow flex items-center gap-1">
-                <span>Chicken Karahi</span>
+                <span>{plate2.alt}</span>
                 <Plus className="w-3 h-3" />
               </span>
             </div>
@@ -157,26 +192,27 @@ export default function Hero() {
             {/* Plate 3: Bottom-Center — Mutton Chops Karahi */}
             <div
               onClick={() =>
-                addToCart(
-                  6,
-                  "Mutton Chops Karahi",
+                handlePlateClick(
+                  plate3.dishId,
+                  plate3.alt,
                   3200,
-                  "https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=900&q=85"
+                  plate3.url
                 )
               }
               className="cursor-pointer group absolute -bottom-3 left-10 sm:left-20 w-38 h-38 sm:w-48 sm:h-48 rounded-full bg-sand-50 p-2 shadow-2xl animate-float transition-transform"
             >
               <div className="relative w-full h-full rounded-full overflow-hidden">
                 <Image
-                  src="https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=900&q=85"
-                  alt="Mutton Chops Karahi"
+                  src={plate3.url}
+                  alt={plate3.alt}
                   fill
+                  unoptimized={plate3.url.includes("/api/media/")}
                   sizes="(max-width: 640px) 152px, 192px"
                   className="object-cover group-hover:scale-105 transition-transform duration-300"
                 />
               </div>
               <span className="absolute top-2 -right-1 bg-saffron-400 text-charcoal-900 text-[10px] font-extrabold px-2.5 py-0.5 rounded-full shadow flex items-center gap-1">
-                <span>Chops Karahi</span>
+                <span>{plate3.alt}</span>
                 <Plus className="w-3 h-3" />
               </span>
             </div>

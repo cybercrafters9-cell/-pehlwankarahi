@@ -2,10 +2,15 @@
 
 import Image from "next/image";
 import { useRestaurant } from "@/context/RestaurantContext";
+import { useSlot } from "@/context/SiteContentContext";
 import { Sparkles, Crown } from "lucide-react";
 
 export default function EditorialShowcase() {
   const { activateLoyalty } = useRestaurant();
+  const editorialSlot = useSlot("editorial.main", {
+    url: "https://images.unsplash.com/photo-1599487488170-d11ec9c172f0?auto=format&fit=crop&w=600&q=80",
+    alt: "Shami & Seekh Kabab Platter",
+  });
 
   return (
     <section className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center mb-12 sm:mb-16 bg-sand-50/70 border border-sand-200 rounded-4xl p-5 sm:p-8 shadow-soft">
@@ -14,9 +19,10 @@ export default function EditorialShowcase() {
         {/* Rounded Dish Image */}
         <div className="sm:col-span-7 h-[240px] sm:h-[260px] rounded-3xl overflow-hidden shadow-md relative group">
           <Image
-            src="https://images.unsplash.com/photo-1599487488170-d11ec9c172f0?auto=format&fit=crop&w=600&q=80"
-            alt="Shami & Seekh Kabab Platter"
+            src={editorialSlot.url}
+            alt={editorialSlot.alt}
             fill
+            unoptimized={editorialSlot.url.includes("/api/media/")}
             sizes="(max-width: 640px) 100vw, 30vw"
             className="object-cover group-hover:scale-105 transition-transform duration-500"
           />

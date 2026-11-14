@@ -2,10 +2,29 @@
 
 import Image from "next/image";
 import { useRestaurant } from "@/context/RestaurantContext";
+import { useSlot } from "@/context/SiteContentContext";
 import { Plus, ArrowRight, ArrowUpRight, Flame } from "lucide-react";
 
 export default function BentoGrid() {
   const { addToCart, setSelectedCategory } = useRestaurant();
+
+  const bentoMain = useSlot("bento.main", {
+    url: "https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=1000&q=85",
+    alt: "Royal Pakistani BBQ & Karahi Feast",
+    dishId: 6,
+  });
+
+  const bentoSub1 = useSlot("bento.sub1", {
+    url: "https://images.unsplash.com/photo-1603894584373-5ac82b2ae398?auto=format&fit=crop&w=600&q=80",
+    alt: "Matka Handi & Garlic Naan",
+    dishId: 8,
+  });
+
+  const bentoSub4 = useSlot("bento.sub4", {
+    url: "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?auto=format&fit=crop&w=600&q=80",
+    alt: "Boneless Chicken Karahi",
+    dishId: 5,
+  });
 
   const scrollToMenu = (cat?: string) => {
     if (cat) setSelectedCategory(cat);
@@ -20,9 +39,10 @@ export default function BentoGrid() {
         {/* Top-Left Card: Large Dark Plate Overhead Shot */}
         <div className="bento-card relative h-[340px] sm:h-[390px] rounded-4xl overflow-hidden bg-charcoal-900 shadow-card group">
           <Image
-            src="https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=1000&q=85"
-            alt="Royal Pakistani BBQ & Karahi Feast"
+            src={bentoMain.url}
+            alt={bentoMain.alt}
             fill
+            unoptimized={bentoMain.url.includes("/api/media/")}
             sizes="(max-width: 1024px) 100vw, 50vw"
             className="zoom-img object-cover opacity-90"
           />
@@ -116,9 +136,10 @@ export default function BentoGrid() {
         {/* Sub-Card 1 (Top-Left): Clay Handi & Desi Chai */}
         <div className="bento-card relative h-[265px] rounded-4xl overflow-hidden bg-charcoal-800 shadow-card group">
           <Image
-            src="https://images.unsplash.com/photo-1603894584373-5ac82b2ae398?auto=format&fit=crop&w=600&q=80"
-            alt="Matka Handi & Garlic Naan"
+            src={bentoSub1.url}
+            alt={bentoSub1.alt}
             fill
+            unoptimized={bentoSub1.url.includes("/api/media/")}
             sizes="(max-width: 640px) 100vw, 25vw"
             className="zoom-img object-cover"
           />
@@ -200,9 +221,10 @@ export default function BentoGrid() {
         {/* Sub-Card 4 (Bottom-Right): Overhead Dark Bowls Shot */}
         <div className="bento-card relative h-[265px] rounded-4xl overflow-hidden bg-charcoal-800 shadow-card group">
           <Image
-            src="https://images.unsplash.com/photo-1555939594-58d7cb561ad1?auto=format&fit=crop&w=600&q=80"
-            alt="Boneless Chicken Karahi"
+            src={bentoSub4.url}
+            alt={bentoSub4.alt}
             fill
+            unoptimized={bentoSub4.url.includes("/api/media/")}
             sizes="(max-width: 640px) 100vw, 25vw"
             className="zoom-img object-cover"
           />

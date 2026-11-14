@@ -3,15 +3,16 @@ import { query, queryOne, execute } from "../db/pool";
 import { mediaRepository } from "./media.repository";
 
 export interface SiteSlotRecord {
-  slotKey: string;
+  key: string;
   section: string;
   label: string;
   altText: string;
-  fallbackUrl: string;
+  effectiveUrl: string;
   mediaId: number | null;
   dishId: number | null;
+  dishName?: string;
+  fallbackUrl: string;
   sortOrder: number;
-  imageUrl: string;
 }
 
 interface SiteSlotRow extends RowDataPacket {
@@ -23,34 +24,69 @@ interface SiteSlotRow extends RowDataPacket {
   media_id: number | null;
   dish_id: number | null;
   sort_order: number;
+  dish_name?: string;
+  dish_image_media_id?: number | null;
+  dish_image_url?: string | null;
 }
 
 function mapRow(row: SiteSlotRow): SiteSlotRecord {
-  const imageUrl = row.media_id ? `/api/media/${row.media_id}` : row.fallback_url;
+  let effectiveUrl = row.fallback_url;
+  let effectiveAlt = row.alt_text;
+
+  if (row.media_id) {
+    effectiveUrl = `/api/media/${row.media_id}`;
+  } else if (row.dish_id) {
+    if (row.dish_image_media_id) {
+      effectiveUrl = `/api/media/${row.dish_image_media_id}`;
+    } else if (row.dish_image_url) {
+      effectiveUrl = row.dish_image_url;
+    }
+    if (row.dish_name) {
+      effectiveAlt = row.dish_name;
+    }
+  }
+
   return {
-    slotKey: row.slot_key,
+    key: row.slot_key,
     section: row.section,
     label: row.label,
-    altText: row.alt_text,
-    fallbackUrl: row.fallback_url,
+    altText: effectiveAlt,
+    effectiveUrl,
     mediaId: row.media_id,
     dishId: row.dish_id,
+    dishName: row.dish_name,
+    fallbackUrl: row.fallback_url,
     sortOrder: row.sort_order,
-    imageUrl,
   };
 }
 
 export const siteSlotRepository = {
   async getAll(): Promise<SiteSlotRecord[]> {
-    const rows = await query<SiteSlotRow>(
-      "SELECT * FROM site_slots ORDER BY sort_order ASC, slot_key ASC"
-    );
+    const rows = await query<SiteSlotRow>(`
+      SELECT 
+        s.*,
+        d.name AS dish_name,
+        d.image_media_id AS dish_image_media_id,
+        d.image_url AS dish_image_url
+      FROM site_slots s
+      LEFT JOIN dishes d ON d.id = s.dish_id
+      ORDER BY s.sort_order ASC, s.slot_key ASC
+    `);
     return rows.map(mapRow);
   },
 
   async getByKey(slotKey: string): Promise<SiteSlotRecord | null> {
     const row = await queryOne<SiteSlotRow>(
-      "SELECT * FROM site_slots WHERE slot_key = ?",
+      `
+      SELECT 
+        s.*,
+        d.name AS dish_name,
+        d.image_media_id AS dish_image_media_id,
+        d.image_url AS dish_image_url
+      FROM site_slots s
+      LEFT JOIN dishes d ON d.id = s.dish_id
+      WHERE s.slot_key = ?
+    `,
       [slotKey]
     );
     return row ? mapRow(row) : null;
@@ -60,8 +96,10 @@ export const siteSlotRepository = {
     slotKey: string,
     updates: {
       mediaId?: number | null;
-      altText?: string;
       dishId?: number | null;
+      label?: string;
+      altText?: string;
+      fallbackUrl?: string;
     }
   ): Promise<SiteSlotRecord> {
     const existing = await this.getByKey(slotKey);
@@ -72,14 +110,20 @@ export const siteSlotRepository = {
     const oldMediaId = existing.mediaId;
     const mediaId =
       updates.mediaId !== undefined ? updates.mediaId : existing.mediaId;
-    const altText =
-      updates.altText !== undefined ? updates.altText : existing.altText;
     const dishId =
       updates.dishId !== undefined ? updates.dishId : existing.dishId;
+    const label =
+      updates.label !== undefined ? updates.label : existing.label;
+    const altText =
+      updates.altText !== undefined ? updates.altText : existing.altText;
+    const fallbackUrl =
+      updates.fallbackUrl !== undefined ? updates.fallbackUrl : existing.fallbackUrl;
 
     await execute(
-      "UPDATE site_slots SET media_id = ?, alt_text = ?, dish_id = ? WHERE slot_key = ?",
-      [mediaId, altText, dishId, slotKey]
+      `UPDATE site_slots 
+       SET media_id = ?, dish_id = ?, label = ?, alt_text = ?, fallback_url = ? 
+       WHERE slot_key = ?`,
+      [mediaId, dishId, label, altText, fallbackUrl, slotKey]
     );
 
     if (oldMediaId && oldMediaId !== mediaId) {

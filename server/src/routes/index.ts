@@ -8,8 +8,14 @@ import statsRoutes from "./stats.routes";
 import authRoutes from "./auth.routes";
 import mediaRoutes from "./media.routes";
 import categoryRoutes from "./category.routes";
+import { getSiteContent, updateSiteSlot } from "../controllers/siteSlot.controller";
+import { requireAuth } from "../middleware/requireAuth";
 
 const router = Router();
+
+router.get("/site-content", getSiteContent);
+router.get("/admin/site-slots", requireAuth, getSiteContent);
+router.put("/admin/site-slots/:key", requireAuth, updateSiteSlot);
 
 router.use("/auth", authRoutes);
 router.use("/categories", categoryRoutes);

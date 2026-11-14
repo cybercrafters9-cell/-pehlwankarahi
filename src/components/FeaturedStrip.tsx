@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { resolveImageUrl } from "@/lib/media";
 import { useRestaurant } from "@/context/RestaurantContext";
+import { useSlot } from "@/context/SiteContentContext";
 
 const featuredItems = [
   {
@@ -56,60 +57,77 @@ const featuredItems = [
 ];
 
 export default function FeaturedStrip() {
-  const { addToCart } = useRestaurant();
+  const { addToCart, dishes } = useRestaurant();
+
+  const slot1 = useSlot("strip.1", { url: featuredItems[0].image, alt: featuredItems[0].name, dishId: 2 });
+  const slot2 = useSlot("strip.2", { url: featuredItems[1].image, alt: featuredItems[1].name, dishId: 1 });
+  const slot3 = useSlot("strip.3", { url: featuredItems[2].image, alt: featuredItems[2].name, dishId: 6 });
+  const slot4 = useSlot("strip.4", { url: featuredItems[3].image, alt: featuredItems[3].name, dishId: 9 });
+  const slots = [slot1, slot2, slot3, slot4];
 
   return (
     <section className="mb-8 sm:mb-10">
       <div className="reference-pill-gradient rounded-4xl sm:rounded-full p-4 sm:px-7 sm:py-4 shadow-card text-white">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 items-center">
-          {featuredItems.map((item, idx) => (
-            <div
-              key={idx}
-              onClick={() => addToCart(item.id, item.name, item.price, item.image)}
-              className={`flex items-center gap-3.5 group cursor-pointer p-2 rounded-full transition-all ${
-                item.isDarkCard
-                  ? "bg-charcoal-900/20 hover:bg-charcoal-900/35"
-                  : "bg-white/5 hover:bg-white/15"
-              }`}
-            >
-              <div className={`relative w-14 h-14 rounded-full overflow-hidden border-2 ${item.borderColor} shrink-0 group-hover:scale-105 transition-transform`}>
-                <Image
-                  src={resolveImageUrl(item.image)}
-                  alt={item.name}
-                  fill
-                  unoptimized={item.image.includes("/api/media/")}
-                  sizes="56px"
-                  className="object-cover"
-                />
-              </div>
-              <div className="min-w-0 flex-1">
-                <p className={`text-[10px] uppercase tracking-wider font-bold ${item.tagColor}`}>
-                  {item.category}
-                </p>
-                <h3
-                  className={`text-xs sm:text-sm font-bold truncate ${
-                    item.isDarkCard ? "text-charcoal-900 font-extrabold" : "text-white"
-                  }`}
+          {featuredItems.map((item, idx) => {
+            const currentSlot = slots[idx];
+            const effectiveImage = currentSlot?.url || item.image;
+            const effectiveName = currentSlot?.alt || item.name;
+            const dishId = currentSlot?.dishId || item.id;
+            const matchedDish = dishes.find((d) => d.id === dishId);
+            const price = matchedDish?.price || item.price;
+
+            return (
+              <div
+                key={idx}
+                onClick={() => addToCart(dishId, effectiveName, price, effectiveImage)}
+                className={`flex items-center gap-3.5 group cursor-pointer p-2 rounded-full transition-all ${
+                  item.isDarkCard
+                    ? "bg-charcoal-900/20 hover:bg-charcoal-900/35"
+                    : "bg-white/5 hover:bg-white/15"
+                }`}
+              >
+                <div
+                  className={`relative w-14 h-14 rounded-full overflow-hidden border-2 ${item.borderColor} shrink-0 group-hover:scale-105 transition-transform`}
                 >
-                  {item.name}
-                </h3>
-                <div className="flex items-center justify-between mt-0.5 pr-2">
-                  <span className={`text-xs font-extrabold ${item.textColor}`}>
-                    Rs. {item.price.toLocaleString()}
-                  </span>
-                  <span
-                    className={`text-[10px] px-2 py-0.5 rounded-full font-bold transition-colors ${
-                      item.isDarkCard
-                        ? "bg-charcoal-900 text-white"
-                        : `bg-white/20 ${item.btnColor}`
+                  <Image
+                    src={resolveImageUrl(effectiveImage)}
+                    alt={effectiveName}
+                    fill
+                    unoptimized={effectiveImage.includes("/api/media/")}
+                    sizes="56px"
+                    className="object-cover"
+                  />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className={`text-[10px] uppercase tracking-wider font-bold ${item.tagColor}`}>
+                    {item.category}
+                  </p>
+                  <h3
+                    className={`text-xs sm:text-sm font-bold truncate ${
+                      item.isDarkCard ? "text-charcoal-900 font-extrabold" : "text-white"
                     }`}
                   >
-                    + Add
-                  </span>
+                    {effectiveName}
+                  </h3>
+                  <div className="flex items-center justify-between mt-0.5 pr-2">
+                    <span className={`text-xs font-extrabold ${item.textColor}`}>
+                      Rs. {price.toLocaleString()}
+                    </span>
+                    <span
+                      className={`text-[10px] px-2 py-0.5 rounded-full font-bold transition-colors ${
+                        item.isDarkCard
+                          ? "bg-charcoal-900 text-white"
+                          : `bg-white/20 ${item.btnColor}`
+                      }`}
+                    >
+                      + Add
+                    </span>
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
     </section>

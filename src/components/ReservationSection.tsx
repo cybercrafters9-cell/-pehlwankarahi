@@ -3,10 +3,16 @@
 import React, { useState } from "react";
 import Image from "next/image";
 import { useRestaurant } from "@/context/RestaurantContext";
+import { useSlot } from "@/context/SiteContentContext";
 import { PhoneCall, CheckCircle } from "lucide-react";
 
 export default function ReservationSection() {
   const { showToast, addToCart, spiceLevel, setSpiceLevel, reserveTable } = useRestaurant();
+  const resSlot = useSlot("reservation.main", {
+    url: "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?auto=format&fit=crop&w=900&q=85",
+    alt: "Sizzling Charcoal Sajji & Lemon Chops",
+    dishId: 6,
+  });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const [form, setForm] = useState({
@@ -150,9 +156,10 @@ export default function ReservationSection() {
       {/* Bottom-Right Card: Dramatic Black Plate Showcase with Citrus & Herbs */}
       <div className="lg:col-span-6 bento-card relative min-h-[340px] rounded-4xl overflow-hidden bg-charcoal-900 shadow-card flex items-end p-6 sm:p-8 group">
         <Image
-          src="https://images.unsplash.com/photo-1555939594-58d7cb561ad1?auto=format&fit=crop&w=900&q=85"
-          alt="Sizzling Charcoal Sajji & Lemon Chops"
+          src={resSlot.url}
+          alt={resSlot.alt}
           fill
+          unoptimized={resSlot.url.includes("/api/media/")}
           sizes="(max-width: 1024px) 100vw, 50vw"
           className="zoom-img object-cover opacity-85"
         />

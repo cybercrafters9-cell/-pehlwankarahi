@@ -8,6 +8,7 @@ import {
   OrderRecord,
   ReservationRecord,
   RestaurantSettings,
+  SiteSlot,
   isAuthExpiredError,
   getErrorMessage,
 } from "@/services/api";
@@ -18,6 +19,7 @@ import { MenuTab } from "@/components/admin/tabs/MenuTab";
 import { OrdersTab } from "@/components/admin/tabs/OrdersTab";
 import { ReservationsTab } from "@/components/admin/tabs/ReservationsTab";
 import { SettingsTab } from "@/components/admin/tabs/SettingsTab";
+import { SiteImagesTab } from "@/components/admin/tabs/SiteImagesTab";
 import {
   LayoutDashboard,
   UtensilsCrossed,
@@ -30,9 +32,10 @@ import {
   LogOut,
   User,
   Loader2,
+  Image as ImageIcon,
 } from "lucide-react";
 
-type TabType = "overview" | "menu" | "orders" | "reservations" | "settings";
+type TabType = "overview" | "menu" | "orders" | "reservations" | "settings" | "images";
 
 interface SessionUser {
   id: string;
@@ -65,6 +68,7 @@ export default function AdminPage() {
   const [orders, setOrders] = useState<OrderRecord[]>([]);
   const [reservations, setReservations] = useState<ReservationRecord[]>([]);
   const [settings, setSettings] = useState<RestaurantSettings | null>(null);
+  const [slots, setSlots] = useState<SiteSlot[]>([]);
 
   // Toast Notification State
   const [toasts, setToasts] = useState<{ id: number; message: string; type: "success" | "error" }[]>([]);
@@ -129,8 +133,9 @@ export default function AdminPage() {
       api.getReservations(),
       api.getSettings(),
       api.getStats(),
+      api.getSiteContent(),
     ])
-      .then(([menuData, categoriesData, ordersData, resData, settingsData, statsData]) => {
+      .then(([menuData, categoriesData, ordersData, resData, settingsData, statsData, siteContentData]) => {
         const authResults = [ordersData, resData, statsData];
         const expired = authResults.some(
           (r) => r.status === "rejected" && isAuthExpiredError(r.reason)
@@ -157,6 +162,9 @@ export default function AdminPage() {
         }
         if (statsData.status === "fulfilled") {
           setStats(statsData.value);
+        }
+        if (siteContentData.status === "fulfilled" && siteContentData.value.slots) {
+          setSlots(Object.values(siteContentData.value.slots));
         }
         setApiConnected(true);
       })
@@ -339,6 +347,27 @@ export default function AdminPage() {
     }
   };
 
+  // --- Handlers for Site Images Slots ---
+  const handleUpdateSiteSlot = async (
+    key: string,
+    data: {
+      mediaId?: number | null;
+      dishId?: number | null;
+      label?: string;
+      altText?: string;
+      fallbackUrl?: string;
+    }
+  ) => {
+    try {
+      const updated = await api.updateSiteSlot(key, data);
+      setSlots((prev) => prev.map((s) => (s.key === key ? updated : s)));
+      showToast(`Site slot "${updated.label}" updated successfully!`);
+    } catch (err: unknown) {
+      if (checkAuthExpired(err)) return;
+      showToast(getErrorMessage(err, "Failed to update site slot"), "error");
+    }
+  };
+
   // Hydration safety loader
   if (!isMounted) {
     return (
@@ -427,6 +456,7 @@ export default function AdminPage() {
           {[
             { id: "overview", label: "Overview", icon: <LayoutDashboard className="w-4 h-4" /> },
             { id: "menu", label: "Menu & Prices", icon: <UtensilsCrossed className="w-4 h-4" />, count: dishes.length },
+            { id: "images", label: "Site Images", icon: <ImageIcon className="w-4 h-4" />, count: slots.length },
             { id: "orders", label: "Live Orders", icon: <ShoppingBag className="w-4 h-4" />, count: pendingOrdersCount, badgeColor: "bg-terracotta-500 text-white" },
             { id: "reservations", label: "Dawat Bookings", icon: <Calendar className="w-4 h-4" />, count: reservations.length },
             { id: "settings", label: "Address & Settings", icon: <Settings className="w-4 h-4" /> },
@@ -486,6 +516,15 @@ export default function AdminPage() {
             onUpdateCategory={handleUpdateCategory}
             onDeleteCategory={handleDeleteCategory}
             onReorderCategories={handleReorderCategories}
+            isLoading={isLoading}
+          />
+        )}
+
+        {activeTab === "images" && (
+          <SiteImagesTab
+            slots={slots}
+            dishes={dishes}
+            onUpdateSlot={handleUpdateSiteSlot}
             isLoading={isLoading}
           />
         )}

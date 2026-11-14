@@ -2,10 +2,15 @@
 
 import Image from "next/image";
 import { useRestaurant } from "@/context/RestaurantContext";
+import { useSlot } from "@/context/SiteContentContext";
 import { X } from "lucide-react";
 
 export default function VideoModal() {
   const { isVideoOpen, setIsVideoOpen, setSelectedCategory } = useRestaurant();
+  const videoSlot = useSlot("video.poster", {
+    url: "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?auto=format&fit=crop&w=900&q=80",
+    alt: "Live Charcoal Grill",
+  });
 
   if (!isVideoOpen) return null;
 
@@ -21,9 +26,10 @@ export default function VideoModal() {
       <div className="bg-charcoal-900 border border-white/15 rounded-4xl max-w-lg w-full overflow-hidden shadow-2xl text-white">
         <div className="relative h-64">
           <Image
-            src="https://images.unsplash.com/photo-1555939594-58d7cb561ad1?auto=format&fit=crop&w=900&q=80"
-            alt="Live Charcoal Grill"
+            src={videoSlot.url}
+            alt={videoSlot.alt}
             fill
+            unoptimized={videoSlot.url.includes("/api/media/")}
             className="object-cover"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-charcoal-900 via-charcoal-900/40 to-transparent flex items-end p-6">

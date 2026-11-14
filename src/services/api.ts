@@ -78,6 +78,23 @@ export interface UploadedMedia {
   url: string;
 }
 
+export interface SiteSlot {
+  key: string;
+  section: string;
+  label: string;
+  altText: string;
+  effectiveUrl: string;
+  mediaId: number | null;
+  dishId: number | null;
+  dishName?: string;
+  fallbackUrl: string;
+  sortOrder: number;
+}
+
+export interface SiteContent {
+  slots: Record<string, SiteSlot>;
+}
+
 export interface DashboardStats {
   totalRevenue: number;
   totalOrders: number;
@@ -346,6 +363,26 @@ export const api = {
   cleanupMedia: () =>
     request<{ deletedCount: number }>("/admin/media/cleanup", {
       method: "POST",
+      auth: true,
+    }),
+
+  // --- Site Slots & Content ---
+  getSiteContent: () =>
+    request<SiteContent>("/site-content"),
+
+  updateSiteSlot: (
+    key: string,
+    data: {
+      mediaId?: number | null;
+      dishId?: number | null;
+      label?: string;
+      altText?: string;
+      fallbackUrl?: string;
+    }
+  ) =>
+    request<SiteSlot>(`/admin/site-slots/${encodeURIComponent(key)}`, {
+      method: "PUT",
+      body: data,
       auth: true,
     }),
 };
