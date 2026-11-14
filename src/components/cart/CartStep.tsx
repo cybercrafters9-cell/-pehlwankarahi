@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { resolveImageUrl } from "@/lib/media";
 import { CookingPot, Plus, Minus, ArrowRight } from "lucide-react";
 import { CartItem } from "@/data/menu";
 import { LoyaltyPassSummary } from "@/services/api";
@@ -55,7 +56,14 @@ export default function CartStep({
               className="bg-sand-50 border border-sand-200 rounded-2xl p-3 flex items-center gap-3 shadow-sm hover:border-sand-300 transition-all"
             >
               <div className="relative w-14 h-14 rounded-xl overflow-hidden shrink-0 bg-charcoal-900">
-                <Image src={item.image} alt={item.name} fill sizes="56px" className="object-cover" />
+                <Image
+                  src={resolveImageUrl(item.image)}
+                  alt={item.name}
+                  fill
+                  unoptimized={Boolean(item.image && item.image.includes("/api/media/"))}
+                  sizes="56px"
+                  className="object-cover"
+                />
               </div>
               <div className="flex-1 min-w-0">
                 <h4 className="font-bold text-xs sm:text-sm text-charcoal-900 truncate">{item.name}</h4>

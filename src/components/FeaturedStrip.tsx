@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { resolveImageUrl } from "@/lib/media";
 import { useRestaurant } from "@/context/RestaurantContext";
 
 const featuredItems = [
@@ -73,9 +74,10 @@ export default function FeaturedStrip() {
             >
               <div className={`relative w-14 h-14 rounded-full overflow-hidden border-2 ${item.borderColor} shrink-0 group-hover:scale-105 transition-transform`}>
                 <Image
-                  src={item.image}
+                  src={resolveImageUrl(item.image)}
                   alt={item.name}
                   fill
+                  unoptimized={item.image.includes("/api/media/")}
                   sizes="56px"
                   className="object-cover"
                 />

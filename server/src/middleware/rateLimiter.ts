@@ -35,3 +35,15 @@ export const submissionLimiter = rateLimit({
     error: "Too many requests, please try again after 15 minutes",
   },
 });
+
+// Media upload limiter: 30 uploads per 15 minutes per IP
+export const mediaUploadLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 30,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: {
+    success: false,
+    error: "Too many media uploads from this IP, please try again after 15 minutes",
+  },
+});

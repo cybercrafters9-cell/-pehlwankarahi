@@ -5,6 +5,7 @@ import Image from "next/image";
 import { useRestaurant } from "@/context/RestaurantContext";
 import { Dish } from "@/data/menu";
 import { X, Plus, ShoppingBag, Phone, Check } from "lucide-react";
+import { resolveImageUrl } from "@/lib/media";
 
 export default function MenuModal() {
   const { isMenuModalOpen, setIsMenuModalOpen, dishes, addToCart, setIsCartOpen, cart } = useRestaurant();
@@ -140,9 +141,10 @@ export default function MenuModal() {
                     {/* Circular Food Platter Shot */}
                     <div className="relative w-28 h-28 sm:w-36 sm:h-36 md:w-40 md:h-40 rounded-full border-4 sm:border-[5px] border-sand-100 shadow-2xl overflow-hidden shrink-0 z-20 bg-charcoal-900 group-hover:scale-105 transition-transform duration-300">
                       <Image
-                        src={dish.image}
+                        src={resolveImageUrl(dish.image)}
                         alt={dish.name}
                         fill
+                        unoptimized={dish.image.includes("/api/media/")}
                         sizes="(max-width: 640px) 120px, 160px"
                         className="object-cover"
                       />
@@ -192,9 +194,10 @@ export default function MenuModal() {
                     {/* On Mobile: Image top first for natural visual hierarchy, on tablet/desktop it sits on the right */}
                     <div className="sm:hidden relative w-28 h-28 rounded-full border-4 border-sand-100 shadow-2xl overflow-hidden shrink-0 z-20 bg-charcoal-900 mb-[-1.5rem]">
                       <Image
-                        src={dish.image}
+                        src={resolveImageUrl(dish.image)}
                         alt={dish.name}
                         fill
+                        unoptimized={dish.image.includes("/api/media/")}
                         sizes="120px"
                         className="object-cover"
                       />
@@ -237,9 +240,10 @@ export default function MenuModal() {
                     {/* Circular Food Platter Shot (Desktop Right) */}
                     <div className="hidden sm:block relative w-36 h-36 md:w-40 md:h-40 rounded-full border-[5px] border-sand-100 shadow-2xl overflow-hidden shrink-0 z-20 bg-charcoal-900 group-hover:scale-105 transition-transform duration-300 order-2">
                       <Image
-                        src={dish.image}
+                        src={resolveImageUrl(dish.image)}
                         alt={dish.name}
                         fill
+                        unoptimized={dish.image.includes("/api/media/")}
                         sizes="(max-width: 640px) 120px, 160px"
                         className="object-cover"
                       />

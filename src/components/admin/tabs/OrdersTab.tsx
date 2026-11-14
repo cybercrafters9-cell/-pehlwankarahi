@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Image from "next/image";
+import { resolveImageUrl } from "@/lib/media";
 import { OrderRecord } from "@/services/api";
 import { Badge } from "../ui/Badge";
 import { Search, Phone, Bike, Clock, Loader2 } from "lucide-react";
@@ -226,7 +227,14 @@ export function OrdersTab({ orders, onUpdateOrderStatus, isLoading }: OrdersTabP
                       >
                         {item.image && (
                           <div className="relative w-10 h-10 rounded-lg overflow-hidden shrink-0">
-                            <Image src={item.image} alt={item.name} fill sizes="40px" className="object-cover" />
+                            <Image
+                              src={resolveImageUrl(item.image)}
+                              alt={item.name}
+                              fill
+                              unoptimized={item.image.includes("/api/media/")}
+                              sizes="40px"
+                              className="object-cover"
+                            />
                           </div>
                         )}
                         <div className="min-w-0 flex-1">

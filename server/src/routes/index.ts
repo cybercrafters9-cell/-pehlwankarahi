@@ -6,6 +6,7 @@ import loyaltyRoutes from "./loyalty.routes";
 import settingsRoutes from "./settings.routes";
 import statsRoutes from "./stats.routes";
 import authRoutes from "./auth.routes";
+import mediaRoutes from "./media.routes";
 
 const router = Router();
 
@@ -16,5 +17,7 @@ router.use("/reservations", reservationRoutes);
 router.use("/loyalty", loyaltyRoutes);
 router.use("/settings", settingsRoutes);
 router.use("/stats", statsRoutes);
+router.use("/media", mediaRoutes);
+router.use("/admin/media", mediaRoutes);
 
 export default router;

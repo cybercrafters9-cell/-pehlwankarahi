@@ -11,6 +11,8 @@ import { getJwtSecret } from "./middleware/requireAuth";
 import { globalLimiter } from "./middleware/rateLimiter";
 import { validateDbEnv, checkDbHealth, closePool } from "./db/pool";
 import { runMigrations } from "./db/migrate";
+import { serveMedia } from "./controllers/media.controller";
+import { mediaRepository } from "./repositories/media.repository";
 
 // Load environment variables (.env from cwd and optionally server/.env if running from root)
 dotenv.config();
@@ -115,6 +117,9 @@ app.get("/api/health", async (_req, res) => {
   });
 });
 
+// Serve media files directly before global rate limiter for fast asset delivery
+app.get("/api/media/:id", serveMedia);
+
 // Mount API Routes with global rate limiting
 app.use("/api", globalLimiter, apiRoutes);
 
@@ -130,6 +135,7 @@ app.use((_req, res) => {
 app.use(errorHandler);
 
 let server: ReturnType<typeof app.listen> | null = null;
+let orphanCleanupInterval: NodeJS.Timeout | null = null;
 
 async function bootstrap() {
   validateDbEnv();
@@ -146,6 +152,18 @@ async function bootstrap() {
       process.exit(1);
     }
   }
+
+  // Schedule daily orphan media cleanup (every 24 hours)
+  orphanCleanupInterval = setInterval(async () => {
+    try {
+      const cleaned = await mediaRepository.cleanupOrphans();
+      if (cleaned > 0) {
+        console.log(`[Media] Cleaned up ${cleaned} orphan media records.`);
+      }
+    } catch (err) {
+      console.error("[Media] Orphan cleanup job failed:", err);
+    }
+  }, 24 * 60 * 60 * 1000);
 
   server = app.listen(PORT, HOST, () => {
     console.log(`
@@ -175,6 +193,10 @@ bootstrap().catch((err) => {
 
 const handleShutdown = (signal: string) => {
   console.log(`[Express] ${signal} received. Gracefully shutting down HTTP server...`);
+  if (orphanCleanupInterval) {
+    clearInterval(orphanCleanupInterval);
+    orphanCleanupInterval = null;
+  }
   if (server) {
     server.close(async () => {
       console.log("[Express] HTTP server closed.");

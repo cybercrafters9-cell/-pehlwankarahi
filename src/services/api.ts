@@ -68,6 +68,14 @@ export interface RestaurantSettings {
   paymentAccountTitle?: string;
 }
 
+export interface UploadedMedia {
+  id: number;
+  filename: string;
+  mimeType: string;
+  sizeBytes: number;
+  url: string;
+}
+
 export interface DashboardStats {
   totalRevenue: number;
   totalOrders: number;
@@ -177,7 +185,8 @@ async function request<T>(path: string, options: RequestOptions = {}): Promise<T
   const { method = "GET", body, auth, token } = options;
   const headers: Record<string, string> = {};
 
-  if (body !== undefined) {
+  const isFormData = typeof FormData !== "undefined" && body instanceof FormData;
+  if (body !== undefined && !isFormData) {
     headers["Content-Type"] = "application/json";
   }
 
@@ -192,7 +201,7 @@ async function request<T>(path: string, options: RequestOptions = {}): Promise<T
   const res = await fetch(url, {
     method,
     headers,
-    body: body !== undefined ? JSON.stringify(body) : undefined,
+    body: isFormData ? (body as FormData) : body !== undefined ? JSON.stringify(body) : undefined,
     cache: "no-store",
   });
 
@@ -301,6 +310,23 @@ export const api = {
       "/auth/credentials",
       { method: "PUT", body: data, auth: true, token }
     ),
+
+  // --- Media Storage ---
+  uploadMedia: (file: File | Blob, filename?: string) => {
+    const formData = new FormData();
+    formData.append("file", file, filename || (file instanceof File ? file.name : "upload.webp"));
+    return request<UploadedMedia>("/admin/media", {
+      method: "POST",
+      body: formData,
+      auth: true,
+    });
+  },
+
+  cleanupMedia: () =>
+    request<{ deletedCount: number }>("/admin/media/cleanup", {
+      method: "POST",
+      auth: true,
+    }),
 };
 
 export { clearSession, getToken };

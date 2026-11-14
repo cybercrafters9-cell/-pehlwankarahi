@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { resolveImageUrl } from "@/lib/media";
 import { useRestaurant } from "@/context/RestaurantContext";
 import { Star, Plus, X } from "lucide-react";
 
@@ -108,9 +109,10 @@ export default function MenuSection() {
               <div>
                 <div className="relative h-48 overflow-hidden bg-charcoal-900">
                   <Image
-                    src={dish.image}
+                    src={resolveImageUrl(dish.image)}
                     alt={dish.name}
                     fill
+                    unoptimized={dish.image.includes("/api/media/")}
                     sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
                     className="zoom-img object-cover"
                   />

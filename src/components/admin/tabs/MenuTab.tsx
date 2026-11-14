@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Image from "next/image";
+import { resolveImageUrl } from "@/lib/media";
 import { Dish } from "@/data/menu";
 import { Button } from "../ui/Button";
 import { Input } from "../ui/Input";
@@ -244,9 +245,10 @@ export function MenuTab({
                   {/* Image Container */}
                   <div className="relative h-44 overflow-hidden bg-charcoal-900">
                     <Image
-                      src={dish.image}
+                      src={resolveImageUrl(dish.image)}
                       alt={dish.name}
                       fill
+                      unoptimized={dish.image.includes("/api/media/")}
                       sizes="(max-width: 640px) 100vw, 25vw"
                       className="object-cover group-hover:scale-105 transition-transform duration-500"
                     />
