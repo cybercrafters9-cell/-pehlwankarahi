@@ -7,6 +7,7 @@ interface DishRow extends RowDataPacket {
   id: number;
   category_id: number;
   category_slug: string;
+  category_name?: string;
   name: string;
   tag: string;
   price: number;
@@ -59,7 +60,8 @@ function mapRow(row: DishRow): MenuItem {
   return {
     id: row.id,
     name: row.name,
-    category: row.category_slug as MenuItem["category"],
+    category: row.category_slug,
+    categoryName: row.category_name,
     tag: row.tag,
     price: row.price,
     rating: row.rating,
@@ -70,11 +72,13 @@ function mapRow(row: DishRow): MenuItem {
 }
 
 export const dishRepository = {
-  async getAll(): Promise<MenuItem[]> {
+  async getAll(includeUnavailable = false): Promise<MenuItem[]> {
+    const whereClause = includeUnavailable ? "" : "WHERE d.is_available = 1";
     const rows = await query<DishRow>(`
-      SELECT d.*, c.slug AS category_slug
+      SELECT d.*, c.slug AS category_slug, c.name AS category_name
       FROM dishes d
       JOIN categories c ON c.id = d.category_id
+      ${whereClause}
       ORDER BY d.sort_order ASC, d.id ASC
     `);
     return rows.map(mapRow);
@@ -83,7 +87,7 @@ export const dishRepository = {
   async getById(id: number): Promise<MenuItem | null> {
     const row = await queryOne<DishRow>(
       `
-      SELECT d.*, c.slug AS category_slug
+      SELECT d.*, c.slug AS category_slug, c.name AS category_name
       FROM dishes d
       JOIN categories c ON c.id = d.category_id
       WHERE d.id = ?

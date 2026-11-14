@@ -1,4 +1,6 @@
-import { Dish, CartItem } from "@/data/menu";
+import { Dish, CartItem, CategoryItem } from "@/data/menu";
+
+export type { CategoryItem, Dish, CartItem };
 
 // Cleanly resolve API base URL, ensuring /api path and no trailing slashes
 const getApiBaseUrl = (): string => {
@@ -229,24 +231,43 @@ async function request<T>(path: string, options: RequestOptions = {}): Promise<T
 }
 
 export const api = {
+  // --- Categories ---
+  getCategories: (activeOnly?: boolean) =>
+    request<CategoryItem[]>(`/categories${activeOnly ? "?activeOnly=true" : ""}`),
+
+  createCategory: (data: { name: string; slug?: string; sortOrder?: number; isActive?: boolean }) =>
+    request<CategoryItem>("/categories", { method: "POST", body: data, auth: true }),
+
+  updateCategory: (id: number, data: Partial<{ name: string; slug?: string; sortOrder?: number; isActive?: boolean }>) =>
+    request<CategoryItem>(`/categories/${id}`, { method: "PUT", body: data, auth: true }),
+
+  deleteCategory: (id: number) =>
+    request<{ id: number }>(`/categories/${id}`, { method: "DELETE", auth: true }),
+
+  reorderCategories: (ids: number[]) =>
+    request<void>("/categories/reorder", { method: "PUT", body: { ids }, auth: true }),
+
   // --- Menu ---
-  getMenu: (category?: string, search?: string) =>
-    request<Dish[]>(
-      `/menu${
-        category || search
-          ? `?${new URLSearchParams({
-              ...(category && category !== "all" ? { category } : {}),
-              ...(search?.trim() ? { search: search.trim() } : {}),
-            })}`
-          : ""
-      }`
-    ),
+  getMenu: (category?: string, search?: string, all?: boolean) => {
+    const params = new URLSearchParams();
+    if (category && category !== "all") params.set("category", category);
+    if (search && search.trim()) params.set("search", search.trim());
+    if (all) params.set("all", "true");
+    const qs = params.toString();
+    return request<Dish[]>(`/menu${qs ? `?${qs}` : ""}`);
+  },
 
   createDish: (dish: Omit<Dish, "id">) =>
     request<Dish>("/menu", { method: "POST", body: dish, auth: true }),
 
   updateDish: (id: number, updates: Partial<Dish>) =>
     request<Dish>(`/menu/${id}`, { method: "PUT", body: updates, auth: true }),
+
+  toggleDishAvailability: (id: number) =>
+    request<Dish>(`/menu/${id}/toggle-availability`, { method: "PATCH", auth: true }),
+
+  reorderDishes: (ids: number[]) =>
+    request<void>("/menu/reorder", { method: "PUT", body: { ids }, auth: true }),
 
   deleteDish: (id: number) =>
     request<unknown>(`/menu/${id}`, { method: "DELETE", auth: true }).then(() => true),

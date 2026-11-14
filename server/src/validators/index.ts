@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { CategoryType, OrderStatus, PaymentMethod, ReservationStatus } from "../types";
+import { OrderStatus, PaymentMethod, ReservationStatus } from "../types";
 
 // --- Common Validators ---
 export const pakistaniPhoneRegex = /^03\d{2}-?\d{7}$/;
@@ -36,18 +36,36 @@ export const priceSchema = z
 export const imageUrlSchema = z
   .string()
   .trim()
-  .url("Image must be a valid URL")
-  .regex(/^https?:\/\//i, "Image URL must start with http:// or https://")
   .max(1000, "Image URL must not exceed 1000 characters");
 
-export const categoryEnum = z.enum([
-  "karahi",
-  "mutton",
-  "chicken",
-  "bbq",
-  "rice",
-  "tandoor",
-] as const satisfies readonly [CategoryType, ...CategoryType[]]);
+export const categoryFieldSchema = z.union([
+  z.string().trim().min(1, "Category cannot be empty"),
+  z.number().positive(),
+]);
+
+export const createCategorySchema = z
+  .object({
+    name: z.string().trim().min(1, "Name is required").max(100),
+    slug: z.string().trim().max(100).optional(),
+    sortOrder: z.number().int().optional(),
+    isActive: z.boolean().optional(),
+  })
+  .strip();
+
+export const updateCategorySchema = z
+  .object({
+    name: z.string().trim().min(1).max(100).optional(),
+    slug: z.string().trim().max(100).optional(),
+    sortOrder: z.number().int().optional(),
+    isActive: z.boolean().optional(),
+  })
+  .strip();
+
+export const reorderSchema = z
+  .object({
+    ids: z.array(z.number().int()),
+  })
+  .strip();
 
 // --- Dish Schemas ---
 export const createDishSchema = z
@@ -57,7 +75,7 @@ export const createDishSchema = z
       .trim()
       .min(1, "Name is required")
       .max(100, "Name must not exceed 100 characters"),
-    category: categoryEnum,
+    category: categoryFieldSchema,
     tag: z
       .string()
       .trim()
@@ -78,7 +96,10 @@ export const createDishSchema = z
       .max(500, "Description must not exceed 500 characters")
       .optional(),
     image: imageUrlSchema.optional(),
+    imageUrl: imageUrlSchema.optional(),
+    imageMediaId: z.number().int().positive().nullable().optional(),
     isAvailable: z.boolean().optional(),
+    sortOrder: z.number().int().optional(),
   })
   .strip();
 
@@ -90,7 +111,7 @@ export const updateDishSchema = z
       .min(1, "Name cannot be empty")
       .max(100, "Name must not exceed 100 characters")
       .optional(),
-    category: categoryEnum.optional(),
+    category: categoryFieldSchema.optional(),
     tag: z
       .string()
       .trim()
@@ -111,7 +132,10 @@ export const updateDishSchema = z
       .max(500, "Description must not exceed 500 characters")
       .optional(),
     image: imageUrlSchema.optional(),
+    imageUrl: imageUrlSchema.optional(),
+    imageMediaId: z.number().int().positive().nullable().optional(),
     isAvailable: z.boolean().optional(),
+    sortOrder: z.number().int().optional(),
   })
   .strip();
 

@@ -8,8 +8,16 @@ import { X, Plus, ShoppingBag, Phone, Check } from "lucide-react";
 import { resolveImageUrl } from "@/lib/media";
 
 export default function MenuModal() {
-  const { isMenuModalOpen, setIsMenuModalOpen, dishes, addToCart, setIsCartOpen, cart } = useRestaurant();
-  const [filter, setFilter] = useState<"all" | "mutton" | "chicken">("all");
+  const {
+    isMenuModalOpen,
+    setIsMenuModalOpen,
+    dishes,
+    categories,
+    addToCart,
+    setIsCartOpen,
+    cart,
+  } = useRestaurant();
+  const [filter, setFilter] = useState<string>("all");
   const [addedDishId, setAddedDishId] = useState<number | null>(null);
 
   const totalCartCount = cart.reduce((sum, item) => sum + item.qty, 0);
@@ -88,37 +96,33 @@ export default function MenuModal() {
           </div>
 
           {/* Quick Category Filter Pills */}
-          <div className="flex items-center justify-center gap-2 mt-4 pt-1">
+          <div className="flex items-center justify-center gap-2 mt-4 pt-1 overflow-x-auto scrollbar-none max-w-full px-2">
             <button
               onClick={() => setFilter("all")}
-              className={`text-xs font-bold px-4 py-1.5 rounded-full transition-all cursor-pointer ${
+              className={`text-xs font-bold px-4 py-1.5 rounded-full transition-all cursor-pointer whitespace-nowrap ${
                 filter === "all"
                   ? "bg-white text-charcoal-900 shadow-md font-extrabold"
                   : "bg-white/15 text-white/80 hover:bg-white/25"
               }`}
             >
-              All Karahi ({dishes.length})
+              All Dishes ({dishes.length})
             </button>
-            <button
-              onClick={() => setFilter("mutton")}
-              className={`text-xs font-bold px-4 py-1.5 rounded-full transition-all cursor-pointer ${
-                filter === "mutton"
-                  ? "bg-saffron-400 text-charcoal-900 shadow-md font-extrabold"
-                  : "bg-white/15 text-white/80 hover:bg-white/25"
-              }`}
-            >
-              Mutton Karahi
-            </button>
-            <button
-              onClick={() => setFilter("chicken")}
-              className={`text-xs font-bold px-4 py-1.5 rounded-full transition-all cursor-pointer ${
-                filter === "chicken"
-                  ? "bg-saffron-400 text-charcoal-900 shadow-md font-extrabold"
-                  : "bg-white/15 text-white/80 hover:bg-white/25"
-              }`}
-            >
-              Chicken Karahi
-            </button>
+            {categories.map((cat) => {
+              const isActive = filter === cat.slug;
+              return (
+                <button
+                  key={cat.id}
+                  onClick={() => setFilter(cat.slug)}
+                  className={`text-xs font-bold px-4 py-1.5 rounded-full transition-all cursor-pointer whitespace-nowrap ${
+                    isActive
+                      ? "bg-saffron-400 text-charcoal-900 shadow-md font-extrabold"
+                      : "bg-white/15 text-white/80 hover:bg-white/25"
+                  }`}
+                >
+                  {cat.name}
+                </button>
+              );
+            })}
           </div>
         </div>
 

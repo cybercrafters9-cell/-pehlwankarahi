@@ -5,15 +5,10 @@ import { resolveImageUrl } from "@/lib/media";
 import { useRestaurant } from "@/context/RestaurantContext";
 import { Star, Plus, X } from "lucide-react";
 
-const categories = [
-  { id: "all", label: "🔥 All Karahi (9)" },
-  { id: "mutton", label: "🐑 Mutton Karahi (5)" },
-  { id: "chicken", label: "🍗 Chicken Karahi (4)" },
-];
-
 export default function MenuSection() {
   const {
     dishes,
+    categories,
     selectedCategory,
     setSelectedCategory,
     searchQuery,
@@ -64,19 +59,30 @@ export default function MenuSection() {
 
         {/* Category Filter Pills */}
         <div className="flex items-center gap-2 overflow-x-auto pb-2 md:pb-0 scrollbar-none">
+          <button
+            onClick={() => setSelectedCategory("all")}
+            className={`text-xs font-bold px-4 py-2.5 rounded-full whitespace-nowrap transition-all cursor-pointer ${
+              selectedCategory === "all" || selectedCategory === "karahi"
+                ? "bg-charcoal-900 text-white shadow"
+                : "bg-sand-200/80 hover:bg-sand-300 text-charcoal-900"
+            }`}
+          >
+            🔥 All Dishes ({dishes.length})
+          </button>
           {categories.map((cat) => {
-            const isActive = selectedCategory === cat.id;
+            const count = dishes.filter((d) => d.category === cat.slug).length;
+            const isActive = selectedCategory === cat.slug;
             return (
               <button
                 key={cat.id}
-                onClick={() => setSelectedCategory(cat.id)}
+                onClick={() => setSelectedCategory(cat.slug)}
                 className={`text-xs font-bold px-4 py-2.5 rounded-full whitespace-nowrap transition-all cursor-pointer ${
                   isActive
                     ? "bg-charcoal-900 text-white shadow"
                     : "bg-sand-200/80 hover:bg-sand-300 text-charcoal-900"
                 }`}
               >
-                {cat.label}
+                {cat.name} ({count})
               </button>
             );
           })}

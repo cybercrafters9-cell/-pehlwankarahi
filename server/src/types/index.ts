@@ -1,9 +1,10 @@
-export type CategoryType = "karahi" | "mutton" | "chicken" | "bbq" | "rice" | "tandoor";
+export type CategoryType = string;
 
 export interface MenuItem {
   id: number;
   name: string;
-  category: CategoryType;
+  category: string;
+  categoryName?: string;
   tag: string;
   price: number;
   rating: string;

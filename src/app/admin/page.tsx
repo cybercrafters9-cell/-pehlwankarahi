@@ -11,7 +11,7 @@ import {
   isAuthExpiredError,
   getErrorMessage,
 } from "@/services/api";
-import { Dish, menuDishes as fallbackMenu } from "@/data/menu";
+import { Dish, CategoryItem } from "@/data/menu";
 import { AdminLogin } from "@/components/admin/AdminLogin";
 import { OverviewTab } from "@/components/admin/tabs/OverviewTab";
 import { MenuTab } from "@/components/admin/tabs/MenuTab";
@@ -60,7 +60,8 @@ export default function AdminPage() {
 
   // Data States
   const [stats, setStats] = useState<DashboardStats | null>(null);
-  const [dishes, setDishes] = useState<Dish[]>(fallbackMenu);
+  const [dishes, setDishes] = useState<Dish[]>([]);
+  const [categories, setCategories] = useState<CategoryItem[]>([]);
   const [orders, setOrders] = useState<OrderRecord[]>([]);
   const [reservations, setReservations] = useState<ReservationRecord[]>([]);
   const [settings, setSettings] = useState<RestaurantSettings | null>(null);
@@ -122,13 +123,14 @@ export default function AdminPage() {
   const fetchData = useCallback(() => {
     setIsLoading(true);
     return Promise.allSettled([
-      api.getMenu(),
+      api.getMenu(undefined, undefined, true),
+      api.getCategories(),
       api.getOrders(),
       api.getReservations(),
       api.getSettings(),
       api.getStats(),
     ])
-      .then(([menuData, ordersData, resData, settingsData, statsData]) => {
+      .then(([menuData, categoriesData, ordersData, resData, settingsData, statsData]) => {
         const authResults = [ordersData, resData, statsData];
         const expired = authResults.some(
           (r) => r.status === "rejected" && isAuthExpiredError(r.reason)
@@ -138,8 +140,11 @@ export default function AdminPage() {
           return;
         }
 
-        if (menuData.status === "fulfilled" && menuData.value.length > 0) {
+        if (menuData.status === "fulfilled") {
           setDishes(menuData.value);
+        }
+        if (categoriesData.status === "fulfilled") {
+          setCategories(categoriesData.value);
         }
         if (ordersData.status === "fulfilled") {
           setOrders(ordersData.value);
@@ -220,6 +225,78 @@ export default function AdminPage() {
     } catch (err: unknown) {
       if (checkAuthExpired(err)) return;
       showToast(getErrorMessage(err, `Failed to delete dish #${id}`), "error");
+    }
+  };
+
+  const handleToggleDishAvailability = async (id: number) => {
+    try {
+      const updated = await api.toggleDishAvailability(id);
+      setDishes((prev) => prev.map((d) => (d.id === id ? updated : d)));
+      showToast(`Dish #${id} marked as ${updated.isAvailable ? "Available" : "Sold Out"}`);
+    } catch (err: unknown) {
+      if (checkAuthExpired(err)) return;
+      showToast(getErrorMessage(err, "Failed to toggle availability"), "error");
+    }
+  };
+
+  const handleReorderDishes = async (ids: number[]) => {
+    try {
+      await api.reorderDishes(ids);
+      setDishes((prev) => {
+        const map = new Map(prev.map((d) => [d.id, d]));
+        return ids.map((id) => map.get(id)!).filter(Boolean);
+      });
+      showToast("Menu reordered successfully!");
+    } catch (err: unknown) {
+      if (checkAuthExpired(err)) return;
+      showToast(getErrorMessage(err, "Failed to reorder menu"), "error");
+    }
+  };
+
+  const handleCreateCategory = async (data: { name: string; slug?: string }) => {
+    try {
+      const newCat = await api.createCategory(data);
+      setCategories((prev) => [...prev, newCat]);
+      showToast(`Category "${newCat.name}" created!`);
+    } catch (err: unknown) {
+      if (checkAuthExpired(err)) return;
+      showToast(getErrorMessage(err, "Failed to create category"), "error");
+    }
+  };
+
+  const handleUpdateCategory = async (id: number, data: Partial<CategoryItem>) => {
+    try {
+      const updated = await api.updateCategory(id, data);
+      setCategories((prev) => prev.map((c) => (c.id === id ? updated : c)));
+      showToast(`Category #${id} updated!`);
+    } catch (err: unknown) {
+      if (checkAuthExpired(err)) return;
+      showToast(getErrorMessage(err, "Failed to update category"), "error");
+    }
+  };
+
+  const handleDeleteCategory = async (id: number) => {
+    try {
+      await api.deleteCategory(id);
+      setCategories((prev) => prev.filter((c) => c.id !== id));
+      showToast(`Category #${id} deleted.`);
+    } catch (err: unknown) {
+      if (checkAuthExpired(err)) return;
+      showToast(getErrorMessage(err, "Failed to delete category"), "error");
+    }
+  };
+
+  const handleReorderCategories = async (ids: number[]) => {
+    try {
+      await api.reorderCategories(ids);
+      setCategories((prev) => {
+        const map = new Map(prev.map((c) => [c.id, c]));
+        return ids.map((id) => map.get(id)!).filter(Boolean);
+      });
+      showToast("Categories reordered successfully!");
+    } catch (err: unknown) {
+      if (checkAuthExpired(err)) return;
+      showToast(getErrorMessage(err, "Failed to reorder categories"), "error");
     }
   };
 
@@ -399,9 +476,16 @@ export default function AdminPage() {
         {activeTab === "menu" && (
           <MenuTab
             dishes={dishes}
+            categories={categories}
             onCreateDish={handleCreateDish}
             onUpdateDish={handleUpdateDish}
+            onToggleDishAvailability={handleToggleDishAvailability}
+            onReorderDishes={handleReorderDishes}
             onDeleteDish={handleDeleteDish}
+            onCreateCategory={handleCreateCategory}
+            onUpdateCategory={handleUpdateCategory}
+            onDeleteCategory={handleDeleteCategory}
+            onReorderCategories={handleReorderCategories}
             isLoading={isLoading}
           />
         )}
