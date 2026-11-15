@@ -1,41 +1,63 @@
 import fs from "fs";
 import path from "path";
+import dotenv from "dotenv";
+import { RowDataPacket } from "mysql2/promise";
+import { query, closePool } from "../src/db/pool";
 
-interface StoreDish {
+interface CategoryRow extends RowDataPacket {
   id: number;
+  slug: string;
   name: string;
-  category: string;
+  sort_order: number;
+  is_active: number;
+}
+
+interface DishRow extends RowDataPacket {
+  id: number;
+  category_id: number;
+  name: string;
   tag: string;
   price: number;
   rating: string;
-  desc: string;
-  image: string;
-  isAvailable?: boolean;
+  description: string;
+  image_url: string;
+  is_available: number;
+  sort_order: number;
 }
 
-interface StoreSettings {
-  restaurantName: string;
+interface SettingsRow extends RowDataPacket {
+  id: number;
+  restaurant_name: string;
   tagline: string;
   phone: string;
   whatsapp: string;
   landline: string;
   email: string;
   address: string;
-  branches: string[];
+  branches: string;
   timings: string;
-  deliveryFee: number;
-  minOrder: number;
-  deliveryEstimate: string;
+  delivery_fee: number;
+  min_order: number;
+  delivery_estimate: string;
   announcement: string;
-  isLiveWokActive: boolean;
-  easypaisaNumber?: string;
-  jazzcashNumber?: string;
-  paymentAccountTitle?: string;
+  is_live_wok_active: number;
+  is_accepting_orders: number;
+  announcement_enabled: number;
+  opening_time: string;
+  closing_time: string;
+  free_delivery_threshold: number;
+  easypaisa_number: string;
+  jazzcash_number: string;
+  payment_account_title: string;
 }
 
-interface StoreJson {
-  menu: StoreDish[];
-  settings: StoreSettings;
+interface SiteSlotRow extends RowDataPacket {
+  slot_key: string;
+  section: string;
+  label: string;
+  alt_text: string;
+  fallback_url: string;
+  sort_order: number;
 }
 
 function escapeSql(value: string | number | boolean | null | undefined): string {
@@ -68,96 +90,92 @@ function escapeSql(value: string | number | boolean | null | undefined): string 
   })}'`;
 }
 
-export function exportSeed(): void {
-  const storePath = path.resolve(process.cwd(), "server", "data", "store.json");
-  if (!fs.existsSync(storePath)) {
-    throw new Error(`[ExportSeed] store.json not found at ${storePath}`);
-  }
-
-  const storeRaw = fs.readFileSync(storePath, "utf8");
-  const store: StoreJson = JSON.parse(storeRaw);
-
+export async function exportSeed(): Promise<void> {
   const outDir = path.resolve(process.cwd(), "database");
   if (!fs.existsSync(outDir)) {
     fs.mkdirSync(outDir, { recursive: true });
   }
   const outFile = path.join(outDir, "seed.sql");
 
+  console.log("[ExportSeed] Fetching seed data from MySQL database...");
+  const categories = await query<CategoryRow>("SELECT * FROM categories ORDER BY sort_order ASC, id ASC");
+  const dishes = await query<DishRow>("SELECT * FROM dishes ORDER BY sort_order ASC, id ASC");
+  const settingsRows = await query<SettingsRow>("SELECT * FROM settings WHERE id = 1");
+  const siteSlots = await query<SiteSlotRow>("SELECT * FROM site_slots ORDER BY sort_order ASC, id ASC");
+
   const lines: string[] = [];
   lines.push("-- ============================================================");
   lines.push("-- PEHALWAN KARAHI & DERAGHAR — HOSTINGER DATABASE SEED DATA");
-  lines.push("-- Exported from store.json (Menu and Settings ONLY)");
+  lines.push("-- Exported from MySQL Database (Categories, Menu, Settings & Slots)");
   lines.push("-- Run this script in phpMyAdmin on Hostinger MySQL");
   lines.push("-- ============================================================\n");
   lines.push("SET FOREIGN_KEY_CHECKS = 0;\n");
 
   // 1. Categories
-  const categoryNames: Record<string, string> = {
-    karahi: "Special Karahi & Handi",
-    bbq: "Charcoal Bar B Q",
-    rice: "Matka Dum Biryani & Pulao",
-    tandoor: "Garam Tandoor & Desserts",
-  };
-
-  const rawCategories = Array.from(new Set(store.menu.map((d) => d.category)));
-  const categoryMap = new Map<string, number>();
-
-  lines.push("-- Categories");
-  lines.push("INSERT INTO categories (id, slug, name, sort_order, is_active) VALUES");
-  const catInserts: string[] = [];
-  rawCategories.forEach((slug, idx) => {
-    const id = idx + 1;
-    categoryMap.set(slug, id);
-    const name = categoryNames[slug] || slug.toUpperCase();
-    catInserts.push(`  (${id}, ${escapeSql(slug)}, ${escapeSql(name)}, ${id}, 1)`);
-  });
-  lines.push(catInserts.join(",\n") + "\nON DUPLICATE KEY UPDATE name=VALUES(name), sort_order=VALUES(sort_order);\n");
+  if (categories.length > 0) {
+    lines.push("-- Categories");
+    lines.push("INSERT INTO categories (id, slug, name, sort_order, is_active) VALUES");
+    const catInserts = categories.map(
+      (c) => `  (${c.id}, ${escapeSql(c.slug)}, ${escapeSql(c.name)}, ${c.sort_order}, ${c.is_active})`
+    );
+    lines.push(
+      catInserts.join(",\n") +
+        "\nON DUPLICATE KEY UPDATE name=VALUES(name), sort_order=VALUES(sort_order), is_active=VALUES(is_active);\n"
+    );
+  }
 
   // 2. Dishes
-  lines.push("-- Dishes");
-  lines.push(
-    "INSERT INTO dishes (id, category_id, name, tag, price, rating, description, image_url, is_available, sort_order) VALUES"
-  );
-  const dishInserts: string[] = [];
-  store.menu.forEach((dish, idx) => {
-    const catId = categoryMap.get(dish.category) || 1;
-    const isAvail = dish.isAvailable !== false ? 1 : 0;
-    dishInserts.push(
-      `  (${dish.id}, ${catId}, ${escapeSql(dish.name)}, ${escapeSql(dish.tag || "")}, ${Number(dish.price)}, ${escapeSql(dish.rating || "4.9")}, ${escapeSql(dish.desc || "")}, ${escapeSql(dish.image)}, ${isAvail}, ${idx + 1})`
+  if (dishes.length > 0) {
+    lines.push("-- Dishes");
+    lines.push(
+      "INSERT INTO dishes (id, category_id, name, tag, price, rating, description, image_url, is_available, sort_order) VALUES"
     );
-  });
-  lines.push(
-    dishInserts.join(",\n") +
-      "\nON DUPLICATE KEY UPDATE name=VALUES(name), price=VALUES(price), description=VALUES(description), image_url=VALUES(image_url);\n"
-  );
+    const dishInserts = dishes.map(
+      (d) =>
+        `  (${d.id}, ${d.category_id}, ${escapeSql(d.name)}, ${escapeSql(d.tag)}, ${d.price}, ${escapeSql(
+          d.rating
+        )}, ${escapeSql(d.description)}, ${escapeSql(d.image_url)}, ${d.is_available}, ${d.sort_order})`
+    );
+    lines.push(
+      dishInserts.join(",\n") +
+        "\nON DUPLICATE KEY UPDATE name=VALUES(name), price=VALUES(price), description=VALUES(description), image_url=VALUES(image_url), is_available=VALUES(is_available);\n"
+    );
+  }
 
   // 3. Settings
-  lines.push("-- Settings");
-  const s = store.settings;
-  const branchesJson = JSON.stringify(s.branches || []);
-  lines.push(`INSERT INTO settings (
+  if (settingsRows.length > 0) {
+    const s = settingsRows[0];
+    lines.push("-- Settings");
+    lines.push(`INSERT INTO settings (
   id, restaurant_name, tagline, phone, whatsapp, landline, email,
   address, branches, timings, delivery_fee, min_order, delivery_estimate,
-  announcement, is_live_wok_active, easypaisa_number, jazzcash_number, payment_account_title
+  announcement, is_live_wok_active, is_accepting_orders, announcement_enabled,
+  opening_time, closing_time, free_delivery_threshold,
+  easypaisa_number, jazzcash_number, payment_account_title
 ) VALUES (
   1,
-  ${escapeSql(s.restaurantName)},
+  ${escapeSql(s.restaurant_name)},
   ${escapeSql(s.tagline)},
   ${escapeSql(s.phone)},
   ${escapeSql(s.whatsapp)},
   ${escapeSql(s.landline)},
   ${escapeSql(s.email)},
   ${escapeSql(s.address)},
-  ${escapeSql(branchesJson)},
+  ${escapeSql(s.branches)},
   ${escapeSql(s.timings)},
-  ${Number(s.deliveryFee || 0)},
-  ${Number(s.minOrder || 500)},
-  ${escapeSql(s.deliveryEstimate || "28–35 mins")},
+  ${Number(s.delivery_fee || 0)},
+  ${Number(s.min_order || 500)},
+  ${escapeSql(s.delivery_estimate || "28–35 mins")},
   ${escapeSql(s.announcement)},
-  ${s.isLiveWokActive ? 1 : 0},
-  ${escapeSql(s.easypaisaNumber || "03001234567")},
-  ${escapeSql(s.jazzcashNumber || "03219876543")},
-  ${escapeSql(s.paymentAccountTitle || "Pehalwan Karahi & DeraGhar")}
+  ${s.is_live_wok_active ? 1 : 0},
+  ${s.is_accepting_orders ? 1 : 0},
+  ${s.announcement_enabled ? 1 : 0},
+  ${escapeSql(s.opening_time || "12:00 PM")},
+  ${escapeSql(s.closing_time || "02:00 AM")},
+  ${Number(s.free_delivery_threshold || 3000)},
+  ${escapeSql(s.easypaisa_number || "03001234567")},
+  ${escapeSql(s.jazzcash_number || "03219876543")},
+  ${escapeSql(s.payment_account_title || "Pehalwan Karahi & DeraGhar")}
 ) ON DUPLICATE KEY UPDATE
   restaurant_name=VALUES(restaurant_name),
   tagline=VALUES(tagline),
@@ -169,7 +187,31 @@ export function exportSeed(): void {
   delivery_fee=VALUES(delivery_fee),
   min_order=VALUES(min_order),
   delivery_estimate=VALUES(delivery_estimate),
-  announcement=VALUES(announcement);\n`);
+  announcement=VALUES(announcement),
+  is_accepting_orders=VALUES(is_accepting_orders),
+  announcement_enabled=VALUES(announcement_enabled),
+  opening_time=VALUES(opening_time),
+  closing_time=VALUES(closing_time),
+  free_delivery_threshold=VALUES(free_delivery_threshold);\n`);
+  }
+
+  // 4. Site Slots
+  if (siteSlots.length > 0) {
+    lines.push("-- Site Slots");
+    lines.push(
+      "INSERT INTO site_slots (slot_key, section, label, alt_text, fallback_url, sort_order) VALUES"
+    );
+    const slotInserts = siteSlots.map(
+      (sl) =>
+        `  (${escapeSql(sl.slot_key)}, ${escapeSql(sl.section)}, ${escapeSql(sl.label)}, ${escapeSql(
+          sl.alt_text
+        )}, ${escapeSql(sl.fallback_url)}, ${sl.sort_order})`
+    );
+    lines.push(
+      slotInserts.join(",\n") +
+        "\nON DUPLICATE KEY UPDATE label=VALUES(label), alt_text=VALUES(alt_text), fallback_url=VALUES(fallback_url);\n"
+    );
+  }
 
   lines.push("SET FOREIGN_KEY_CHECKS = 1;\n");
 
@@ -178,10 +220,19 @@ export function exportSeed(): void {
 }
 
 if (require.main === module) {
-  try {
-    exportSeed();
-  } catch (err: unknown) {
-    console.error("[ExportSeed] Error:", err);
-    process.exit(1);
+  dotenv.config();
+  const serverEnv = path.resolve(process.cwd(), "server", ".env");
+  if (fs.existsSync(serverEnv)) {
+    dotenv.config({ path: serverEnv });
   }
+
+  exportSeed()
+    .then(async () => {
+      await closePool();
+      process.exit(0);
+    })
+    .catch((err: unknown) => {
+      console.error("[ExportSeed] Error:", err);
+      process.exit(1);
+    });
 }
