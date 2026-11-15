@@ -11,7 +11,7 @@ interface CartHeaderProps {
 
 const STEP_TITLES: Record<DrawerStep, { title: string; subtitle: string }> = {
   cart: {
-    title: "Your Desi Dastarkhwan",
+    title: "Your Order Cart",
     subtitle: "Review your sizzling Karahi selections",
   },
   checkout: {
@@ -19,8 +19,8 @@ const STEP_TITLES: Record<DrawerStep, { title: string; subtitle: string }> = {
     subtitle: "Enter delivery address & select payment method",
   },
   success: {
-    title: "Order Confirmed!",
-    subtitle: "Dispatched to live wok & tandoor",
+    title: "Order Submitted!",
+    subtitle: "Complete payment to confirm delivery",
   },
 };
 

@@ -14,7 +14,7 @@ const INITIAL_FORM: CheckoutFormData = {
   customerPhone: "",
   address: "",
   notes: "",
-  paymentMethod: "cod",
+  paymentMethod: "easypaisa",
   transactionId: "",
 };
 
@@ -85,11 +85,23 @@ export default function CartDrawer() {
 
   const validateForm = () => {
     const errs: typeof errors = {};
-    if (!formData.customerName.trim()) errs.name = "Please enter your name";
-    if (!formData.customerPhone.trim() || formData.customerPhone.trim().length < 10) {
-      errs.phone = "Enter a valid 11-digit phone number (e.g. 0300-1234567)";
+    if (!formData.customerName.trim()) {
+      errs.name = "Please enter your full name";
     }
-    if (!formData.address.trim()) errs.address = "Please enter your delivery address / location";
+
+    const cleanPhone = formData.customerPhone.replace(/\D/g, "");
+    if (!formData.customerPhone.trim()) {
+      errs.phone = "Phone number is compulsory";
+    } else if (cleanPhone.length !== 11) {
+      errs.phone = "Phone number must be exactly 11 digits (e.g. 03001234567)";
+    }
+
+    if (!formData.address.trim()) {
+      errs.address = "Delivery address is compulsory";
+    } else if (formData.address.trim().length < 5) {
+      errs.address = "Please enter a complete delivery address";
+    }
+
     setErrors(errs);
     return Object.keys(errs).length === 0;
   };
@@ -103,7 +115,7 @@ export default function CartDrawer() {
         customerName: formData.customerName.trim(),
         customerPhone: formData.customerPhone.trim(),
         address: formData.address.trim(),
-        spiceLevel,
+        spiceLevel: "Standard",
         paymentMethod: formData.paymentMethod,
         transactionId: formData.transactionId.trim() || undefined,
         notes: formData.notes.trim() || undefined,
@@ -117,10 +129,12 @@ export default function CartDrawer() {
           customerPhone: formData.customerPhone.trim(),
           address: formData.address.trim(),
           subtotal: result.subtotal ?? subtotal,
+          deliveryFee: result.deliveryFee ?? deliveryFee,
           discount: result.discount ?? discount,
           totalAmount: result.total,
           paymentMethod: formData.paymentMethod,
           transactionId: formData.transactionId.trim(),
+          items: cart.map((i) => ({ id: i.id, name: i.name, price: i.price, qty: i.qty })),
         });
         setStep("success");
       }
@@ -175,8 +189,6 @@ export default function CartDrawer() {
             totalAmount={totalAmount}
             discount={discount}
             cartItemsCount={cart.reduce((s, i) => s + i.qty, 0)}
-            spiceLevel={spiceLevel}
-            setSpiceLevel={setSpiceLevel}
             copiedAccount={copiedAccount}
             onCopy={handleCopy}
             loyaltyPhone={loyaltyPhone}

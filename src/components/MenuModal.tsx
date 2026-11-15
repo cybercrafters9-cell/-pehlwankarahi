@@ -277,7 +277,7 @@ export default function MenuModal() {
           )}
 
           <div className="hidden md:block text-[11px] uppercase tracking-widest text-white/60 font-semibold">
-            Pehalwan Karahi • Asli Desi Riwayat
+            Pehalwan Karahi • Authentic Heritage
           </div>
 
           {totalCartCount > 0 ? (

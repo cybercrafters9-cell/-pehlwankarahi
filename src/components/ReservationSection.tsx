@@ -7,7 +7,7 @@ import { useSlot } from "@/context/SiteContentContext";
 import { PhoneCall, CheckCircle } from "lucide-react";
 
 export default function ReservationSection() {
-  const { showToast, addToCart, spiceLevel, setSpiceLevel, reserveTable, settings, dishes } = useRestaurant();
+  const { showToast, addToCart, reserveTable, settings, dishes } = useRestaurant();
   const resSlot = useSlot("reservation.main", {
     url: "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?auto=format&fit=crop&w=900&q=85",
     alt: "Sizzling Charcoal Sajji & Lemon Chops",
@@ -46,12 +46,6 @@ export default function ReservationSection() {
       setIsSubmitting(false);
     }
   };
-
-  const spiceOptions = [
-    { id: "Namkeen Mild", label: "Mild" },
-    { id: "Chatpata Desi", label: "Karara" },
-    { id: "Full Angara", label: "Angara 🌶️" },
-  ];
 
   return (
     <section id="reservation-section" className="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-10">
@@ -171,28 +165,10 @@ export default function ReservationSection() {
         />
         <div className="absolute inset-0 bg-gradient-to-t from-charcoal-900 via-charcoal-900/30 to-transparent" />
 
-        {/* Interactive Spice Level Selector Top-Left */}
-        <div className="absolute top-5 left-5 bg-charcoal-900/85 backdrop-blur-md border border-white/15 rounded-full p-1.5 flex items-center gap-1 text-[11px] text-white z-10">
-          <span className="px-2.5 py-1 text-white/70 font-semibold">Mirch Level:</span>
-          {spiceOptions.map((opt) => {
-            const isSelected = spiceLevel === opt.id;
-            return (
-              <button
-                key={opt.id}
-                onClick={() => {
-                  setSpiceLevel(opt.id);
-                  showToast(`🌶️ Spice preference set to: ${opt.id}`);
-                }}
-                className={`px-2.5 py-1 rounded-full transition cursor-pointer ${
-                  isSelected
-                    ? "bg-terracotta-500 font-bold"
-                    : "hover:bg-white/10"
-                }`}
-              >
-                {opt.label}
-              </button>
-            );
-          })}
+        {/* Signature Badge Top-Left */}
+        <div className="absolute top-5 left-5 bg-charcoal-900/85 backdrop-blur-md border border-white/15 rounded-full px-3 py-1 flex items-center gap-1.5 text-xs text-white z-10">
+          <span className="w-2 h-2 rounded-full bg-saffron-400 animate-pulse" />
+          <span className="font-semibold text-white/90">Chef&apos;s Signature</span>
         </div>
 
         {/* Dish Details Overlay */}

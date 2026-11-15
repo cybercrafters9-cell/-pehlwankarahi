@@ -1,9 +1,9 @@
 "use client";
 
 import React from "react";
-import { Loader2, ArrowRight, AlertCircle } from "lucide-react";
+import { Loader2, ArrowRight, AlertCircle, Clock } from "lucide-react";
 import { LoyaltyPassSummary, RestaurantSettings } from "@/services/api";
-import { CheckoutFormData } from "./types";
+import { CheckoutFormData, getDeliverySchedule } from "./types";
 import CustomerSection from "./CustomerSection";
 import AddressSection from "./AddressSection";
 import SpiceAndNotesSection from "./SpiceAndNotesSection";
@@ -17,8 +17,6 @@ interface CheckoutFormProps {
   totalAmount: number;
   discount: number;
   cartItemsCount: number;
-  spiceLevel: string;
-  setSpiceLevel: (lvl: string) => void;
   copiedAccount: string | null;
   onCopy: (text: string, label: string) => void;
   loyaltyPhone: string;
@@ -43,8 +41,6 @@ export default function CheckoutForm({
   totalAmount,
   discount,
   cartItemsCount,
-  spiceLevel,
-  setSpiceLevel,
   copiedAccount,
   onCopy,
   loyaltyPhone,
@@ -67,6 +63,8 @@ export default function CheckoutForm({
   const diffMin = minOrder - subtotal;
   const isClosed = settings?.isAcceptingOrders === false;
 
+  const deliverySchedule = getDeliverySchedule();
+
   return (
     <form onSubmit={onSubmit} className="flex-1 flex flex-col justify-between overflow-hidden">
       <div className="p-5 overflow-y-auto space-y-5 flex-1 scrollbar-thin">
@@ -86,6 +84,22 @@ export default function CheckoutForm({
           <span className="bg-charcoal-900 text-white text-[10px] font-bold px-2.5 py-1 rounded-full">
             {cartItemsCount} Karahi Items
           </span>
+        </div>
+
+        {/* Next Day Delivery Schedule Banner */}
+        <div className="bg-amber-50/90 border border-amber-200 rounded-2xl p-3 flex items-start gap-2.5 text-xs">
+          <Clock className="w-4 h-4 text-amber-700 shrink-0 mt-0.5" />
+          <div className="space-y-0.5">
+            <div className="flex items-center gap-1.5 flex-wrap">
+              <span className="font-extrabold text-amber-950">Delivery Schedule:</span>
+              <span className="font-bold text-amber-800 bg-amber-200/80 px-2 py-0.5 rounded-full text-[10px]">
+                {deliverySchedule.etaText}
+              </span>
+            </div>
+            <p className="text-[11px] text-amber-900/80 leading-relaxed">
+              {deliverySchedule.policyNote}
+            </p>
+          </div>
         </div>
 
         {/* 1. Customer Information */}
@@ -122,15 +136,13 @@ export default function CheckoutForm({
           error={errors.address}
         />
 
-        {/* Spice Level & Cooking Instructions */}
+        {/* Cooking & Delivery Notes (Spice level removed as requested) */}
         <SpiceAndNotesSection
-          spiceLevel={spiceLevel}
-          setSpiceLevel={setSpiceLevel}
           notes={notes}
           onNotesChange={(val) => updateField("notes", val)}
         />
 
-        {/* 3. Payment Method */}
+        {/* 3. Payment Method (Digital Only) */}
         <PaymentPicker
           paymentMethod={paymentMethod}
           setPaymentMethod={(method) => updateField("paymentMethod", method)}
@@ -183,7 +195,7 @@ export default function CheckoutForm({
           {isSubmittingOrder ? (
             <>
               <Loader2 className="w-4 h-4 animate-spin" />
-              <span>Dispatching to Live Wok...</span>
+              <span>Placing Order...</span>
             </>
           ) : isClosed ? (
             <span>Online Orders Closed</span>
@@ -191,7 +203,7 @@ export default function CheckoutForm({
             <span>Minimum Order Rs. {minOrder}</span>
           ) : (
             <>
-              <span>Confirm &amp; Place Order</span>
+              <span>Place Order &amp; Proceed to Verification</span>
               <ArrowRight className="w-4 h-4" />
             </>
           )}

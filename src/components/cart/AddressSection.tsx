@@ -25,7 +25,7 @@ export default function AddressSection({
 
       <div>
         <label className="block text-[11px] font-bold text-charcoal-800 mb-1">
-          Complete Street Address &amp; Sector <span className="text-terracotta-500">*</span>
+          Complete Street Address &amp; Sector (Compulsory) <span className="text-terracotta-500">*</span>
         </label>
         <textarea
           rows={2}

@@ -1,5 +1,5 @@
 export type DrawerStep = "cart" | "checkout" | "success";
-export type PaymentType = "cod" | "easypaisa" | "jazzcash";
+export type PaymentType = "easypaisa" | "jazzcash";
 export type DigitalPaymentMethod = "easypaisa" | "jazzcash";
 
 export interface CompletedOrderSummary {
@@ -8,10 +8,12 @@ export interface CompletedOrderSummary {
   customerPhone: string;
   address: string;
   subtotal?: number;
+  deliveryFee?: number;
   discount?: number;
   totalAmount: number;
   paymentMethod: PaymentType;
   transactionId?: string;
+  items?: { id: number; name: string; price: number; qty: number }[];
 }
 
 export interface PaymentAccountConfig {
@@ -90,7 +92,7 @@ export const QUICK_AREAS = [
   "Gulberg / D-Ground",
   "Madina Town",
   "Civil Lines",
-  "Dine-in / Pickup",
+  "Peoples Colony",
 ];
 
 export interface CheckoutFormData {
@@ -102,3 +104,22 @@ export interface CheckoutFormData {
   transactionId: string;
 }
 
+export function getDeliverySchedule(orderDate = new Date()) {
+  const hour = orderDate.getHours();
+  const isBefore7PM = hour < 19;
+  const target = new Date(orderDate);
+  target.setDate(target.getDate() + (isBefore7PM ? 1 : 2));
+  const formattedDate = target.toLocaleDateString("en-US", {
+    weekday: "long",
+    month: "short",
+    day: "numeric",
+  });
+
+  return {
+    isBefore7PM,
+    deliveryDate: formattedDate,
+    badgeText: isBefore7PM ? "Next Day Delivery" : "Scheduled Delivery",
+    etaText: isBefore7PM ? `Tomorrow (${formattedDate})` : `${formattedDate}`,
+    policyNote: "Orders confirmed before 7:00 PM are delivered the next day.",
+  };
+}

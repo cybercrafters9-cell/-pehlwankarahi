@@ -59,13 +59,14 @@ export default function CustomerSection({
 
       <div>
         <label className="block text-[11px] font-bold text-charcoal-800 mb-1">
-          Phone / WhatsApp Number <span className="text-terracotta-500">*</span>
+          Mobile / WhatsApp Number (11 Digits) <span className="text-terracotta-500">*</span>
         </label>
         <div className="relative">
           <input
             type="tel"
             required
-            placeholder="0300-1234567"
+            maxLength={13}
+            placeholder="03001234567"
             value={customerPhone}
             onChange={(e) => onUpdate("customerPhone", e.target.value)}
             className={`w-full bg-white border ${

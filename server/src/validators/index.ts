@@ -284,7 +284,7 @@ export const orderItemSchema = createOrderItemInputSchema;
 
 export const orderItemsInputSchema = z
   .array(createOrderItemInputSchema)
-  .min(1, "Cart cannot be empty. Please add items to your Dastarkhwan.")
+  .min(1, "Cart cannot be empty. Please add items to your cart.")
   .max(30, "Cannot order more than 30 item lines.")
   .transform((items) => {
     const merged = new Map<number, number>();
@@ -300,27 +300,28 @@ export const createOrderSchema = z
     customerName: z
       .string()
       .trim()
-      .max(100, "Customer name must not exceed 100 characters")
-      .optional(),
+      .min(1, "Customer name is required")
+      .max(100, "Customer name must not exceed 100 characters"),
     customerPhone: z
       .string()
       .trim()
-      .regex(
-        pakistaniPhoneRegex,
-        "Invalid Pakistani mobile number. Format must be 03XX-XXXXXXX or 03XXXXXXXXX"
-      )
-      .optional(),
+      .min(1, "Phone number is required")
+      .refine(
+        (val) => val.replace(/\D/g, "").length === 11,
+        "Phone number must be exactly 11 digits (e.g. 03001234567)"
+      ),
     address: z
       .string()
       .trim()
-      .max(300, "Address must not exceed 300 characters")
-      .optional(),
+      .min(5, "Delivery address is required and must be at least 5 characters")
+      .max(300, "Address must not exceed 300 characters"),
     items: orderItemsInputSchema,
     spiceLevel: z
       .string()
       .trim()
       .max(50, "Spice level must not exceed 50 characters")
-      .optional(),
+      .optional()
+      .default("Standard"),
     notes: z
       .string()
       .trim()
@@ -330,7 +331,7 @@ export const createOrderSchema = z
       .transform(normalizePhone)
       .optional()
       .or(z.literal("").transform(() => undefined)),
-    paymentMethod: paymentMethodEnum.optional().default("cod"),
+    paymentMethod: paymentMethodEnum.optional().default("easypaisa"),
     transactionId: z
       .string()
       .trim()

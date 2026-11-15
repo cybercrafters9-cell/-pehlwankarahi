@@ -172,7 +172,7 @@ export default function BentoGrid() {
 
           {/* Right Side */}
           <div className="sm:border-l sm:border-white/20 sm:pl-6 max-w-[240px]">
-            <p className="font-serif italic text-saffron-400 text-sm">Garma Garam Tandoor</p>
+            <p className="font-serif italic text-saffron-400 text-sm">Fresh Clay Tandoor</p>
             <h4 className="font-display font-bold text-lg sm:text-xl leading-snug mt-0.5">
               100% Pure Chakki &amp; Desi Ghee Tarka
             </h4>
@@ -226,10 +226,10 @@ export default function BentoGrid() {
         <div className="bento-card h-[265px] rounded-4xl bg-saffron-400 p-6 flex flex-col justify-between text-charcoal-900 shadow-card">
           <div>
             <span className="text-[10px] font-extrabold uppercase tracking-widest bg-charcoal-900/10 px-2.5 py-1 rounded-full">
-              Peshawari Riwayat
+              Peshawari Tradition
             </span>
             <h3 className="font-display font-extrabold text-xl sm:text-2xl leading-tight mt-3">
-              Asli Koyla &amp; <br /> Desi Ghee Zaiqa
+              Charcoal Ember &amp; <br /> Desi Ghee Flavor
             </h3>
             <p className="text-charcoal-900/80 text-xs mt-2 leading-relaxed">
               No artificial colors or packet masalas — just black pepper, vine-ripened tomatoes, green chilies, and organic desi ghee.

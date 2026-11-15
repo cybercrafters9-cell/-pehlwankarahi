@@ -4,7 +4,7 @@ import "./globals.css";
 export const metadata: Metadata = {
   title: "Pehalwan Karahi & DeraGhar — Authentic Pakistani Karahi, Bar B Q & Desi Cuisine",
   description:
-    "Asli Peshawari Shinwari Karahi, smoky Charcoal Seekh Kebabs, and Matka Dum Biryani crafted with 100% pure desi ghee and hand-roasted spices.",
+    "Authentic Peshawari Shinwari Karahi, smoky Charcoal Seekh Kebabs, and Matka Dum Biryani crafted with 100% pure desi ghee and hand-roasted spices.",
 };
 
 export default function RootLayout({

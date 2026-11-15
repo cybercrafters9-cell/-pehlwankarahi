@@ -86,7 +86,7 @@ export function RestaurantProvider({ children }: { children: ReactNode }) {
   const [isMenuModalOpen, setIsMenuModalOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
-  const [spiceLevel, setSpiceLevel] = useState("Chatpata Desi");
+  const [spiceLevel, setSpiceLevel] = useState("Standard");
   const [toasts, setToasts] = useState<ToastMessage[]>([]);
   const [isSubmittingOrder, setIsSubmittingOrder] = useState(false);
 
@@ -213,7 +213,7 @@ export function RestaurantProvider({ children }: { children: ReactNode }) {
         }
         return [...prev, { id, name, price, qty: 1, image }];
       });
-      showToast(`Added ${name} to Dera Dastarkhwan!`);
+      showToast(`Added ${name} to your cart!`);
     },
     [showToast]
   );
@@ -256,11 +256,11 @@ export function RestaurantProvider({ children }: { children: ReactNode }) {
 
         const payload: CreateOrderPayload = {
           items,
-          spiceLevel,
+          spiceLevel: customerData?.spiceLevel || spiceLevel || "Standard",
           customerName: customerData?.customerName,
           customerPhone: customerData?.customerPhone,
           address: customerData?.address,
-          paymentMethod: customerData?.paymentMethod || "cod",
+          paymentMethod: customerData?.paymentMethod || "easypaisa",
           paymentStatus: customerData?.paymentStatus || "pending",
           transactionId: customerData?.transactionId,
           notes: customerData?.notes,
@@ -270,7 +270,7 @@ export function RestaurantProvider({ children }: { children: ReactNode }) {
         const order = await api.placeOrder(payload);
         clearCart();
         setIsCartOpen(false);
-        showToast(`Shahi Order #${order.id} sent straight to live wok & tandoor!`);
+        showToast(`Order #${order.id} placed successfully!`);
         return order;
       } catch (err: unknown) {
         const msg = getErrorMessage(err, "Failed to submit order. Please check connection.");

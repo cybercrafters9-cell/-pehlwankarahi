@@ -6,6 +6,7 @@ import { CookingPot, Plus, Minus, ArrowRight, AlertCircle, Clock } from "lucide-
 import { CartItem } from "@/data/menu";
 import { LoyaltyPassSummary, RestaurantSettings } from "@/services/api";
 import LoyaltyPassInput from "./LoyaltyPassInput";
+import { getDeliverySchedule } from "./types";
 
 interface CartStepProps {
   cart: CartItem[];
@@ -48,13 +49,14 @@ export default function CartStep({
   const isBelowMin = cart.length > 0 && minOrder > 0 && subtotal < minOrder;
   const diffMin = minOrder - subtotal;
   const isClosed = settings?.isAcceptingOrders === false;
+  const deliverySchedule = getDeliverySchedule();
   return (
     <>
       <div className="p-5 flex-1 overflow-y-auto space-y-3">
         {cart.length === 0 ? (
           <div className="text-center py-16 text-charcoal-700/70">
             <CookingPot className="w-14 h-14 mx-auto text-terracotta-500 mb-2" />
-            <p className="font-bold text-sm text-charcoal-900">Your Dastarkhwan is empty</p>
+            <p className="font-bold text-sm text-charcoal-900">Your cart is empty</p>
             <p className="text-xs mt-1">Add some sizzling Mutton or Chicken Karahi to get started!</p>
           </div>
         ) : (
@@ -128,11 +130,15 @@ export default function CartStep({
           <div className="flex justify-between text-charcoal-700">
             <span className="flex items-center gap-1">
               <Clock className="w-3 h-3 text-terracotta-500" />
-              <span>Est. Delivery ({settings?.deliveryEstimate || "28–35 mins"})</span>
+              <span>Est. Delivery ({deliverySchedule.etaText})</span>
             </span>
             <span className={`font-bold ${deliveryFee === 0 ? "text-emerald-700" : "text-charcoal-900"}`}>
               {deliveryFee === 0 ? "FREE" : `Rs. ${deliveryFee}`}
             </span>
+          </div>
+          <div className="text-[11px] text-amber-800 bg-amber-50/90 border border-amber-200/80 rounded-lg px-2.5 py-1.5 flex items-center gap-1.5">
+            <Clock className="w-3.5 h-3.5 text-amber-600 shrink-0" />
+            <span>{deliverySchedule.policyNote}</span>
           </div>
           {discount > 0 && loyaltyPass && (
             <div className="flex justify-between text-emerald-700 font-bold">

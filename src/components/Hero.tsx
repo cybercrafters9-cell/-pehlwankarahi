@@ -52,20 +52,20 @@ export default function Hero() {
         <div className="inline-flex items-center gap-2 bg-sand-200/80 border border-sand-300 w-fit px-3 py-1 rounded-full">
           <span className="w-2 h-2 rounded-full bg-terracotta-500 animate-ping" />
           <span className="text-[10px] sm:text-[11px] font-extrabold uppercase tracking-wider text-charcoal-800">
-            Live Wok &amp; Garma Garam Karahi
+            Live Wok &amp; Sizzling Karahi
           </span>
         </div>
 
         {/* Clean, Scaled Heading (Fits perfectly in 3 lines without giant vertical stretching) */}
         <h1 className="font-display font-extrabold text-2xl sm:text-3xl md:text-4xl lg:text-[2.35rem] xl:text-[2.75rem] leading-[1.08] tracking-tight text-charcoal-900 uppercase">
-          Fresh &amp; Garma Garam <br />
-          <span className="text-terracotta-500">Desi Karahi</span> For <br />
+          Fresh &amp; Sizzling <br />
+          <span className="text-terracotta-500">Authentic Karahi</span> For <br />
           Every Taste
         </h1>
 
         {/* Concise Description */}
         <p className="text-charcoal-700/85 text-xs sm:text-sm leading-relaxed max-w-lg">
-          Asli Peshawari Mutton Karahi, Royal Chaamp, Machli Shank, and fresh Desi Murgh cooked live in pure desi ghee with vine tomatoes, ginger juliennes, and freshly cracked black pepper.
+          Signature Peshawari Mutton Karahi, Royal Chaamp, Machli Shank, and fresh Desi Murgh cooked live in pure desi ghee with vine tomatoes, ginger juliennes, and freshly cracked black pepper.
         </p>
 
         {/* Actions Button Row */}

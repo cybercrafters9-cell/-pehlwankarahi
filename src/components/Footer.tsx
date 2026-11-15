@@ -47,7 +47,7 @@ export default function Footer() {
             <span>Live Wok &amp; Koyla Grill Active Daily</span>
           </div>
           <h3 className="font-display font-extrabold text-2xl sm:text-3xl text-white tracking-tight">
-            Craving Authentic Garma Garam Karahi?
+            Craving Authentic Sizzling Karahi?
           </h3>
           <p className="text-white/85 text-xs sm:text-sm max-w-xl">
             Order your favorite Mutton, Chaamp, or Desi Murgh Karahi delivered steaming hot to your doorstep in 30 minutes, or reserve a family takht at our rooftop dera.
@@ -85,7 +85,7 @@ export default function Footer() {
                 Pehalwan <span className="text-terracotta-500">Karahi.</span>
               </span>
               <span className="text-[11px] font-extrabold uppercase tracking-widest text-saffron-400 block mt-1">
-                Asli Desi Riwayat • Since 1998
+                Authentic Heritage • Since 1998
               </span>
             </div>
 
