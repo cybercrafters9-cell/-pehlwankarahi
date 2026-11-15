@@ -84,8 +84,8 @@ app.use(
 app.use(express.json({ limit: "100kb" }));
 app.use(morgan(process.env.NODE_ENV === "production" ? "combined" : "dev"));
 
-// Root Server Info Endpoint
-app.get("/", (_req, res) => {
+// API Root Info Endpoint
+app.get("/api", (_req, res) => {
   res.json({
     status: "ok",
     service: "Pehalwan Karahi & Bar B Q API",
@@ -123,8 +123,8 @@ app.get("/api/media/:id", serveMedia);
 // Mount API Routes with global rate limiting
 app.use("/api", globalLimiter, apiRoutes);
 
-// 404 Handler
-app.use((_req, res) => {
+// Catch-all 404 for unhandled API requests
+app.use("/api/*", (_req, res) => {
   res.status(404).json({
     success: false,
     error: "API endpoint not found",
@@ -136,22 +136,31 @@ app.use(errorHandler);
 
 let server: ReturnType<typeof app.listen> | null = null;
 let orphanCleanupInterval: NodeJS.Timeout | null = null;
+let bootstrapPromise: Promise<void> | null = null;
+
+export async function ensureBootstrapped(): Promise<void> {
+  if (!bootstrapPromise) {
+    bootstrapPromise = (async () => {
+      validateDbEnv();
+      try {
+        await runMigrations();
+        console.log("[DB] Migrations verified successfully.");
+      } catch (err) {
+        console.error(
+          "[DB] Migration warning/error on startup:",
+          err instanceof Error ? err.message : err
+        );
+        if (process.env.NODE_ENV === "production" && !process.env.NEXT_RUNTIME) {
+          process.exit(1);
+        }
+      }
+    })();
+  }
+  return bootstrapPromise;
+}
 
 async function bootstrap() {
-  validateDbEnv();
-
-  try {
-    await runMigrations();
-    console.log("[DB] Migrations verified successfully.");
-  } catch (err) {
-    console.error(
-      "[DB] Migration warning/error on startup:",
-      err instanceof Error ? err.message : err
-    );
-    if (process.env.NODE_ENV === "production") {
-      process.exit(1);
-    }
-  }
+  await ensureBootstrapped();
 
   // Schedule daily orphan media cleanup (every 24 hours)
   orphanCleanupInterval = setInterval(async () => {
@@ -164,6 +173,18 @@ async function bootstrap() {
       console.error("[Media] Orphan cleanup job failed:", err);
     }
   }, 24 * 60 * 60 * 1000);
+
+  // When imported inside Next.js (e.g. Hostinger Next.js deployment), do not bind to port
+  const isInsideNext = Boolean(
+    process.env.NEXT_RUNTIME ||
+    process.env.__NEXT_PROCESSED_ENV ||
+    process.env.NEXT_PHASE
+  );
+
+  if (isInsideNext) {
+    console.log("[Express] Mounted inside Next.js process, skipping standalone port binding.");
+    return;
+  }
 
   server = app.listen(PORT, HOST, () => {
     console.log(`
@@ -186,7 +207,7 @@ async function bootstrap() {
 
 bootstrap().catch((err) => {
   console.error("[Startup] Fatal error during bootstrap:", err);
-  if (process.env.NODE_ENV === "production") {
+  if (process.env.NODE_ENV === "production" && !process.env.NEXT_RUNTIME) {
     process.exit(1);
   }
 });

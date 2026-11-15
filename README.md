@@ -130,6 +130,7 @@ Hostinger Cloud & Business hosting provides native Node.js application hosting w
 | `ADMIN_EMAIL` | `admin@pehalwankarahi.com` | Initial admin email |
 | `ADMIN_PASSWORD` | `YourSecurePassword2026!` | Used to seed initial admin account on first boot |
 | `CORS_ORIGIN` | `https://yourdomain.com` | Allowed origin for API requests |
+| `TRUST_PROXY` | `1` | Enable reverse proxy trust behind Hostinger (ensures accurate client IP logging & rate limits) |
 | `NEXT_PUBLIC_API_URL` | `/api` | Root relative path (or `https://yourdomain.com/api`) |
 
 ### Step 3: Build & Start on Hostinger

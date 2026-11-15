@@ -6,7 +6,7 @@
     "dev": "concurrently -k -p \"[{name}]\" -n \"NEXT,EXPR\" -c \"cyan,magenta\" \"next dev --webpack\" \"tsx watch server/src/index.ts\"",
     "dev:frontend": "next dev --webpack",
     "dev:server": "tsx watch server/src/index.ts",
-    "build": "next build --webpack",
+    "build": "next build --webpack && pnpm run build:server",
     "build:server": "node -e \"const fs = require('fs'); fs.rmSync('server/dist', { recursive: true, force: true });\" && tsc -p server && node -e \"const fs = require('fs'); fs.cpSync('server/migrations', 'server/dist/migrations', { recursive: true, force: true });\"",
     "build:all": "next build --webpack && pnpm run build:server",
     "start": "next start",
