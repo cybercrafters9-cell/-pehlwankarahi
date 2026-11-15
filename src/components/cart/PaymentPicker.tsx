@@ -2,6 +2,7 @@
 
 import { Banknote, Check, Copy } from "lucide-react";
 import { PaymentType, PAYMENT_ACCOUNTS, DigitalPaymentMethod } from "./types";
+import { RestaurantSettings } from "@/services/api";
 
 interface PaymentPickerProps {
   paymentMethod: PaymentType;
@@ -10,6 +11,7 @@ interface PaymentPickerProps {
   setTransactionId: (val: string) => void;
   copiedAccount: string | null;
   onCopy: (text: string, label: string) => void;
+  settings?: RestaurantSettings | null;
 }
 
 export default function PaymentPicker({
@@ -19,8 +21,19 @@ export default function PaymentPicker({
   setTransactionId,
   copiedAccount,
   onCopy,
+  settings,
 }: PaymentPickerProps) {
   const activeDigital = paymentMethod !== "cod" ? PAYMENT_ACCOUNTS[paymentMethod as DigitalPaymentMethod] : null;
+
+  const accountTitle =
+    settings?.paymentAccountTitle || activeDigital?.accountTitle || "Pehalwan Karahi & DeraGhar";
+  const rawNumber =
+    activeDigital?.id === "easypaisa"
+      ? settings?.easypaisaNumber || activeDigital.rawNumber
+      : activeDigital?.id === "jazzcash"
+      ? settings?.jazzcashNumber || activeDigital.rawNumber
+      : activeDigital?.rawNumber || "";
+  const displayNumber = rawNumber;
 
   return (
     <div className="space-y-3 pt-2 border-t border-sand-200">
@@ -96,14 +109,14 @@ export default function PaymentPicker({
           <div className={`bg-white rounded-xl p-2.5 border ${activeDigital.theme.cardBorder} flex items-center justify-between`}>
             <div>
               <p className="text-[10px] text-charcoal-600 font-semibold">Account Title</p>
-              <p className="font-bold text-xs text-charcoal-900">{activeDigital.accountTitle}</p>
+              <p className="font-bold text-xs text-charcoal-900">{accountTitle}</p>
               <p className={`font-mono font-extrabold text-sm ${activeDigital.theme.numberColor} mt-0.5`}>
-                {activeDigital.displayNumber}
+                {displayNumber}
               </p>
             </div>
             <button
               type="button"
-              onClick={() => onCopy(activeDigital.rawNumber, activeDigital.id)}
+              onClick={() => onCopy(rawNumber, activeDigital.id)}
               className={`${activeDigital.theme.copyBtn} font-bold px-3 py-1.5 rounded-lg flex items-center gap-1 text-[11px] cursor-pointer`}
             >
               {copiedAccount === activeDigital.id ? (

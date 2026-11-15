@@ -32,7 +32,9 @@ ON DUPLICATE KEY UPDATE name=VALUES(name), price=VALUES(price), description=VALU
 INSERT INTO settings (
   id, restaurant_name, tagline, phone, whatsapp, landline, email,
   address, branches, timings, delivery_fee, min_order, delivery_estimate,
-  announcement, is_live_wok_active, easypaisa_number, jazzcash_number, payment_account_title
+  announcement, is_live_wok_active, is_accepting_orders, announcement_enabled,
+  opening_time, closing_time, free_delivery_threshold,
+  easypaisa_number, jazzcash_number, payment_account_title
 ) VALUES (
   1,
   'Pehalwan Karahi & DeraGhar',
@@ -49,6 +51,11 @@ INSERT INTO settings (
   '28–35 mins',
   '🔥 Live Koyla Grill & Freshly slaughtered Halal Meat prepared in pure Desi Ghee!',
   1,
+  1,
+  1,
+  '12:00 PM',
+  '02:00 AM',
+  3000,
   '03001234567',
   '03219876543',
   'Pehalwan Karahi & DeraGhar'
@@ -63,6 +70,11 @@ INSERT INTO settings (
   delivery_fee=VALUES(delivery_fee),
   min_order=VALUES(min_order),
   delivery_estimate=VALUES(delivery_estimate),
+  is_accepting_orders=VALUES(is_accepting_orders),
+  announcement_enabled=VALUES(announcement_enabled),
+  opening_time=VALUES(opening_time),
+  closing_time=VALUES(closing_time),
+  free_delivery_threshold=VALUES(free_delivery_threshold);
   announcement=VALUES(announcement);
 
 SET FOREIGN_KEY_CHECKS = 1;

@@ -324,10 +324,21 @@ export const updateSettingsSchema = z
       .min(1, "Restaurant name cannot be empty")
       .max(100, "Restaurant name must not exceed 100 characters")
       .optional(),
+    name: z
+      .string()
+      .trim()
+      .min(1, "Restaurant name cannot be empty")
+      .max(100, "Restaurant name must not exceed 100 characters")
+      .optional(),
     tagline: z
       .string()
       .trim()
       .max(200, "Tagline must not exceed 200 characters")
+      .optional(),
+    description: z
+      .string()
+      .trim()
+      .max(500, "Description must not exceed 500 characters")
       .optional(),
     phone: z
       .string()
@@ -370,6 +381,16 @@ export const updateSettingsSchema = z
       .trim()
       .max(100, "Timings must not exceed 100 characters")
       .optional(),
+    openingTime: z
+      .string()
+      .trim()
+      .max(50, "Opening time must not exceed 50 characters")
+      .optional(),
+    closingTime: z
+      .string()
+      .trim()
+      .max(50, "Closing time must not exceed 50 characters")
+      .optional(),
     deliveryFee: z
       .union([
         z.number(),
@@ -407,12 +428,50 @@ export const updateSettingsSchema = z
       .trim()
       .max(50, "Delivery estimate must not exceed 50 characters")
       .optional(),
+    freeDeliveryThreshold: z
+      .union([
+        z.number(),
+        z
+          .string()
+          .trim()
+          .regex(/^\d+$/, "Free delivery threshold must be a valid number")
+          .transform(Number),
+      ])
+      .pipe(
+        z
+          .number()
+          .min(0, "Free delivery threshold cannot be negative")
+          .max(100000, "Free delivery threshold must not exceed 100,000")
+      )
+      .optional(),
     announcement: z
       .string()
       .trim()
       .max(300, "Announcement must not exceed 300 characters")
       .optional(),
+    announcementText: z
+      .string()
+      .trim()
+      .max(300, "Announcement must not exceed 300 characters")
+      .optional(),
+    announcementEnabled: z.boolean().optional(),
     isLiveWokActive: z.boolean().optional(),
+    isAcceptingOrders: z.boolean().optional(),
+    easypaisaNumber: z
+      .string()
+      .trim()
+      .max(50, "Easypaisa number must not exceed 50 characters")
+      .optional(),
+    jazzcashNumber: z
+      .string()
+      .trim()
+      .max(50, "JazzCash number must not exceed 50 characters")
+      .optional(),
+    paymentAccountTitle: z
+      .string()
+      .trim()
+      .max(255, "Payment account title must not exceed 255 characters")
+      .optional(),
   })
   .strip();
 

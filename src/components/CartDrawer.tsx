@@ -28,6 +28,7 @@ export default function CartDrawer() {
     isSubmittingOrder,
     spiceLevel,
     setSpiceLevel,
+    settings,
   } = useRestaurant();
 
   const [step, setStep] = useState<DrawerStep>("cart");
@@ -51,7 +52,10 @@ export default function CartDrawer() {
 
   const subtotal = cart.reduce((sum, item) => sum + item.price * item.qty, 0);
   const discount = loyaltyPass ? Math.round(subtotal * (loyaltyPass.discountPercent / 100)) : 0;
-  const totalAmount = Math.max(0, subtotal - discount);
+  const freeThreshold = settings?.freeDeliveryThreshold ?? 0;
+  const baseDeliveryFee = typeof settings?.deliveryFee === "number" ? settings.deliveryFee : 0;
+  const deliveryFee = freeThreshold > 0 && subtotal >= freeThreshold ? 0 : baseDeliveryFee;
+  const totalAmount = Math.max(0, subtotal + deliveryFee - discount);
 
   const updateField = <K extends keyof CheckoutFormData>(field: K, val: CheckoutFormData[K]) => {
     setFormData((prev) => ({ ...prev, [field]: val }));
@@ -147,6 +151,7 @@ export default function CartDrawer() {
             updateQty={updateQty}
             isSubmittingOrder={isSubmittingOrder}
             subtotal={subtotal}
+            deliveryFee={deliveryFee}
             discount={discount}
             totalAmount={totalAmount}
             loyaltyPhone={loyaltyPhone}
@@ -157,6 +162,7 @@ export default function CartDrawer() {
             onCheckLoyalty={() => handleCheckLoyalty()}
             onRemoveLoyalty={handleRemoveLoyalty}
             onProceed={() => setStep("checkout")}
+            settings={settings}
           />
         )}
 
@@ -165,6 +171,7 @@ export default function CartDrawer() {
             formData={formData}
             updateField={updateField}
             setAddress={setAddress}
+            subtotal={subtotal}
             totalAmount={totalAmount}
             discount={discount}
             cartItemsCount={cart.reduce((s, i) => s + i.qty, 0)}
@@ -183,11 +190,12 @@ export default function CartDrawer() {
             setErrors={setErrors}
             onSubmit={handleSubmitOrder}
             isSubmittingOrder={isSubmittingOrder}
+            settings={settings}
           />
         )}
 
         {step === "success" && completedOrder && (
-          <SuccessView completedOrder={completedOrder} onClose={handleClose} />
+          <SuccessView completedOrder={completedOrder} onClose={handleClose} settings={settings} />
         )}
       </aside>
     </>

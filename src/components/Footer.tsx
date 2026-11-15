@@ -14,7 +14,13 @@ import {
 } from "lucide-react";
 
 export default function Footer() {
-  const { setIsMenuModalOpen } = useRestaurant();
+  const { setIsMenuModalOpen, settings } = useRestaurant();
+
+  const cleanPhone = (p: string) => p.replace(/\D/g, "");
+  const cleanWa = (p: string) => {
+    const digits = p.replace(/\D/g, "");
+    return digits.startsWith("0") ? `92${digits.slice(1)}` : digits;
+  };
 
   const scrollTo = (id: string) => {
     const el = document.getElementById(id);
@@ -177,27 +183,31 @@ export default function Footer() {
             </h4>
 
             <div className="space-y-3 text-xs text-white/75">
-              <div className="border-l-2 border-terracotta-500 pl-3 space-y-1">
-                <p className="font-bold text-white">Kohinoor City Branch</p>
-                <p className="text-[11px] text-white/60">
-                  Main Boulevard, Kohinoor City, Faisalabad
-                </p>
-                <p className="text-[10px] text-saffron-300 font-semibold flex items-center gap-1">
-                  <Clock className="w-3 h-3" />
-                  <span>12:00 PM – 02:00 AM Daily</span>
-                </p>
-              </div>
-
-              <div className="border-l-2 border-saffron-400 pl-3 space-y-1">
-                <p className="font-bold text-white">Canal Road Rooftop Dera</p>
-                <p className="text-[11px] text-white/60">
-                  Canal Road, Family Takht Lawn &amp; Gazebo
-                </p>
-                <p className="text-[10px] text-saffron-300 font-semibold flex items-center gap-1">
-                  <Clock className="w-3 h-3" />
-                  <span>05:00 PM – 03:00 AM Daily</span>
-                </p>
-              </div>
+              {(settings?.branches && settings.branches.length > 0
+                ? settings.branches
+                : [
+                    "Kohinoor City Branch",
+                    "Canal Road Rooftop Family Dera",
+                  ]
+              ).map((branch, idx) => (
+                <div
+                  key={idx}
+                  className={`border-l-2 ${
+                    idx % 2 === 0 ? "border-terracotta-500" : "border-saffron-400"
+                  } pl-3 space-y-1`}
+                >
+                  <p className="font-bold text-white">{branch}</p>
+                  <p className="text-[11px] text-white/60">
+                    {idx === 0
+                      ? settings?.address || "Main Boulevard, Kohinoor City, Faisalabad"
+                      : "Canal Road, Family Takht Lawn & Gazebo"}
+                  </p>
+                  <p className="text-[10px] text-saffron-300 font-semibold flex items-center gap-1">
+                    <Clock className="w-3 h-3" />
+                    <span>{settings?.timings || "12:00 PM – 02:00 AM Daily"}</span>
+                  </p>
+                </div>
+              ))}
             </div>
           </div>
 
@@ -210,21 +220,27 @@ export default function Footer() {
 
             <div className="space-y-2 text-xs">
               <a
-                href="tel:03001234567"
+                href={`tel:${cleanPhone(settings?.phone || "0300-1234567")}`}
                 className="block p-2 rounded-xl bg-white/5 hover:bg-white/10 transition-colors text-white font-mono font-bold"
               >
                 <span className="text-[10px] text-white/60 block font-sans font-medium">UAN Delivery:</span>
-                0300-1234567
+                {settings?.phone || "0300-1234567"}
               </a>
               <a
-                href="https://wa.me/923219876543"
+                href={`https://wa.me/${cleanWa(settings?.whatsapp || settings?.phone || "0321-9876543")}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="block p-2 rounded-xl bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-300 transition-colors font-mono font-bold border border-emerald-500/20"
               >
                 <span className="text-[10px] text-emerald-400/80 block font-sans font-medium">WhatsApp Booking:</span>
-                0321-9876543
+                {settings?.whatsapp || "0321-9876543"}
               </a>
+              {settings?.landline && (
+                <div className="p-2 rounded-xl bg-white/5 text-white/80 font-mono text-[11px]">
+                  <span className="text-[10px] text-white/60 block font-sans font-medium">Landline Desk:</span>
+                  {settings.landline}
+                </div>
+              )}
             </div>
 
             {/* Payment Methods */}

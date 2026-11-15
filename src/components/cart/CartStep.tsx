@@ -2,9 +2,9 @@
 
 import Image from "next/image";
 import { resolveImageUrl } from "@/lib/media";
-import { CookingPot, Plus, Minus, ArrowRight } from "lucide-react";
+import { CookingPot, Plus, Minus, ArrowRight, AlertCircle, Clock } from "lucide-react";
 import { CartItem } from "@/data/menu";
-import { LoyaltyPassSummary } from "@/services/api";
+import { LoyaltyPassSummary, RestaurantSettings } from "@/services/api";
 import LoyaltyPassInput from "./LoyaltyPassInput";
 
 interface CartStepProps {
@@ -12,6 +12,7 @@ interface CartStepProps {
   updateQty: (id: number, delta: number) => void;
   isSubmittingOrder: boolean;
   subtotal: number;
+  deliveryFee: number;
   discount: number;
   totalAmount: number;
   loyaltyPhone: string;
@@ -22,6 +23,7 @@ interface CartStepProps {
   onCheckLoyalty: () => void;
   onRemoveLoyalty: () => void;
   onProceed: () => void;
+  settings?: RestaurantSettings | null;
 }
 
 export default function CartStep({
@@ -29,6 +31,7 @@ export default function CartStep({
   updateQty,
   isSubmittingOrder,
   subtotal,
+  deliveryFee,
   discount,
   totalAmount,
   loyaltyPhone,
@@ -39,7 +42,12 @@ export default function CartStep({
   onCheckLoyalty,
   onRemoveLoyalty,
   onProceed,
+  settings,
 }: CartStepProps) {
+  const minOrder = settings?.minOrder ?? 0;
+  const isBelowMin = cart.length > 0 && minOrder > 0 && subtotal < minOrder;
+  const diffMin = minOrder - subtotal;
+  const isClosed = settings?.isAcceptingOrders === false;
   return (
     <>
       <div className="p-5 flex-1 overflow-y-auto space-y-3">
@@ -118,8 +126,13 @@ export default function CartStep({
             <span className="font-bold">Rs. {subtotal.toLocaleString()}</span>
           </div>
           <div className="flex justify-between text-charcoal-700">
-            <span>Hot Wok Delivery</span>
-            <span className="font-bold text-emerald-700">FREE</span>
+            <span className="flex items-center gap-1">
+              <Clock className="w-3 h-3 text-terracotta-500" />
+              <span>Est. Delivery ({settings?.deliveryEstimate || "28–35 mins"})</span>
+            </span>
+            <span className={`font-bold ${deliveryFee === 0 ? "text-emerald-700" : "text-charcoal-900"}`}>
+              {deliveryFee === 0 ? "FREE" : `Rs. ${deliveryFee}`}
+            </span>
           </div>
           {discount > 0 && loyaltyPass && (
             <div className="flex justify-between text-emerald-700 font-bold">
@@ -133,13 +146,35 @@ export default function CartStep({
           </div>
         </div>
 
+        {isClosed && (
+          <div className="p-2.5 bg-red-50 border border-red-200 rounded-xl text-red-800 text-xs flex items-center gap-2">
+            <AlertCircle className="w-4 h-4 text-red-600 shrink-0" />
+            <span>We are currently closed for online orders. Call {settings?.phone || "0300-1234567"} to place an advance order.</span>
+          </div>
+        )}
+
+        {!isClosed && isBelowMin && (
+          <div className="p-2.5 bg-amber-50 border border-amber-200 rounded-xl text-amber-900 text-xs flex items-center gap-2">
+            <AlertCircle className="w-4 h-4 text-amber-600 shrink-0" />
+            <span>Minimum order is PKR {minOrder}. Add PKR {diffMin} more to checkout.</span>
+          </div>
+        )}
+
         <button
           onClick={onProceed}
-          disabled={cart.length === 0}
-          className="w-full bg-terracotta-500 hover:bg-terracotta-600 text-white font-extrabold text-sm py-3.5 sm:py-4 rounded-full shadow-glow transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+          disabled={cart.length === 0 || isClosed || isBelowMin}
+          className="w-full bg-terracotta-500 hover:bg-terracotta-600 text-white font-extrabold text-sm py-3.5 sm:py-4 rounded-full shadow-glow transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          <span>Proceed to Checkout</span>
-          <ArrowRight className="w-4 h-4" />
+          {isClosed ? (
+            <span>Online Orders Closed</span>
+          ) : isBelowMin ? (
+            <span>Minimum Order Rs. {minOrder}</span>
+          ) : (
+            <>
+              <span>Proceed to Checkout</span>
+              <ArrowRight className="w-4 h-4" />
+            </>
+          )}
         </button>
       </div>
     </>

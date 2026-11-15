@@ -50,6 +50,13 @@ export const createOrder = asyncHandler(
     }
 
     const settings = await settingsRepository.get();
+    if (settings.isAcceptingOrders === false) {
+      return res.status(400).json({
+        success: false,
+        error: `We are currently closed for online orders. Please call ${settings.phone} to place an advance order.`,
+      });
+    }
+
     if (typeof settings.minOrder === "number" && subtotal < settings.minOrder) {
       return res.status(400).json({
         success: false,
@@ -57,7 +64,9 @@ export const createOrder = asyncHandler(
       });
     }
 
-    const deliveryFee = typeof settings.deliveryFee === "number" ? settings.deliveryFee : 0;
+    const freeThreshold = settings.freeDeliveryThreshold ?? 0;
+    const baseDeliveryFee = typeof settings.deliveryFee === "number" ? settings.deliveryFee : 0;
+    const deliveryFee = freeThreshold > 0 && subtotal >= freeThreshold ? 0 : baseDeliveryFee;
 
     // Check if customer has active VIP Loyalty pass (15% discount)
     let discount = 0;

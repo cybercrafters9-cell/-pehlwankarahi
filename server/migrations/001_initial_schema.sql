@@ -68,6 +68,11 @@ CREATE TABLE IF NOT EXISTS settings (
   delivery_estimate VARCHAR(100) NOT NULL,
   announcement TEXT NOT NULL,
   is_live_wok_active TINYINT(1) NOT NULL DEFAULT 1,
+  is_accepting_orders TINYINT(1) NOT NULL DEFAULT 1,
+  announcement_enabled TINYINT(1) NOT NULL DEFAULT 1,
+  opening_time VARCHAR(50) NOT NULL DEFAULT '12:00 PM',
+  closing_time VARCHAR(50) NOT NULL DEFAULT '02:00 AM',
+  free_delivery_threshold INT NOT NULL DEFAULT 3000,
   easypaisa_number VARCHAR(50) NOT NULL DEFAULT '03001234567',
   jazzcash_number VARCHAR(50) NOT NULL DEFAULT '03219876543',
   payment_account_title VARCHAR(255) NOT NULL DEFAULT 'Pehalwan Karahi & DeraGhar'
@@ -143,7 +148,9 @@ CREATE TABLE IF NOT EXISTS admin_users (
 INSERT INTO settings (
   id, restaurant_name, tagline, phone, whatsapp, landline, email,
   address, branches, timings, delivery_fee, min_order, delivery_estimate,
-  announcement, is_live_wok_active, easypaisa_number, jazzcash_number, payment_account_title
+  announcement, is_live_wok_active, is_accepting_orders, announcement_enabled,
+  opening_time, closing_time, free_delivery_threshold,
+  easypaisa_number, jazzcash_number, payment_account_title
 ) VALUES (
   1,
   'Pehalwan Karahi & DeraGhar',
@@ -160,6 +167,11 @@ INSERT INTO settings (
   '28–35 mins',
   '🔥 Live Koyla Grill & Freshly slaughtered Halal Meat prepared in pure Desi Ghee!',
   1,
+  1,
+  1,
+  '12:00 PM',
+  '02:00 AM',
+  3000,
   '03001234567',
   '03219876543',
   'Pehalwan Karahi & DeraGhar'

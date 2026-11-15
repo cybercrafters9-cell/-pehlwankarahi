@@ -26,6 +26,7 @@ router.use("/orders", orderRoutes);
 router.use("/reservations", reservationRoutes);
 router.use("/loyalty", loyaltyRoutes);
 router.use("/settings", settingsRoutes);
+router.use("/admin/settings", settingsRoutes);
 router.use("/stats", statsRoutes);
 router.use("/media", mediaRoutes);
 router.use("/admin/media", mediaRoutes);

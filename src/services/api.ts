@@ -52,7 +52,9 @@ export interface CreateReservationPayload {
 
 export interface RestaurantSettings {
   restaurantName: string;
+  name?: string;
   tagline: string;
+  description?: string;
   phone: string;
   whatsapp: string;
   landline: string;
@@ -60,11 +62,17 @@ export interface RestaurantSettings {
   address: string;
   branches: string[];
   timings: string;
+  openingTime?: string;
+  closingTime?: string;
   deliveryFee: number;
   minOrder: number;
   deliveryEstimate: string;
   announcement: string;
+  announcementText?: string;
+  announcementEnabled?: boolean;
   isLiveWokActive: boolean;
+  isAcceptingOrders?: boolean;
+  freeDeliveryThreshold?: number;
   easypaisaNumber?: string;
   jazzcashNumber?: string;
   paymentAccountTitle?: string;
@@ -314,7 +322,10 @@ export const api = {
     request<RestaurantSettings>("/settings"),
 
   updateSettings: (settings: Partial<RestaurantSettings>) =>
-    request<RestaurantSettings>("/settings", { method: "PUT", body: settings, auth: true }),
+    request<RestaurantSettings>("/admin/settings", { method: "PUT", body: settings, auth: true }),
+
+  resetSettings: () =>
+    request<RestaurantSettings>("/admin/settings/reset", { method: "POST", auth: true }),
 
   // --- Stats ---
   getStats: () =>

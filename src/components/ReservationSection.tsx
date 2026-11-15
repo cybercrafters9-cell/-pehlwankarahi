@@ -7,7 +7,7 @@ import { useSlot } from "@/context/SiteContentContext";
 import { PhoneCall, CheckCircle } from "lucide-react";
 
 export default function ReservationSection() {
-  const { showToast, addToCart, spiceLevel, setSpiceLevel, reserveTable } = useRestaurant();
+  const { showToast, addToCart, spiceLevel, setSpiceLevel, reserveTable, settings } = useRestaurant();
   const resSlot = useSlot("reservation.main", {
     url: "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?auto=format&fit=crop&w=900&q=85",
     alt: "Sizzling Charcoal Sajji & Lemon Chops",
@@ -132,14 +132,13 @@ export default function ReservationSection() {
 
             {/* Bottom Dual Pill Buttons */}
             <div className="sm:col-span-2 flex flex-col sm:flex-row items-center gap-3 pt-3">
-              <button
-                type="button"
-                onClick={() => showToast("📞 Calling Pehalwan Karahi Desk: 041-8899221")}
-                className="w-full sm:w-1/2 border border-charcoal-900/30 hover:bg-sand-200 text-charcoal-900 font-bold text-xs py-3.5 rounded-full transition-colors flex items-center justify-center gap-2 cursor-pointer"
+              <a
+                href={`tel:${(settings?.phone || "0300-1234567").replace(/\D/g, "")}`}
+                className="w-full sm:w-1/2 border border-charcoal-900/30 hover:bg-sand-200 text-charcoal-900 font-bold text-xs py-3.5 rounded-full transition-colors flex items-center justify-center gap-2 cursor-pointer text-center"
               >
-                <PhoneCall className="w-4 h-4" />
-                <span>Call Desk</span>
-              </button>
+                <PhoneCall className="w-4 h-4 text-terracotta-500" />
+                <span className="truncate">Call Helpline: {settings?.phone || "0300-1234567"}</span>
+              </a>
               <button
                 type="submit"
                 disabled={isSubmitting}

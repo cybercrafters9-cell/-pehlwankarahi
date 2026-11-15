@@ -5,10 +5,14 @@ import { useRestaurant } from "@/context/RestaurantContext";
 import { ShoppingBag, ArrowUpRight, Menu, X } from "lucide-react";
 
 export default function Navbar() {
-  const { cart, setIsCartOpen, setSelectedCategory, setIsMenuModalOpen } = useRestaurant();
+  const { cart, setIsCartOpen, setSelectedCategory, setIsMenuModalOpen, settings } = useRestaurant();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const totalCartCount = cart.reduce((sum, item) => sum + item.qty, 0);
+
+  const announcementText = settings?.announcement || settings?.announcementText;
+  const isAnnouncementEnabled = settings?.announcementEnabled ?? true;
+  const showAnnouncement = Boolean(isAnnouncementEnabled && announcementText && announcementText.trim());
 
   const handleNavClick = (sectionId: string, category?: string) => {
     setMobileMenuOpen(false);
@@ -22,7 +26,13 @@ export default function Navbar() {
   };
 
   return (
-    <header className="sticky top-2 sm:top-3 z-40 bg-sand-100/90 backdrop-blur-md rounded-full px-4 sm:px-7 py-2.5 sm:py-3 mb-3 sm:mb-5 border border-sand-200/90 shadow-sm transition-all">
+    <div className="sticky top-2 sm:top-3 z-40 mb-3 sm:mb-5 space-y-2">
+      {showAnnouncement && (
+        <div className="bg-gradient-to-r from-terracotta-600 via-terracotta-500 to-[#92331f] text-white px-4 py-1.5 rounded-full text-[11px] font-bold shadow-sm flex items-center justify-center gap-2 overflow-hidden text-center animate-in fade-in">
+          <span className="truncate">{announcementText}</span>
+        </div>
+      )}
+      <header className="bg-sand-100/90 backdrop-blur-md rounded-full px-4 sm:px-7 py-2.5 sm:py-3 border border-sand-200/90 shadow-sm transition-all">
       <div className="flex items-center justify-between">
         {/* Left: Brand Logo */}
         <a
@@ -111,5 +121,6 @@ export default function Navbar() {
         </div>
       )}
     </header>
+  </div>
   );
 }

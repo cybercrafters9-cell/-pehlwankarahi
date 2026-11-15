@@ -11,6 +11,7 @@ import {
   SiteSlot,
   isAuthExpiredError,
   getErrorMessage,
+  getToken,
 } from "@/services/api";
 import { Dish, CategoryItem } from "@/data/menu";
 import { AdminLogin } from "@/components/admin/AdminLogin";
@@ -347,6 +348,17 @@ export default function AdminPage() {
     }
   };
 
+  const handleResetSettings = async () => {
+    try {
+      const reset = await api.resetSettings();
+      setSettings(reset);
+      showToast("🔄 Settings reset to factory defaults!");
+    } catch (err: unknown) {
+      if (checkAuthExpired(err)) return;
+      showToast(getErrorMessage(err, "Failed to reset settings"), "error");
+    }
+  };
+
   // --- Handlers for Site Images Slots ---
   const handleUpdateSiteSlot = async (
     key: string,
@@ -549,7 +561,9 @@ export default function AdminPage() {
           <SettingsTab
             settings={settings}
             onUpdateSettings={handleUpdateSettings}
+            onResetSettings={handleResetSettings}
             isLoading={isLoading}
+            token={getToken() || undefined}
             onShowToast={showToast}
           />
         )}

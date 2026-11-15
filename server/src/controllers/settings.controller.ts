@@ -23,3 +23,14 @@ export const updateSettings = asyncHandler(
     });
   }
 );
+
+export const resetSettings = asyncHandler(
+  async (_req: Request, res: Response<ApiResponse<RestaurantSettings>>) => {
+    const reset = await settingsRepository.reset();
+    res.json({
+      success: true,
+      message: "Restaurant settings reset to defaults successfully!",
+      data: reset,
+    });
+  }
+);
