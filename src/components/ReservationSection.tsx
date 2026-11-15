@@ -7,12 +7,15 @@ import { useSlot } from "@/context/SiteContentContext";
 import { PhoneCall, CheckCircle } from "lucide-react";
 
 export default function ReservationSection() {
-  const { showToast, addToCart, spiceLevel, setSpiceLevel, reserveTable, settings } = useRestaurant();
+  const { showToast, addToCart, spiceLevel, setSpiceLevel, reserveTable, settings, dishes } = useRestaurant();
   const resSlot = useSlot("reservation.main", {
     url: "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?auto=format&fit=crop&w=900&q=85",
     alt: "Sizzling Charcoal Sajji & Lemon Chops",
-    dishId: 6,
   });
+  const dishRes = resSlot.dishId ? dishes.find((d) => d.id === resSlot.dishId) : null;
+  const imgRes = resSlot.slot?.mediaId ? resSlot.url : (dishRes?.image || resSlot.url);
+  const nameRes = dishRes ? dishRes.name : (resSlot.dishName || "Smoky Lamb Chops & Whole Sajji");
+  const catRes = dishRes?.category || "Balochi & Peshawari Fusion";
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const [form, setForm] = useState({
@@ -132,17 +135,21 @@ export default function ReservationSection() {
 
             {/* Bottom Dual Pill Buttons */}
             <div className="sm:col-span-2 flex flex-col sm:flex-row items-center gap-3 pt-3">
-              <a
-                href={`tel:${(settings?.phone || "0300-1234567").replace(/\D/g, "")}`}
-                className="w-full sm:w-1/2 border border-charcoal-900/30 hover:bg-sand-200 text-charcoal-900 font-bold text-xs py-3.5 rounded-full transition-colors flex items-center justify-center gap-2 cursor-pointer text-center"
-              >
-                <PhoneCall className="w-4 h-4 text-terracotta-500" />
-                <span className="truncate">Call Helpline: {settings?.phone || "0300-1234567"}</span>
-              </a>
+              {settings?.phone ? (
+                <a
+                  href={`tel:${settings.phone.replace(/\D/g, "")}`}
+                  className="w-full sm:w-1/2 border border-charcoal-900/30 hover:bg-sand-200 text-charcoal-900 font-bold text-xs py-3.5 rounded-full transition-colors flex items-center justify-center gap-2 cursor-pointer text-center"
+                >
+                  <PhoneCall className="w-4 h-4 text-terracotta-500" />
+                  <span className="truncate">Call Helpline: {settings.phone}</span>
+                </a>
+              ) : null}
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full sm:w-1/2 bg-charcoal-900 hover:bg-terracotta-500 text-white font-bold text-xs py-3.5 rounded-full transition-colors shadow-md flex items-center justify-center gap-2 cursor-pointer disabled:opacity-70"
+                className={`${
+                  settings?.phone ? "w-full sm:w-1/2" : "w-full"
+                } bg-charcoal-900 hover:bg-terracotta-500 text-white font-bold text-xs py-3.5 rounded-full transition-colors shadow-md flex items-center justify-center gap-2 cursor-pointer disabled:opacity-70`}
               >
                 <span>{isSubmitting ? "Confirming..." : "Confirm Table"}</span>
                 <CheckCircle className="w-4 h-4" />
@@ -155,10 +162,10 @@ export default function ReservationSection() {
       {/* Bottom-Right Card: Dramatic Black Plate Showcase with Citrus & Herbs */}
       <div className="lg:col-span-6 bento-card relative min-h-[340px] rounded-4xl overflow-hidden bg-charcoal-900 shadow-card flex items-end p-6 sm:p-8 group">
         <Image
-          src={resSlot.url}
-          alt={resSlot.alt}
+          src={imgRes}
+          alt={nameRes}
           fill
-          unoptimized={resSlot.url.includes("/api/media/")}
+          unoptimized={imgRes.includes("/api/media/")}
           sizes="(max-width: 1024px) 100vw, 50vw"
           className="zoom-img object-cover opacity-85"
         />
@@ -192,28 +199,25 @@ export default function ReservationSection() {
         <div className="relative z-10 w-full flex flex-col sm:flex-row sm:items-end justify-between gap-4 text-white">
           <div>
             <span className="text-saffron-400 text-xs font-extrabold uppercase tracking-widest">
-              Balochi &amp; Peshawari Fusion
+              {catRes}
             </span>
             <h3 className="font-display font-bold text-2xl sm:text-3xl mt-1">
-              Smoky Lamb Chops &amp; Whole Sajji
+              {nameRes}
             </h3>
             <p className="text-white/75 text-xs sm:text-sm mt-1 max-w-md">
               Marinated for 12 hours in roasted cumin, green papaya, and fresh lemon slices, slow-charred over fruitwood coals.
             </p>
           </div>
-          <button
-            onClick={() =>
-              addToCart(
-                6,
-                "Smoky Lamb Chops & Sajji Platter",
-                2450,
-                "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?auto=format&fit=crop&w=600&q=80"
-              )
-            }
-            className="shrink-0 bg-saffron-400 hover:bg-terracotta-500 hover:text-white text-charcoal-900 font-extrabold text-xs px-5 py-3.5 rounded-full shadow-lg transition-all cursor-pointer"
-          >
-            Add — Rs. 2,450
-          </button>
+          {dishRes && (
+            <button
+              onClick={() =>
+                addToCart(dishRes.id, dishRes.name, dishRes.price, imgRes)
+              }
+              className="shrink-0 bg-saffron-400 hover:bg-terracotta-500 hover:text-white text-charcoal-900 font-extrabold text-xs px-5 py-3.5 rounded-full shadow-lg transition-all cursor-pointer"
+            >
+              Add — Rs. {dishRes.price.toLocaleString()}
+            </button>
+          )}
         </div>
       </div>
     </section>

@@ -73,16 +73,37 @@ export const updateCategory = asyncHandler(
       return res.status(400).json({ success: false, error: "Invalid category ID" });
     }
 
-    const updated = await categoryRepository.update(id, req.body);
-    if (!updated) {
-      return res.status(404).json({ success: false, error: "Category not found" });
+    if (req.body.slug) {
+      const existing = await categoryRepository.getBySlug(req.body.slug);
+      if (existing && existing.id !== id) {
+        return res.status(409).json({
+          success: false,
+          error: `Category with slug "${req.body.slug}" already exists`,
+        });
+      }
     }
 
-    res.json({
-      success: true,
-      message: `Category #${id} updated successfully`,
-      data: updated,
-    });
+    try {
+      const updated = await categoryRepository.update(id, req.body);
+      if (!updated) {
+        return res.status(404).json({ success: false, error: "Category not found" });
+      }
+
+      res.json({
+        success: true,
+        message: `Category #${id} updated successfully`,
+        data: updated,
+      });
+    } catch (err: unknown) {
+      const dbErr = err as { code?: string; errno?: number };
+      if (dbErr?.code === "ER_DUP_ENTRY" || dbErr?.errno === 1062) {
+        return res.status(409).json({
+          success: false,
+          error: `Category with slug "${req.body.slug}" already exists`,
+        });
+      }
+      throw err;
+    }
   }
 );
 

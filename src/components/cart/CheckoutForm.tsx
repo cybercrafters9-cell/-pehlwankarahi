@@ -147,7 +147,10 @@ export default function CheckoutForm({
         {isClosed && (
           <div className="p-2.5 bg-red-50 border border-red-200 rounded-xl text-red-800 text-xs flex items-center gap-2">
             <AlertCircle className="w-4 h-4 text-red-600 shrink-0" />
-            <span>We are currently closed for online orders. Call {settings?.phone || "0300-1234567"} to place an advance order.</span>
+            <span>
+              We are currently closed for online orders.
+              {settings?.phone ? ` Call ${settings.phone} to place an advance order.` : ""}
+            </span>
           </div>
         )}
 

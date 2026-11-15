@@ -73,7 +73,18 @@ export function MenuTab({
   const [editingCatName, setEditingCatName] = useState("");
 
   // Dish Form State
-  const [form, setForm] = useState({
+  const [form, setForm] = useState<{
+    name: string;
+    category: string;
+    tag: string;
+    price: number;
+    rating: string;
+    desc: string;
+    image: string;
+    imageUrl?: string;
+    imageMediaId: number | null;
+    isAvailable: boolean;
+  }>({
     name: "",
     category: categories[0]?.slug || "karahi",
     tag: "Bestseller",
@@ -82,6 +93,9 @@ export function MenuTab({
     desc: "",
     image:
       "https://images.unsplash.com/photo-1585937421612-70a008356fbe?auto=format&fit=crop&w=600&q=80",
+    imageUrl:
+      "https://images.unsplash.com/photo-1585937421612-70a008356fbe?auto=format&fit=crop&w=600&q=80",
+    imageMediaId: null,
     isAvailable: true,
   });
 
@@ -96,6 +110,9 @@ export function MenuTab({
       desc: "Cooked in traditional iron wok with vine-ripened tomatoes and desi ghee.",
       image:
         "https://images.unsplash.com/photo-1585937421612-70a008356fbe?auto=format&fit=crop&w=600&q=80",
+      imageUrl:
+        "https://images.unsplash.com/photo-1585937421612-70a008356fbe?auto=format&fit=crop&w=600&q=80",
+      imageMediaId: null,
       isAvailable: true,
     });
     setIsDishModalOpen(true);
@@ -103,6 +120,11 @@ export function MenuTab({
 
   const handleOpenEdit = (dish: Dish) => {
     setEditingDish(dish);
+    const mediaId =
+      dish.imageMediaId ??
+      (dish.image.match(/\/api\/media\/(\d+)/)?.[1]
+        ? parseInt(dish.image.match(/\/api\/media\/(\d+)/)![1], 10)
+        : null);
     setForm({
       name: dish.name,
       category: dish.category,
@@ -111,9 +133,35 @@ export function MenuTab({
       rating: dish.rating,
       desc: dish.desc,
       image: dish.image,
+      imageUrl: mediaId ? "" : dish.image,
+      imageMediaId: mediaId,
       isAvailable: dish.isAvailable !== false,
     });
     setIsDishModalOpen(true);
+  };
+
+  const handleImageChange = ({
+    mediaId,
+    url,
+  }: {
+    mediaId: number | null;
+    url: string;
+  }) => {
+    if (mediaId !== null) {
+      setForm((prev) => ({
+        ...prev,
+        image: url,
+        imageMediaId: mediaId,
+        imageUrl: "", // clear image_url for uploads
+      }));
+    } else {
+      setForm((prev) => ({
+        ...prev,
+        image: url,
+        imageMediaId: null,
+        imageUrl: url, // image_url only for pasted URLs
+      }));
+    }
   };
 
   const handleSubmitDish = async (e: React.FormEvent) => {
@@ -122,27 +170,25 @@ export function MenuTab({
 
     setIsSubmitting(true);
     try {
+      const dishData = {
+        name: form.name,
+        category: form.category,
+        tag: form.tag,
+        price: Number(form.price),
+        rating: form.rating,
+        desc: form.desc,
+        image: form.imageMediaId
+          ? `/api/media/${form.imageMediaId}`
+          : form.imageUrl || form.image,
+        imageUrl: form.imageMediaId ? undefined : form.imageUrl || form.image,
+        imageMediaId: form.imageMediaId,
+        isAvailable: form.isAvailable,
+      };
+
       if (editingDish) {
-        await onUpdateDish(editingDish.id, {
-          name: form.name,
-          category: form.category,
-          tag: form.tag,
-          price: Number(form.price),
-          rating: form.rating,
-          desc: form.desc,
-          image: form.image,
-          isAvailable: form.isAvailable,
-        });
+        await onUpdateDish(editingDish.id, dishData);
       } else {
-        await onCreateDish({
-          name: form.name,
-          category: form.category,
-          tag: form.tag,
-          price: Number(form.price),
-          rating: form.rating,
-          desc: form.desc,
-          image: form.image,
-        });
+        await onCreateDish(dishData);
       }
       setIsDishModalOpen(false);
     } finally {
@@ -576,7 +622,7 @@ export function MenuTab({
           <ImagePicker
             label="Dish Photo"
             value={form.image}
-            onChange={(url) => setForm({ ...form, image: url })}
+            onChange={handleImageChange}
           />
 
           <div className="pt-2">

@@ -61,8 +61,8 @@ const DEFAULT_SETTINGS: RestaurantSettings = {
   isLiveWokActive: true,
   isAcceptingOrders: true,
   freeDeliveryThreshold: 3000,
-  easypaisaNumber: "03001234567",
-  jazzcashNumber: "03219876543",
+  easypaisaNumber: "",
+  jazzcashNumber: "",
   paymentAccountTitle: "Pehalwan Karahi & DeraGhar",
 };
 
@@ -562,7 +562,7 @@ function SettingsForm({
         onClose={() => setIsResetConfirmOpen(false)}
         onConfirm={handleConfirmReset}
         title="Reset Restaurant Settings?"
-        message="This will reset all restaurant settings, contact numbers, delivery rules, and payment accounts back to factory default values. Are you sure you want to proceed?"
+        message="This will reset restaurant text, descriptions, and timings back to factory default values. Your Easypaisa, JazzCash, and payment details will be kept intact. Are you sure you want to proceed?"
         confirmText="Reset to Defaults"
         isLoading={isResetting}
       />

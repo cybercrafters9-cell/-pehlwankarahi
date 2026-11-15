@@ -57,6 +57,7 @@ interface SiteSlotRow extends RowDataPacket {
   label: string;
   alt_text: string;
   fallback_url: string;
+  dish_id: number | null;
   sort_order: number;
 }
 
@@ -101,9 +102,10 @@ export async function exportSeed(): Promise<void> {
   const categories = await query<CategoryRow>("SELECT * FROM categories ORDER BY sort_order ASC, id ASC");
   const dishes = await query<DishRow>("SELECT * FROM dishes ORDER BY sort_order ASC, id ASC");
   const settingsRows = await query<SettingsRow>("SELECT * FROM settings WHERE id = 1");
-  const siteSlots = await query<SiteSlotRow>("SELECT * FROM site_slots ORDER BY sort_order ASC, id ASC");
+  const siteSlots = await query<SiteSlotRow>("SELECT * FROM site_slots ORDER BY sort_order ASC, slot_key ASC");
 
   const lines: string[] = [];
+  lines.push("-- first import only");
   lines.push("-- ============================================================");
   lines.push("-- PEHALWAN KARAHI & DERAGHAR — HOSTINGER DATABASE SEED DATA");
   lines.push("-- Exported from MySQL Database (Categories, Menu, Settings & Slots)");
@@ -111,24 +113,21 @@ export async function exportSeed(): Promise<void> {
   lines.push("-- ============================================================\n");
   lines.push("SET FOREIGN_KEY_CHECKS = 0;\n");
 
-  // 1. Categories
+  // 1. Categories (INSERT IGNORE so admin edits are never overwritten)
   if (categories.length > 0) {
     lines.push("-- Categories");
-    lines.push("INSERT INTO categories (id, slug, name, sort_order, is_active) VALUES");
+    lines.push("INSERT IGNORE INTO categories (id, slug, name, sort_order, is_active) VALUES");
     const catInserts = categories.map(
       (c) => `  (${c.id}, ${escapeSql(c.slug)}, ${escapeSql(c.name)}, ${c.sort_order}, ${c.is_active})`
     );
-    lines.push(
-      catInserts.join(",\n") +
-        "\nON DUPLICATE KEY UPDATE name=VALUES(name), sort_order=VALUES(sort_order), is_active=VALUES(is_active);\n"
-    );
+    lines.push(catInserts.join(",\n") + ";\n");
   }
 
-  // 2. Dishes
+  // 2. Dishes (INSERT IGNORE so admin edits are never overwritten)
   if (dishes.length > 0) {
     lines.push("-- Dishes");
     lines.push(
-      "INSERT INTO dishes (id, category_id, name, tag, price, rating, description, image_url, is_available, sort_order) VALUES"
+      "INSERT IGNORE INTO dishes (id, category_id, name, tag, price, rating, description, image_url, is_available, sort_order) VALUES"
     );
     const dishInserts = dishes.map(
       (d) =>
@@ -136,17 +135,30 @@ export async function exportSeed(): Promise<void> {
           d.rating
         )}, ${escapeSql(d.description)}, ${escapeSql(d.image_url)}, ${d.is_available}, ${d.sort_order})`
     );
-    lines.push(
-      dishInserts.join(",\n") +
-        "\nON DUPLICATE KEY UPDATE name=VALUES(name), price=VALUES(price), description=VALUES(description), image_url=VALUES(image_url), is_available=VALUES(is_available);\n"
-    );
+    lines.push(dishInserts.join(",\n") + ";\n");
+
+    lines.push(`-- Link slots to dishes by name (idempotent; only where dish_id is null)
+UPDATE site_slots
+SET dish_id = (SELECT id FROM dishes WHERE name LIKE '%Mutton Karahi%' ORDER BY id LIMIT 1)
+WHERE slot_key IN ('hero.plate1', 'strip.1', 'bento.deal')
+  AND dish_id IS NULL;
+
+UPDATE site_slots
+SET dish_id = (SELECT id FROM dishes WHERE name LIKE '%Chicken Karahi%' ORDER BY id LIMIT 1)
+WHERE slot_key IN ('hero.plate2', 'strip.2')
+  AND dish_id IS NULL;
+
+UPDATE site_slots
+SET dish_id = (SELECT id FROM dishes WHERE name LIKE '%Handi%' ORDER BY id LIMIT 1)
+WHERE slot_key = 'bento.sub1'
+  AND dish_id IS NULL;\n`);
   }
 
-  // 3. Settings
+  // 3. Settings (only inserted when missing)
   if (settingsRows.length > 0) {
     const s = settingsRows[0];
-    lines.push("-- Settings");
-    lines.push(`INSERT INTO settings (
+    lines.push("-- Settings (only inserted when missing)");
+    lines.push(`INSERT IGNORE INTO settings (
   id, restaurant_name, tagline, phone, whatsapp, landline, email,
   address, branches, timings, delivery_fee, min_order, delivery_estimate,
   announcement, is_live_wok_active, is_accepting_orders, announcement_enabled,
@@ -176,41 +188,22 @@ export async function exportSeed(): Promise<void> {
   ${escapeSql(s.easypaisa_number || "03001234567")},
   ${escapeSql(s.jazzcash_number || "03219876543")},
   ${escapeSql(s.payment_account_title || "Pehalwan Karahi & DeraGhar")}
-) ON DUPLICATE KEY UPDATE
-  restaurant_name=VALUES(restaurant_name),
-  tagline=VALUES(tagline),
-  phone=VALUES(phone),
-  whatsapp=VALUES(whatsapp),
-  address=VALUES(address),
-  branches=VALUES(branches),
-  timings=VALUES(timings),
-  delivery_fee=VALUES(delivery_fee),
-  min_order=VALUES(min_order),
-  delivery_estimate=VALUES(delivery_estimate),
-  announcement=VALUES(announcement),
-  is_accepting_orders=VALUES(is_accepting_orders),
-  announcement_enabled=VALUES(announcement_enabled),
-  opening_time=VALUES(opening_time),
-  closing_time=VALUES(closing_time),
-  free_delivery_threshold=VALUES(free_delivery_threshold);\n`);
+);\n`);
   }
 
   // 4. Site Slots
   if (siteSlots.length > 0) {
-    lines.push("-- Site Slots");
+    lines.push("-- Site Slots (only inserted when missing; linked to real dishes by name match where possible)");
     lines.push(
-      "INSERT INTO site_slots (slot_key, section, label, alt_text, fallback_url, sort_order) VALUES"
+      "INSERT IGNORE INTO site_slots (slot_key, section, label, alt_text, fallback_url, dish_id, sort_order) VALUES"
     );
     const slotInserts = siteSlots.map(
       (sl) =>
         `  (${escapeSql(sl.slot_key)}, ${escapeSql(sl.section)}, ${escapeSql(sl.label)}, ${escapeSql(
           sl.alt_text
-        )}, ${escapeSql(sl.fallback_url)}, ${sl.sort_order})`
+        )}, ${escapeSql(sl.fallback_url)}, NULL, ${sl.sort_order})`
     );
-    lines.push(
-      slotInserts.join(",\n") +
-        "\nON DUPLICATE KEY UPDATE label=VALUES(label), alt_text=VALUES(alt_text), fallback_url=VALUES(fallback_url);\n"
-    );
+    lines.push(slotInserts.join(",\n") + ";\n");
   }
 
   lines.push("SET FOREIGN_KEY_CHECKS = 1;\n");

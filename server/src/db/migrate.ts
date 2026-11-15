@@ -2,8 +2,8 @@ import fs from "fs";
 import path from "path";
 import bcrypt from "bcryptjs";
 import dotenv from "dotenv";
-import { RowDataPacket } from "mysql2/promise";
-import { getPool, query, queryOne, withTransaction, closePool } from "./pool";
+import mysql, { RowDataPacket } from "mysql2/promise";
+import { getPool, query, queryOne, withTransaction, closePool, validateDbEnv } from "./pool";
 
 interface MigrationRow extends RowDataPacket {
   version: number;
@@ -156,6 +156,108 @@ export async function runMigrations(): Promise<void> {
   }
 }
 
+export async function testMigrationsOnEmptyDatabase(customDbName?: string): Promise<void> {
+  const config = validateDbEnv();
+  const testDb =
+    customDbName ||
+    `pk_test_${Date.now()}_${Math.floor(Math.random() * 1000)}`;
+
+  console.log(`[Database] Running startup migration test on empty database '${testDb}'...`);
+
+  let conn: mysql.Connection | null = null;
+  try {
+    conn = await mysql.createConnection({
+      host: config.host,
+      port: config.port,
+      user: config.user,
+      password: config.password,
+      multipleStatements: true,
+    });
+  } catch (err) {
+    console.warn(
+      "[Database] Could not establish connection for startup migration test:",
+      err instanceof Error ? err.message : err
+    );
+    return;
+  }
+
+  try {
+    try {
+      await conn.query(`DROP DATABASE IF EXISTS \`${testDb}\``);
+      await conn.query(`CREATE DATABASE \`${testDb}\` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci`);
+    } catch (err: unknown) {
+      const dbErr = err as { code?: string; errno?: number; message?: string };
+      if (
+        dbErr.code === "ER_DBACCESS_DENIED_ERROR" ||
+        dbErr.errno === 1044 ||
+        dbErr.code === "ER_ACCESS_DENIED_ERROR" ||
+        dbErr.errno === 1045
+      ) {
+        console.warn(
+          `[Database] Notice: Current database user lacks CREATE DATABASE privileges. Skipping empty database migration test.`
+        );
+        return;
+      }
+      throw err;
+    }
+
+    await conn.query(`USE \`${testDb}\``);
+
+    // Create schema_migrations table
+    await conn.query(`
+      CREATE TABLE schema_migrations (
+        version INT PRIMARY KEY,
+        name VARCHAR(255) NOT NULL,
+        applied_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+    `);
+
+    const migrationsDir = resolveMigrationsDir();
+    const files = fs
+      .readdirSync(migrationsDir)
+      .filter((f) => f.endsWith(".sql"))
+      .sort((a, b) => a.localeCompare(b, undefined, { numeric: true }));
+
+    for (const file of files) {
+      const match = file.match(/^(\d+)_/);
+      if (!match) continue;
+      const version = parseInt(match[1], 10);
+
+      const filePath = path.join(migrationsDir, file);
+      const sqlContent = fs.readFileSync(filePath, "utf8");
+      const statements = parseSqlStatements(sqlContent);
+
+      for (const statement of statements) {
+        await conn.query(statement);
+      }
+
+      await conn.query(
+        "INSERT INTO schema_migrations (version, name) VALUES (?, ?)",
+        [version, file]
+      );
+    }
+
+    console.log(
+      `[Database] Startup migration test PASSED: all ${files.length} migrations applied cleanly to empty database.`
+    );
+  } catch (err: unknown) {
+    console.error(
+      "[Database] FATAL: Startup migration test on empty database FAILED!",
+      err instanceof Error ? err.message : err
+    );
+    throw err;
+  } finally {
+    if (conn) {
+      try {
+        await conn.query(`DROP DATABASE IF EXISTS \`${testDb}\``);
+      } catch {
+        // ignore drop error on cleanup
+      }
+      await conn.end();
+    }
+  }
+}
+
 // Allow standalone CLI execution: `tsx server/src/db/migrate.ts`
 if (require.main === module) {
   dotenv.config();
@@ -164,7 +266,13 @@ if (require.main === module) {
     dotenv.config({ path: serverEnv });
   }
 
-  runMigrations()
+  const isTestEmpty = process.argv.includes("--test-empty");
+
+  const action = isTestEmpty
+    ? testMigrationsOnEmptyDatabase()
+    : runMigrations();
+
+  action
     .then(async () => {
       await closePool();
       process.exit(0);

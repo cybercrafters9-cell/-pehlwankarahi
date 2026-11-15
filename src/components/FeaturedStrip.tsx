@@ -5,13 +5,13 @@ import { resolveImageUrl } from "@/lib/media";
 import { useRestaurant } from "@/context/RestaurantContext";
 import { useSlot } from "@/context/SiteContentContext";
 
-const featuredItems = [
+const STRIP_CONFIG = [
   {
-    id: 2,
-    name: "Mutton Karahi",
-    category: "Shinwari 1 Kg",
-    price: 2850,
-    image: "https://images.unsplash.com/photo-1585937421612-70a008356fbe?auto=format&fit=crop&w=300&q=80",
+    key: "strip.1",
+    fallbackUrl:
+      "https://images.unsplash.com/photo-1585937421612-70a008356fbe?auto=format&fit=crop&w=300&q=80",
+    fallbackAlt: "Mutton Karahi",
+    defaultCategory: "Shinwari 1 Kg",
     borderColor: "border-terracotta-400",
     tagColor: "text-saffron-400",
     btnColor: "group-hover:bg-terracotta-500",
@@ -19,11 +19,11 @@ const featuredItems = [
     isDarkCard: false,
   },
   {
-    id: 1,
-    name: "Chicken Karahi",
-    category: "Desi Ghee Classic",
-    price: 1550,
-    image: "https://images.unsplash.com/photo-1603894584373-5ac82b2ae398?auto=format&fit=crop&w=300&q=80",
+    key: "strip.2",
+    fallbackUrl:
+      "https://images.unsplash.com/photo-1603894584373-5ac82b2ae398?auto=format&fit=crop&w=300&q=80",
+    fallbackAlt: "Chicken Karahi",
+    defaultCategory: "Desi Ghee Classic",
     borderColor: "border-saffron-400",
     tagColor: "text-saffron-400",
     btnColor: "group-hover:bg-terracotta-500",
@@ -31,11 +31,11 @@ const featuredItems = [
     isDarkCard: false,
   },
   {
-    id: 6,
-    name: "Mutton Chops Karahi",
-    category: "Royal Chaamp",
-    price: 3200,
-    image: "https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=300&q=80",
+    key: "strip.3",
+    fallbackUrl:
+      "https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=300&q=80",
+    fallbackAlt: "Mutton Chops Karahi",
+    defaultCategory: "Royal Chaamp",
     borderColor: "border-white/60",
     tagColor: "text-amber-200",
     btnColor: "group-hover:bg-charcoal-900",
@@ -43,11 +43,11 @@ const featuredItems = [
     isDarkCard: false,
   },
   {
-    id: 9,
-    name: "Mutton Muscles (Machli) Karahi",
-    category: "Special Shank",
-    price: 3100,
-    image: "https://images.unsplash.com/photo-1585937421612-70a008356fbe?auto=format&fit=crop&w=300&q=80",
+    key: "strip.4",
+    fallbackUrl:
+      "https://images.unsplash.com/photo-1585937421612-70a008356fbe?auto=format&fit=crop&w=300&q=80",
+    fallbackAlt: "Mutton Muscles (Machli) Karahi",
+    defaultCategory: "Special Shank",
     borderColor: "border-charcoal-900",
     tagColor: "text-charcoal-900",
     btnColor: "bg-charcoal-900 text-white",
@@ -59,36 +59,61 @@ const featuredItems = [
 export default function FeaturedStrip() {
   const { addToCart, dishes } = useRestaurant();
 
-  const slot1 = useSlot("strip.1", { url: featuredItems[0].image, alt: featuredItems[0].name, dishId: 2 });
-  const slot2 = useSlot("strip.2", { url: featuredItems[1].image, alt: featuredItems[1].name, dishId: 1 });
-  const slot3 = useSlot("strip.3", { url: featuredItems[2].image, alt: featuredItems[2].name, dishId: 6 });
-  const slot4 = useSlot("strip.4", { url: featuredItems[3].image, alt: featuredItems[3].name, dishId: 9 });
+  const slot1 = useSlot("strip.1", {
+    url: STRIP_CONFIG[0].fallbackUrl,
+    alt: STRIP_CONFIG[0].fallbackAlt,
+  });
+  const slot2 = useSlot("strip.2", {
+    url: STRIP_CONFIG[1].fallbackUrl,
+    alt: STRIP_CONFIG[1].fallbackAlt,
+  });
+  const slot3 = useSlot("strip.3", {
+    url: STRIP_CONFIG[2].fallbackUrl,
+    alt: STRIP_CONFIG[2].fallbackAlt,
+  });
+  const slot4 = useSlot("strip.4", {
+    url: STRIP_CONFIG[3].fallbackUrl,
+    alt: STRIP_CONFIG[3].fallbackAlt,
+  });
   const slots = [slot1, slot2, slot3, slot4];
 
   return (
     <section className="mb-8 sm:mb-10">
       <div className="reference-pill-gradient rounded-4xl sm:rounded-full p-4 sm:px-7 sm:py-4 shadow-card text-white">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 items-center">
-          {featuredItems.map((item, idx) => {
+          {STRIP_CONFIG.map((cfg, idx) => {
             const currentSlot = slots[idx];
-            const effectiveImage = currentSlot?.url || item.image;
-            const effectiveName = currentSlot?.alt || item.name;
-            const dishId = currentSlot?.dishId || item.id;
-            const matchedDish = dishes.find((d) => d.id === dishId);
-            const price = matchedDish?.price || item.price;
+            const dish = currentSlot?.dishId
+              ? dishes.find((d) => d.id === currentSlot.dishId)
+              : null;
+            const effectiveImage = currentSlot?.slot?.mediaId
+              ? currentSlot.url
+              : (dish?.image || currentSlot?.url || cfg.fallbackUrl);
+            const effectiveName = dish
+              ? dish.name
+              : (currentSlot?.dishName || currentSlot?.alt || cfg.fallbackAlt);
+            const category = dish?.category || cfg.defaultCategory;
 
             return (
               <div
-                key={idx}
-                onClick={() => addToCart(dishId, effectiveName, price, effectiveImage)}
-                className={`flex items-center gap-3.5 group cursor-pointer p-2 rounded-full transition-all ${
-                  item.isDarkCard
+                key={cfg.key}
+                onClick={() => {
+                  if (dish) {
+                    addToCart(dish.id, dish.name, dish.price, effectiveImage);
+                  }
+                }}
+                className={`flex items-center gap-3.5 p-2 rounded-full transition-all ${
+                  dish ? "cursor-pointer group" : ""
+                } ${
+                  cfg.isDarkCard
                     ? "bg-charcoal-900/20 hover:bg-charcoal-900/35"
                     : "bg-white/5 hover:bg-white/15"
                 }`}
               >
                 <div
-                  className={`relative w-14 h-14 rounded-full overflow-hidden border-2 ${item.borderColor} shrink-0 group-hover:scale-105 transition-transform`}
+                  className={`relative w-14 h-14 rounded-full overflow-hidden border-2 ${
+                    cfg.borderColor
+                  } shrink-0 ${dish ? "group-hover:scale-105" : ""} transition-transform`}
                 >
                   <Image
                     src={resolveImageUrl(effectiveImage)}
@@ -100,30 +125,38 @@ export default function FeaturedStrip() {
                   />
                 </div>
                 <div className="min-w-0 flex-1">
-                  <p className={`text-[10px] uppercase tracking-wider font-bold ${item.tagColor}`}>
-                    {item.category}
+                  <p
+                    className={`text-[10px] uppercase tracking-wider font-bold ${cfg.tagColor}`}
+                  >
+                    {category}
                   </p>
                   <h3
                     className={`text-xs sm:text-sm font-bold truncate ${
-                      item.isDarkCard ? "text-charcoal-900 font-extrabold" : "text-white"
+                      cfg.isDarkCard
+                        ? "text-charcoal-900 font-extrabold"
+                        : "text-white"
                     }`}
                   >
                     {effectiveName}
                   </h3>
-                  <div className="flex items-center justify-between mt-0.5 pr-2">
-                    <span className={`text-xs font-extrabold ${item.textColor}`}>
-                      Rs. {price.toLocaleString()}
-                    </span>
-                    <span
-                      className={`text-[10px] px-2 py-0.5 rounded-full font-bold transition-colors ${
-                        item.isDarkCard
-                          ? "bg-charcoal-900 text-white"
-                          : `bg-white/20 ${item.btnColor}`
-                      }`}
-                    >
-                      + Add
-                    </span>
-                  </div>
+                  {dish ? (
+                    <div className="flex items-center justify-between mt-0.5 pr-2">
+                      <span className={`text-xs font-extrabold ${cfg.textColor}`}>
+                        Rs. {dish.price.toLocaleString()}
+                      </span>
+                      <span
+                        className={`text-[10px] px-2 py-0.5 rounded-full font-bold transition-colors ${
+                          cfg.isDarkCard
+                            ? "bg-charcoal-900 text-white"
+                            : `bg-white/20 ${cfg.btnColor}`
+                        }`}
+                      >
+                        + Add
+                      </span>
+                    </div>
+                  ) : (
+                    <div className="h-4" />
+                  )}
                 </div>
               </div>
             );

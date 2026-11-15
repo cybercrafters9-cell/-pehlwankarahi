@@ -102,8 +102,12 @@ export const uploadMedia = asyncHandler(
       .update(req.file.buffer)
       .digest("hex");
 
+    const rawFilename = req.file.originalname || "image";
+    const filename =
+      rawFilename.length > 255 ? rawFilename.slice(0, 255) : rawFilename;
+
     const media = await mediaRepository.create(
-      req.file.originalname || "image",
+      filename,
       detectedMime,
       req.file.size,
       req.file.buffer,

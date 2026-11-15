@@ -1,3 +1,4 @@
+import crypto from "crypto";
 import { RowDataPacket, ResultSetHeader } from "mysql2/promise";
 import { query, queryOne, execute, withTransaction } from "../db/pool";
 import { Order, OrderItem, OrderStatus } from "../types";
@@ -125,7 +126,8 @@ export const orderRepository = {
 
   async create(data: CreateOrderInput): Promise<Order> {
     return withTransaction(async (conn) => {
-      // 1. Insert order with placeholder code
+      // 1. Insert order with unique temporary code to prevent concurrent unique key collisions
+      const tempCode = `tmp-${crypto.randomUUID()}`;
       const [insertResult] = await conn.execute<ResultSetHeader>(
         `INSERT INTO orders (
           code, customer_name, customer_phone, address, subtotal,
@@ -133,9 +135,10 @@ export const orderRepository = {
           payment_method, payment_status, transaction_id,
           estimated_delivery_mins, notes
         ) VALUES (
-          '', ?, ?, ?, ?, ?, ?, ?, ?, 'preparing', ?, ?, ?, ?, ?
+          ?, ?, ?, ?, ?, ?, ?, ?, ?, 'preparing', ?, ?, ?, ?, ?
         )`,
         [
+          tempCode,
           data.customerName,
           data.customerPhone,
           data.address,

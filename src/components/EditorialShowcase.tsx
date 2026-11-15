@@ -6,7 +6,7 @@ import { useSlot } from "@/context/SiteContentContext";
 import { Sparkles, Crown } from "lucide-react";
 
 export default function EditorialShowcase() {
-  const { activateLoyalty } = useRestaurant();
+  const { setIsCartOpen } = useRestaurant();
   const editorialSlot = useSlot("editorial.main", {
     url: "https://images.unsplash.com/photo-1599487488170-d11ec9c172f0?auto=format&fit=crop&w=600&q=80",
     alt: "Shami & Seekh Kabab Platter",
@@ -50,17 +50,13 @@ export default function EditorialShowcase() {
             <p className="text-[10px] uppercase tracking-widest text-white/60">Free Roghni Naan</p>
             <p className="text-xs font-bold mt-0.5">VIP Dawat Card</p>
             <div className="mt-3 pt-2 border-t border-white/10 flex items-center justify-between text-[10px] text-saffron-400">
-              <span>PKR 1,000 Bonus</span>
+              <span>Shahi VIP Privilege</span>
               <button
-                onClick={async () => {
-                  const phone = window.prompt("Enter your Pakistani mobile number to activate Shahi VIP Pass (e.g. 0300-1234567):");
-                  if (phone?.trim()) {
-                    await activateLoyalty(phone.trim()).catch(() => {});
-                  }
-                }}
+                type="button"
+                onClick={() => setIsCartOpen(true)}
                 className="underline font-bold hover:text-white transition-colors cursor-pointer"
               >
-                Activate
+                Apply in Cart
               </button>
             </div>
           </div>

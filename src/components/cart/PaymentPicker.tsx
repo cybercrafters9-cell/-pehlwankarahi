@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import { Banknote, Check, Copy } from "lucide-react";
 import { PaymentType, PAYMENT_ACCOUNTS, DigitalPaymentMethod } from "./types";
 import { RestaurantSettings } from "@/services/api";
@@ -23,17 +24,35 @@ export default function PaymentPicker({
   onCopy,
   settings,
 }: PaymentPickerProps) {
-  const activeDigital = paymentMethod !== "cod" ? PAYMENT_ACCOUNTS[paymentMethod as DigitalPaymentMethod] : null;
+  const easypaisaNumber = settings?.easypaisaNumber?.trim() || "";
+  const jazzcashNumber = settings?.jazzcashNumber?.trim() || "";
 
-  const accountTitle =
-    settings?.paymentAccountTitle || activeDigital?.accountTitle || "Pehalwan Karahi & DeraGhar";
+  const isEasypaisaAvailable = Boolean(easypaisaNumber);
+  const isJazzcashAvailable = Boolean(jazzcashNumber);
+
+  // If currently selected digital payment is not available, fallback to COD
+  useEffect(() => {
+    if (paymentMethod === "easypaisa" && !isEasypaisaAvailable) {
+      setPaymentMethod("cod");
+    } else if (paymentMethod === "jazzcash" && !isJazzcashAvailable) {
+      setPaymentMethod("cod");
+    }
+  }, [paymentMethod, isEasypaisaAvailable, isJazzcashAvailable, setPaymentMethod]);
+
+  const activeDigital =
+    paymentMethod !== "cod"
+      ? PAYMENT_ACCOUNTS[paymentMethod as DigitalPaymentMethod]
+      : null;
+
   const rawNumber =
     activeDigital?.id === "easypaisa"
-      ? settings?.easypaisaNumber || activeDigital.rawNumber
+      ? easypaisaNumber
       : activeDigital?.id === "jazzcash"
-      ? settings?.jazzcashNumber || activeDigital.rawNumber
-      : activeDigital?.rawNumber || "";
-  const displayNumber = rawNumber;
+      ? jazzcashNumber
+      : "";
+
+  const accountTitle =
+    settings?.paymentAccountTitle?.trim() || "Pehalwan Karahi & DeraGhar";
 
   return (
     <div className="space-y-3 pt-2 border-t border-sand-200">
@@ -47,7 +66,9 @@ export default function PaymentPicker({
         <label
           onClick={() => setPaymentMethod("cod")}
           className={`relative p-3 rounded-2xl border-2 flex flex-col justify-between cursor-pointer transition-all ${
-            paymentMethod === "cod" ? "border-charcoal-900 bg-sand-50 shadow-sm" : "border-sand-300 bg-white hover:bg-sand-50"
+            paymentMethod === "cod"
+              ? "border-charcoal-900 bg-sand-50 shadow-sm"
+              : "border-sand-300 bg-white hover:bg-sand-50"
           }`}
         >
           <div className="flex items-center justify-between">
@@ -61,38 +82,67 @@ export default function PaymentPicker({
             />
           </div>
           <div className="mt-2">
-            <p className="font-extrabold text-xs text-charcoal-900">Cash on Delivery</p>
-            <p className="text-[10px] text-charcoal-600 mt-0.5">Pay upon arrival</p>
+            <p className="font-extrabold text-xs text-charcoal-900">
+              Cash on Delivery
+            </p>
+            <p className="text-[10px] text-charcoal-600 mt-0.5">
+              Pay upon arrival
+            </p>
           </div>
         </label>
 
-        {/* Digital Methods (Easypaisa & JazzCash) from config */}
+        {/* Digital Methods (Easypaisa & JazzCash) */}
         {(["easypaisa", "jazzcash"] as const).map((key) => {
           const cfg = PAYMENT_ACCOUNTS[key];
+          const isAvailable = key === "easypaisa" ? isEasypaisaAvailable : isJazzcashAvailable;
           const isSelected = paymentMethod === key;
+
           return (
             <label
               key={cfg.id}
-              onClick={() => setPaymentMethod(cfg.id)}
-              className={`relative p-3 rounded-2xl border-2 flex flex-col justify-between cursor-pointer transition-all ${
-                isSelected ? `${cfg.theme.cardActiveBorder} ${cfg.theme.cardActiveBg} shadow-sm` : `border-sand-300 bg-white ${cfg.theme.cardHoverBg}`
+              onClick={() => {
+                if (isAvailable) {
+                  setPaymentMethod(cfg.id);
+                }
+              }}
+              className={`relative p-3 rounded-2xl border-2 flex flex-col justify-between transition-all ${
+                !isAvailable
+                  ? "border-sand-200 bg-sand-100/60 opacity-60 cursor-not-allowed"
+                  : isSelected
+                  ? `${cfg.theme.cardActiveBorder} ${cfg.theme.cardActiveBg} shadow-sm cursor-pointer`
+                  : `border-sand-300 bg-white ${cfg.theme.cardHoverBg} cursor-pointer`
               }`}
             >
               <div className="flex items-center justify-between">
-                <span className={`text-xs font-extrabold text-white ${cfg.badgeBg} px-2 py-0.5 rounded-full`}>
+                <span
+                  className={`text-xs font-extrabold text-white ${
+                    isAvailable ? cfg.badgeBg : "bg-charcoal-400"
+                  } px-2 py-0.5 rounded-full`}
+                >
                   {cfg.badgeLabel}
                 </span>
                 <input
                   type="radio"
                   name="payment"
                   checked={isSelected}
-                  onChange={() => setPaymentMethod(cfg.id)}
+                  disabled={!isAvailable}
+                  onChange={() => {
+                    if (isAvailable) setPaymentMethod(cfg.id);
+                  }}
                   className={cfg.theme.radioAccent}
                 />
               </div>
               <div className="mt-2">
-                <p className="font-extrabold text-xs text-charcoal-900">{cfg.name}</p>
-                <p className={`text-[10px] ${cfg.theme.subtitleColor} font-semibold mt-0.5`}>Mobile Transfer</p>
+                <p className="font-extrabold text-xs text-charcoal-900">
+                  {cfg.name}
+                </p>
+                <p
+                  className={`text-[10px] ${
+                    isAvailable ? cfg.theme.subtitleColor : "text-charcoal-500"
+                  } font-semibold mt-0.5`}
+                >
+                  {isAvailable ? "Mobile Transfer" : "Unavailable"}
+                </p>
               </div>
             </label>
           );
@@ -100,18 +150,34 @@ export default function PaymentPicker({
       </div>
 
       {/* Data-Driven Digital Account Instructions Sub-Panel */}
-      {activeDigital && (
-        <div className={`${activeDigital.theme.panelBg} border ${activeDigital.theme.panelBorder} rounded-2xl p-3.5 space-y-2 text-xs animate-in fade-in duration-200`}>
-          <div className={`flex items-center justify-between ${activeDigital.theme.headerText} font-bold`}>
+      {activeDigital && rawNumber && (
+        <div
+          className={`${activeDigital.theme.panelBg} border ${activeDigital.theme.panelBorder} rounded-2xl p-3.5 space-y-2 text-xs animate-in fade-in duration-200`}
+        >
+          <div
+            className={`flex items-center justify-between ${activeDigital.theme.headerText} font-bold`}
+          >
             <span>Official {activeDigital.name} Account:</span>
-            <span className={`text-[10px] ${activeDigital.theme.badgeBg} text-white px-2 py-0.5 rounded-full`}>Verified</span>
+            <span
+              className={`text-[10px] ${activeDigital.theme.badgeBg} text-white px-2 py-0.5 rounded-full`}
+            >
+              Verified
+            </span>
           </div>
-          <div className={`bg-white rounded-xl p-2.5 border ${activeDigital.theme.cardBorder} flex items-center justify-between`}>
+          <div
+            className={`bg-white rounded-xl p-2.5 border ${activeDigital.theme.cardBorder} flex items-center justify-between`}
+          >
             <div>
-              <p className="text-[10px] text-charcoal-600 font-semibold">Account Title</p>
-              <p className="font-bold text-xs text-charcoal-900">{accountTitle}</p>
-              <p className={`font-mono font-extrabold text-sm ${activeDigital.theme.numberColor} mt-0.5`}>
-                {displayNumber}
+              <p className="text-[10px] text-charcoal-600 font-semibold">
+                Account Title
+              </p>
+              <p className="font-bold text-xs text-charcoal-900">
+                {accountTitle}
+              </p>
+              <p
+                className={`font-mono font-extrabold text-sm ${activeDigital.theme.numberColor} mt-0.5`}
+              >
+                {rawNumber}
               </p>
             </div>
             <button
@@ -121,7 +187,9 @@ export default function PaymentPicker({
             >
               {copiedAccount === activeDigital.id ? (
                 <>
-                  <Check className={`w-3.5 h-3.5 ${activeDigital.theme.checkIcon}`} />
+                  <Check
+                    className={`w-3.5 h-3.5 ${activeDigital.theme.checkIcon}`}
+                  />
                   <span>Copied</span>
                 </>
               ) : (
@@ -133,7 +201,9 @@ export default function PaymentPicker({
             </button>
           </div>
           <div>
-            <label className={`block text-[11px] font-bold ${activeDigital.theme.headerText} mb-1`}>
+            <label
+              className={`block text-[11px] font-bold ${activeDigital.theme.headerText} mb-1`}
+            >
               Transaction ID (TID) / Sender Number (Optional):
             </label>
             <input

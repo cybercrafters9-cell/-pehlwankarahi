@@ -67,6 +67,8 @@ function mapRow(row: DishRow): MenuItem {
     rating: row.rating,
     desc: row.description,
     image: resolveImageUrl(row.image_media_id, row.image_url),
+    imageUrl: row.image_url,
+    imageMediaId: row.image_media_id,
     isAvailable: Boolean(row.is_available),
   };
 }
@@ -126,12 +128,10 @@ export const dishRepository = {
     );
     if (row) return row.id as number;
 
-    // Fallback: create category if not exists
-    const createRes = await execute(
-      "INSERT INTO categories (slug, name, sort_order, is_active) VALUES (?, ?, 0, 1)",
-      [slug, slug.toUpperCase()]
-    );
-    return createRes.insertId;
+    const error = new Error(`Category "${categoryInput}" does not exist`);
+    (error as unknown as { statusCode: number; status: number }).statusCode = 400;
+    (error as unknown as { statusCode: number; status: number }).status = 400;
+    throw error;
   },
 
   async create(data: CreateDishInput): Promise<MenuItem> {
@@ -142,6 +142,15 @@ export const dishRepository = {
     const isAvailable = data.isAvailable !== false ? 1 : 0;
     const sortOrder = data.sortOrder ?? 0;
     const imageMediaId = data.imageMediaId ?? null;
+    if (imageMediaId !== null) {
+      const media = await mediaRepository.getById(imageMediaId);
+      if (!media) {
+        const error = new Error(`Media #${imageMediaId} does not exist`);
+        (error as unknown as { statusCode: number; status: number }).statusCode = 400;
+        (error as unknown as { statusCode: number; status: number }).status = 400;
+        throw error;
+      }
+    }
     const imageUrl = data.imageUrl ?? data.image ?? null;
 
     const res = await execute(
@@ -198,6 +207,15 @@ export const dishRepository = {
 
     if (updates.imageMediaId !== undefined) {
       imageMediaId = updates.imageMediaId;
+      if (imageMediaId !== null) {
+        const media = await mediaRepository.getById(imageMediaId);
+        if (!media) {
+          const error = new Error(`Media #${imageMediaId} does not exist`);
+          (error as unknown as { statusCode: number; status: number }).statusCode = 400;
+          (error as unknown as { statusCode: number; status: number }).status = 400;
+          throw error;
+        }
+      }
     }
     if (updates.imageUrl !== undefined || updates.image !== undefined) {
       imageUrl = updates.imageUrl ?? updates.image ?? null;

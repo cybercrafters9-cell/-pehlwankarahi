@@ -16,6 +16,7 @@ export default function MenuModal() {
     addToCart,
     setIsCartOpen,
     cart,
+    settings,
   } = useRestaurant();
   const [filter, setFilter] = useState<string>("all");
   const [addedDishId, setAddedDishId] = useState<number | null>(null);
@@ -261,10 +262,19 @@ export default function MenuModal() {
 
         {/* Modal Bottom Footer */}
         <div className="pt-3 pb-4 px-6 sm:px-10 shrink-0 border-t border-white/10 bg-black/20 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-white/80">
-          <div className="flex items-center gap-2">
-            <Phone className="w-3.5 h-3.5 text-saffron-400" />
-            <span className="font-semibold tracking-wider">Order Helpline: 0300-1234567</span>
-          </div>
+          {settings?.phone ? (
+            <div className="flex items-center gap-2">
+              <Phone className="w-3.5 h-3.5 text-saffron-400" />
+              <a
+                href={`tel:${settings.phone.replace(/\D/g, "")}`}
+                className="font-semibold tracking-wider hover:text-white transition-colors"
+              >
+                Order Helpline: {settings.phone}
+              </a>
+            </div>
+          ) : (
+            <div className="hidden sm:block" />
+          )}
 
           <div className="hidden md:block text-[11px] uppercase tracking-widest text-white/60 font-semibold">
             Pehalwan Karahi • Asli Desi Riwayat

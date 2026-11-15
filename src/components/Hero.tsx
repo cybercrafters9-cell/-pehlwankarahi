@@ -13,34 +13,25 @@ export default function Hero() {
   const plate1 = useSlot("hero.plate1", {
     url: "https://images.unsplash.com/photo-1585937421612-70a008356fbe?auto=format&fit=crop&w=600&q=80",
     alt: "Mutton Karahi",
-    dishId: 2,
   });
 
   const plate2 = useSlot("hero.plate2", {
     url: "https://images.unsplash.com/photo-1603894584373-5ac82b2ae398?auto=format&fit=crop&w=600&q=80",
     alt: "Chicken Karahi",
-    dishId: 1,
   });
 
   const plate3 = useSlot("hero.plate3", {
     url: "https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=900&q=85",
     alt: "Mutton Chops Karahi",
-    dishId: 6,
   });
 
-  const handlePlateClick = (
-    dishId: number | null | undefined,
-    fallbackName: string,
-    fallbackPrice: number,
-    fallbackImage: string
-  ) => {
-    const dish = dishes.find((d) => d.id === dishId);
-    if (dish) {
-      addToCart(dish.id, dish.name, dish.price, dish.image);
-    } else {
-      addToCart(dishId || 1, fallbackName, fallbackPrice, fallbackImage);
-    }
-  };
+  const dish1 = plate1.dishId ? dishes.find((d) => d.id === plate1.dishId) : null;
+  const dish2 = plate2.dishId ? dishes.find((d) => d.id === plate2.dishId) : null;
+  const dish3 = plate3.dishId ? dishes.find((d) => d.id === plate3.dishId) : null;
+
+  const img1 = plate1.slot?.mediaId ? plate1.url : (dish1?.image || plate1.url);
+  const img2 = plate2.slot?.mediaId ? plate2.url : (dish2?.image || plate2.url);
+  const img3 = plate3.slot?.mediaId ? plate3.url : (dish3?.image || plate3.url);
 
   const scrollTo = (id: string) => {
     const el = document.getElementById(id);
@@ -135,86 +126,89 @@ export default function Hero() {
           <div className="relative w-full h-full">
             {/* Plate 1: Top-Left — Mutton Karahi */}
             <div
-              onClick={() =>
-                handlePlateClick(
-                  plate1.dishId,
-                  plate1.alt,
-                  2850,
-                  plate1.url
-                )
-              }
-              className="cursor-pointer group absolute -top-1 left-2 sm:left-4 w-36 h-36 sm:w-44 sm:h-44 rounded-full bg-sand-50 p-2 shadow-2xl animate-float transition-transform"
+              onClick={() => {
+                if (dish1) {
+                  addToCart(dish1.id, dish1.name, dish1.price, img1);
+                }
+              }}
+              className={`absolute -top-1 left-2 sm:left-4 w-36 h-36 sm:w-44 sm:h-44 rounded-full bg-sand-50 p-2 shadow-2xl animate-float transition-transform ${
+                dish1 ? "cursor-pointer group" : ""
+              }`}
             >
               <div className="relative w-full h-full rounded-full overflow-hidden">
                 <Image
-                  src={plate1.url}
-                  alt={plate1.alt}
+                  src={img1}
+                  alt={dish1 ? dish1.name : plate1.alt}
                   fill
-                  unoptimized={plate1.url.includes("/api/media/")}
+                  unoptimized={img1.includes("/api/media/")}
                   sizes="(max-width: 640px) 144px, 176px"
-                  className="object-cover group-hover:scale-105 transition-transform duration-300"
+                  className={`object-cover ${dish1 ? "group-hover:scale-105" : ""} transition-transform duration-300`}
                 />
               </div>
-              <span className="absolute bottom-1 right-1 bg-charcoal-900 text-white text-[10px] font-bold px-2.5 py-0.5 rounded-full shadow flex items-center gap-1">
-                <span>{plate1.alt}</span>
-                <Plus className="w-3 h-3 text-saffron-400" />
-              </span>
+              {dish1 && (
+                <span className="absolute bottom-1 right-1 bg-charcoal-900 text-white text-[10px] font-bold px-2.5 py-0.5 rounded-full shadow flex items-center gap-1">
+                  <span>{dish1.name}</span>
+                  <Plus className="w-3 h-3 text-saffron-400" />
+                </span>
+              )}
             </div>
 
             {/* Plate 2: Top-Right — Chicken Karahi */}
             <div
-              onClick={() =>
-                handlePlateClick(
-                  plate2.dishId,
-                  plate2.alt,
-                  1550,
-                  plate2.url
-                )
-              }
-              className="cursor-pointer group absolute top-2 right-2 sm:right-4 w-32 h-32 sm:w-40 sm:h-40 rounded-full bg-sand-50 p-2 shadow-2xl animate-float-delayed transition-transform"
+              onClick={() => {
+                if (dish2) {
+                  addToCart(dish2.id, dish2.name, dish2.price, img2);
+                }
+              }}
+              className={`absolute top-2 right-2 sm:right-4 w-32 h-32 sm:w-40 sm:h-40 rounded-full bg-sand-50 p-2 shadow-2xl animate-float-delayed transition-transform ${
+                dish2 ? "cursor-pointer group" : ""
+              }`}
             >
               <div className="relative w-full h-full rounded-full overflow-hidden">
                 <Image
-                  src={plate2.url}
-                  alt={plate2.alt}
+                  src={img2}
+                  alt={dish2 ? dish2.name : plate2.alt}
                   fill
-                  unoptimized={plate2.url.includes("/api/media/")}
+                  unoptimized={img2.includes("/api/media/")}
                   sizes="(max-width: 640px) 128px, 160px"
-                  className="object-cover group-hover:scale-105 transition-transform duration-300"
+                  className={`object-cover ${dish2 ? "group-hover:scale-105" : ""} transition-transform duration-300`}
                 />
               </div>
-              <span className="absolute -bottom-1 left-2 bg-terracotta-500 text-white text-[10px] font-bold px-2.5 py-0.5 rounded-full shadow flex items-center gap-1">
-                <span>{plate2.alt}</span>
-                <Plus className="w-3 h-3" />
-              </span>
+              {dish2 && (
+                <span className="absolute -bottom-1 left-2 bg-terracotta-500 text-white text-[10px] font-bold px-2.5 py-0.5 rounded-full shadow flex items-center gap-1">
+                  <span>{dish2.name}</span>
+                  <Plus className="w-3 h-3" />
+                </span>
+              )}
             </div>
 
             {/* Plate 3: Bottom-Center — Mutton Chops Karahi */}
             <div
-              onClick={() =>
-                handlePlateClick(
-                  plate3.dishId,
-                  plate3.alt,
-                  3200,
-                  plate3.url
-                )
-              }
-              className="cursor-pointer group absolute -bottom-3 left-10 sm:left-20 w-38 h-38 sm:w-48 sm:h-48 rounded-full bg-sand-50 p-2 shadow-2xl animate-float transition-transform"
+              onClick={() => {
+                if (dish3) {
+                  addToCart(dish3.id, dish3.name, dish3.price, img3);
+                }
+              }}
+              className={`absolute -bottom-3 left-10 sm:left-20 w-38 h-38 sm:w-48 sm:h-48 rounded-full bg-sand-50 p-2 shadow-2xl animate-float transition-transform ${
+                dish3 ? "cursor-pointer group" : ""
+              }`}
             >
               <div className="relative w-full h-full rounded-full overflow-hidden">
                 <Image
-                  src={plate3.url}
-                  alt={plate3.alt}
+                  src={img3}
+                  alt={dish3 ? dish3.name : plate3.alt}
                   fill
-                  unoptimized={plate3.url.includes("/api/media/")}
+                  unoptimized={img3.includes("/api/media/")}
                   sizes="(max-width: 640px) 152px, 192px"
-                  className="object-cover group-hover:scale-105 transition-transform duration-300"
+                  className={`object-cover ${dish3 ? "group-hover:scale-105" : ""} transition-transform duration-300`}
                 />
               </div>
-              <span className="absolute top-2 -right-1 bg-saffron-400 text-charcoal-900 text-[10px] font-extrabold px-2.5 py-0.5 rounded-full shadow flex items-center gap-1">
-                <span>{plate3.alt}</span>
-                <Plus className="w-3 h-3" />
-              </span>
+              {dish3 && (
+                <span className="absolute top-2 -right-1 bg-saffron-400 text-charcoal-900 text-[10px] font-extrabold px-2.5 py-0.5 rounded-full shadow flex items-center gap-1">
+                  <span>{dish3.name}</span>
+                  <Plus className="w-3 h-3" />
+                </span>
+              )}
             </div>
 
             {/* Condiments */}

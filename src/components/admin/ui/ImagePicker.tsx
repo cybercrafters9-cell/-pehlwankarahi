@@ -7,10 +7,15 @@ import { Sparkles, Check, Upload, Loader2, Link2 } from "lucide-react";
 import { resolveImageUrl } from "@/lib/media";
 import { api, getErrorMessage } from "@/services/api";
 
+export interface ImagePickerResult {
+  mediaId: number | null;
+  url: string;
+}
+
 export interface ImagePickerProps {
   label?: string;
   value: string;
-  onChange: (url: string) => void;
+  onChange: (result: ImagePickerResult) => void;
   error?: string;
 }
 
@@ -142,7 +147,7 @@ export function ImagePicker({
     try {
       const { blob, filename } = await compressImageClient(file);
       const res = await api.uploadMedia(blob, filename);
-      onChange(res.url);
+      onChange({ mediaId: res.id, url: res.url });
     } catch (err: unknown) {
       setUploadError(getErrorMessage(err, "Failed to upload image."));
     } finally {
@@ -251,7 +256,7 @@ export function ImagePicker({
         <div className="pt-1">
           <Input
             value={value}
-            onChange={(e) => onChange(e.target.value)}
+            onChange={(e) => onChange({ mediaId: null, url: e.target.value })}
             placeholder="https://images.unsplash.com/... or paste image URL"
             error={error}
           />
@@ -272,7 +277,7 @@ export function ImagePicker({
                   type="button"
                   key={preset.name}
                   onClick={() => {
-                    onChange(preset.url);
+                    onChange({ mediaId: null, url: preset.url });
                     setShowPresets(false);
                   }}
                   className={`group relative h-16 rounded-xl overflow-hidden border-2 text-left transition-all cursor-pointer ${

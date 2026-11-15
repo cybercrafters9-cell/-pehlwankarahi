@@ -10,12 +10,19 @@ import mediaRoutes from "./media.routes";
 import categoryRoutes from "./category.routes";
 import { getSiteContent, updateSiteSlot } from "../controllers/siteSlot.controller";
 import { requireAuth } from "../middleware/requireAuth";
+import { validate } from "../middleware/validate";
+import { updateSiteSlotSchema } from "../validators";
 
 const router = Router();
 
 router.get("/site-content", getSiteContent);
 router.get("/admin/site-slots", requireAuth, getSiteContent);
-router.put("/admin/site-slots/:key", requireAuth, updateSiteSlot);
+router.put(
+  "/admin/site-slots/:key",
+  requireAuth,
+  validate(updateSiteSlotSchema),
+  updateSiteSlot
+);
 
 router.use("/auth", authRoutes);
 router.use("/categories", categoryRoutes);

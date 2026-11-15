@@ -10,7 +10,6 @@ import { Modal } from "../ui/Modal";
 import { ImagePicker } from "../ui/ImagePicker";
 import { Input } from "../ui/Input";
 import {
-  Link2,
   RotateCcw,
   Upload,
   Loader2,
@@ -51,12 +50,30 @@ const ASPECT_RATIO_HINTS: Record<string, string> = {
   "strip.3": "1:1 Square / Circle (Min 300×300)",
   "strip.4": "1:1 Square / Circle (Min 300×300)",
   "bento.main": "4:3 Landscape (Min 1000×750)",
+  "bento.deal": "16:9 Landscape (Min 600×350)",
   "bento.sub1": "4:3 Landscape (Min 600×450)",
+  "bento.sub3": "4:3 Landscape (Min 600×450)",
   "bento.sub4": "4:3 Landscape (Min 600×450)",
   "editorial.main": "3:4 Portrait (Min 600×800)",
   "reservation.main": "16:9 Landscape (Min 900×500)",
   "video.poster": "16:9 Landscape (Min 900×500)",
 };
+
+const DISH_SLOT_KEYS = new Set([
+  "hero.plate1",
+  "hero.plate2",
+  "hero.plate3",
+  "strip.1",
+  "strip.2",
+  "strip.3",
+  "strip.4",
+  "bento.main",
+  "bento.deal",
+  "bento.sub1",
+  "bento.sub3",
+  "bento.sub4",
+  "reservation.main",
+]);
 
 export function SiteImagesTab({
   slots,
@@ -66,9 +83,9 @@ export function SiteImagesTab({
 }: SiteImagesTabProps) {
   const [editingSlot, setEditingSlot] = useState<SiteSlot | null>(null);
   const [replaceUrl, setReplaceUrl] = useState("");
+  const [replaceMediaId, setReplaceMediaId] = useState<number | null>(null);
   const [altText, setAltText] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [linkingDishSlotKey, setLinkingDishSlotKey] = useState<string | null>(null);
 
   // Group slots by section
   const sections = Array.from(new Set(slots.map((s) => s.section)));
@@ -76,6 +93,7 @@ export function SiteImagesTab({
   const handleOpenReplace = (slot: SiteSlot) => {
     setEditingSlot(slot);
     setReplaceUrl(slot.effectiveUrl);
+    setReplaceMediaId(slot.mediaId);
     setAltText(slot.altText);
   };
 
@@ -84,12 +102,16 @@ export function SiteImagesTab({
     setIsSubmitting(true);
     try {
       // Check if replaceUrl is a database media URL e.g. /api/media/123
-      const match = replaceUrl.match(/\/api\/media\/(\d+)/);
-      const mediaId = match ? parseInt(match[1], 10) : null;
+      let mediaId = replaceMediaId;
+      if (mediaId === null && replaceUrl) {
+        const match = replaceUrl.match(/\/api\/media\/(\d+)/);
+        if (match) {
+          mediaId = parseInt(match[1], 10);
+        }
+      }
 
       await onUpdateSlot(editingSlot.key, {
         mediaId: mediaId || null,
-        dishId: null, // Custom media overrides dish link
         fallbackUrl: !mediaId && replaceUrl ? replaceUrl : undefined,
         altText: altText.trim() || editingSlot.altText,
       });
@@ -105,9 +127,18 @@ export function SiteImagesTab({
     try {
       await onUpdateSlot(slotKey, {
         dishId,
-        mediaId: null, // Clear custom media to inherit dish image
       });
-      setLinkingDishSlotKey(null);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleUnlinkDish = async (slotKey: string) => {
+    setIsSubmitting(true);
+    try {
+      await onUpdateSlot(slotKey, {
+        dishId: null,
+      });
     } finally {
       setIsSubmitting(false);
     }
@@ -118,7 +149,6 @@ export function SiteImagesTab({
     try {
       await onUpdateSlot(slot.key, {
         mediaId: null,
-        dishId: null,
       });
     } finally {
       setIsSubmitting(false);
@@ -169,6 +199,7 @@ export function SiteImagesTab({
                 {sectionSlots.map((slot) => {
                   const resolvedUrl = resolveImageUrl(slot.effectiveUrl);
                   const isMediaCustom = Boolean(slot.mediaId);
+                  const isDishSlot = DISH_SLOT_KEYS.has(slot.key);
                   const isDishLinked = Boolean(slot.dishId);
                   const matchedDish = dishes.find((d) => d.id === slot.dishId);
                   const hint = ASPECT_RATIO_HINTS[slot.key] || "Recommended aspect ratio";
@@ -191,16 +222,25 @@ export function SiteImagesTab({
                           />
                           <div className="absolute inset-0 bg-gradient-to-t from-charcoal-900/80 via-transparent to-transparent" />
 
-                          {/* Source Status Tag */}
-                          <div className="absolute top-3 left-3">
-                            {isMediaCustom ? (
-                              <Badge variant="saffron">Custom DB Upload</Badge>
-                            ) : isDishLinked ? (
-                              <Badge variant="terracotta">
-                                Linked: {matchedDish?.name || `Dish #${slot.dishId}`}
-                              </Badge>
+                          {/* Source Status Tags */}
+                          <div className="absolute top-3 left-3 flex flex-wrap gap-1 max-w-[85%]">
+                            {isMediaCustom && (
+                              <Badge variant="saffron">Custom Media</Badge>
+                            )}
+                            {isDishSlot ? (
+                              isDishLinked ? (
+                                <Badge variant="terracotta">
+                                  Linked: {matchedDish?.name || `Dish #${slot.dishId}`}
+                                </Badge>
+                              ) : (
+                                <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-red-600 text-white shadow-sm">
+                                  Unlinked - add to cart hidden
+                                </span>
+                              )
                             ) : (
-                              <Badge variant="charcoal">Hardcoded Fallback</Badge>
+                              !isMediaCustom && (
+                                <Badge variant="charcoal">Default Fallback</Badge>
+                              )
                             )}
                           </div>
 
@@ -232,7 +272,7 @@ export function SiteImagesTab({
                       </div>
 
                       {/* Controls Footer */}
-                      <div className="p-4 pt-3 border-t border-sand-200/80 bg-sand-100/50 space-y-2">
+                      <div className="p-4 pt-3 border-t border-sand-200/80 bg-sand-100/50 space-y-3">
                         {/* Action Buttons */}
                         <div className="flex items-center gap-2">
                           <button
@@ -241,56 +281,61 @@ export function SiteImagesTab({
                             className="flex-1 px-3 py-1.5 rounded-xl bg-charcoal-900 hover:bg-charcoal-800 text-sand-100 text-xs font-bold flex items-center justify-center gap-1.5 cursor-pointer transition-colors shadow-sm"
                           >
                             <Upload className="w-3.5 h-3.5" />
-                            <span>Replace</span>
+                            <span>Replace Image</span>
                           </button>
 
-                          <button
-                            type="button"
-                            onClick={() =>
-                              setLinkingDishSlotKey(
-                                linkingDishSlotKey === slot.key ? null : slot.key
-                              )
-                            }
-                            className={`px-3 py-1.5 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 cursor-pointer transition-colors border ${
-                              linkingDishSlotKey === slot.key
-                                ? "bg-terracotta-500 text-white border-terracotta-500"
-                                : "bg-sand-100 hover:bg-sand-200 text-charcoal-800 border-sand-300"
-                            }`}
-                          >
-                            <Link2 className="w-3.5 h-3.5" />
-                            <span>Link Dish</span>
-                          </button>
-
-                          {(isMediaCustom || isDishLinked) && (
+                          {isMediaCustom && (
                             <button
                               type="button"
                               onClick={() => handleResetToDefault(slot)}
-                              title="Reset to default fallback"
-                              className="w-8 h-8 rounded-xl bg-sand-200 hover:bg-charcoal-900 hover:text-white text-charcoal-700 flex items-center justify-center transition-colors cursor-pointer shrink-0"
+                              title="Reset image to dish/fallback default"
+                              className="px-2.5 py-1.5 rounded-xl bg-sand-200 hover:bg-charcoal-900 hover:text-white text-charcoal-700 text-xs font-bold flex items-center gap-1 transition-colors cursor-pointer shrink-0"
                             >
                               <RotateCcw className="w-3.5 h-3.5" />
+                              <span>Reset Image</span>
                             </button>
                           )}
                         </div>
 
-                        {/* Inline Dish Linker Dropdown */}
-                        {linkingDishSlotKey === slot.key && (
-                          <div className="p-3 bg-white rounded-xl border border-sand-300 space-y-2 animate-in fade-in duration-150">
-                            <label className="block text-[11px] font-bold text-charcoal-700">
-                              Link slot to live dish photo &amp; name:
-                            </label>
-                            <select
-                              value={slot.dishId || ""}
-                              onChange={(e) => handleLinkDish(slot.key, e.target.value)}
-                              className="w-full bg-sand-100 border border-sand-300 rounded-lg px-2.5 py-1.5 text-xs font-semibold text-charcoal-900 focus:outline-none focus:border-terracotta-500 cursor-pointer"
-                            >
-                              <option value="">-- Choose Menu Dish --</option>
-                              {dishes.map((dish) => (
-                                <option key={dish.id} value={dish.id}>
-                                  #{dish.id} — {dish.name} (Rs. {dish.price.toLocaleString()})
-                                </option>
-                              ))}
-                            </select>
+                        {/* Dish Dropdown for EVERY Dish-Linked Slot */}
+                        {isDishSlot && (
+                          <div className="space-y-1 pt-1 border-t border-sand-200/60">
+                            <div className="flex items-center justify-between">
+                              <label className="text-[11px] font-bold text-charcoal-700">
+                                Linked Menu Dish:
+                              </label>
+                              {!isDishLinked && (
+                                <span className="text-[10px] text-red-600 font-bold">
+                                  Hidden from cart
+                                </span>
+                              )}
+                            </div>
+                            <div className="flex items-center gap-1.5">
+                              <select
+                                value={slot.dishId || ""}
+                                onChange={(e) => handleLinkDish(slot.key, e.target.value)}
+                                disabled={isSubmitting}
+                                className="flex-1 bg-white border border-sand-300 rounded-xl px-2.5 py-1.5 text-xs font-semibold text-charcoal-900 focus:outline-none focus:border-terracotta-500 cursor-pointer"
+                              >
+                                <option value="">-- Choose Menu Dish (or leave unlinked) --</option>
+                                {dishes.map((dish) => (
+                                  <option key={dish.id} value={dish.id}>
+                                    #{dish.id} — {dish.name} (Rs. {dish.price.toLocaleString()})
+                                  </option>
+                                ))}
+                              </select>
+                              {isDishLinked && (
+                                <button
+                                  type="button"
+                                  onClick={() => handleUnlinkDish(slot.key)}
+                                  disabled={isSubmitting}
+                                  title="Unlink dish"
+                                  className="px-2.5 py-1.5 rounded-xl bg-sand-200 hover:bg-red-600 hover:text-white text-charcoal-700 text-xs font-bold transition-colors cursor-pointer shrink-0"
+                                >
+                                  Unlink
+                                </button>
+                              )}
+                            </div>
                           </div>
                         )}
                       </div>
@@ -336,7 +381,10 @@ export function SiteImagesTab({
             <ImagePicker
               label="Upload Image (Compresses & Stores in DB)"
               value={replaceUrl}
-              onChange={(url) => setReplaceUrl(url)}
+              onChange={({ mediaId, url }) => {
+                setReplaceUrl(url);
+                setReplaceMediaId(mediaId);
+              }}
             />
 
             <Input

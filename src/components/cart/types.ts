@@ -19,9 +19,6 @@ export interface PaymentAccountConfig {
   name: string;
   badgeLabel: string;
   badgeBg: string;
-  accountTitle: string;
-  displayNumber: string;
-  rawNumber: string;
   theme: {
     panelBg: string;
     panelBorder: string;
@@ -46,9 +43,6 @@ export const PAYMENT_ACCOUNTS: Record<DigitalPaymentMethod, PaymentAccountConfig
     name: "Easypaisa",
     badgeLabel: "easypaisa",
     badgeBg: "bg-emerald-600",
-    accountTitle: "Pehalwan Karahi Official",
-    displayNumber: "0300-1234567",
-    rawNumber: "03001234567",
     theme: {
       panelBg: "bg-emerald-50",
       panelBorder: "border-emerald-300",
@@ -71,9 +65,6 @@ export const PAYMENT_ACCOUNTS: Record<DigitalPaymentMethod, PaymentAccountConfig
     name: "JazzCash",
     badgeLabel: "JazzCash",
     badgeBg: "bg-red-600",
-    accountTitle: "Pehalwan Karahi Official",
-    displayNumber: "0321-9876543",
-    rawNumber: "03219876543",
     theme: {
       panelBg: "bg-red-50",
       panelBorder: "border-red-300",

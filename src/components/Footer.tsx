@@ -219,27 +219,34 @@ export default function Footer() {
             </h4>
 
             <div className="space-y-2 text-xs">
-              <a
-                href={`tel:${cleanPhone(settings?.phone || "0300-1234567")}`}
-                className="block p-2 rounded-xl bg-white/5 hover:bg-white/10 transition-colors text-white font-mono font-bold"
-              >
-                <span className="text-[10px] text-white/60 block font-sans font-medium">UAN Delivery:</span>
-                {settings?.phone || "0300-1234567"}
-              </a>
-              <a
-                href={`https://wa.me/${cleanWa(settings?.whatsapp || settings?.phone || "0321-9876543")}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="block p-2 rounded-xl bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-300 transition-colors font-mono font-bold border border-emerald-500/20"
-              >
-                <span className="text-[10px] text-emerald-400/80 block font-sans font-medium">WhatsApp Booking:</span>
-                {settings?.whatsapp || "0321-9876543"}
-              </a>
+              {settings?.phone && (
+                <a
+                  href={`tel:${cleanPhone(settings.phone)}`}
+                  className="block p-2 rounded-xl bg-white/5 hover:bg-white/10 transition-colors text-white font-mono font-bold"
+                >
+                  <span className="text-[10px] text-white/60 block font-sans font-medium">UAN Delivery:</span>
+                  {settings.phone}
+                </a>
+              )}
+              {settings?.whatsapp && (
+                <a
+                  href={`https://wa.me/${cleanWa(settings.whatsapp)}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block p-2 rounded-xl bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-300 transition-colors font-mono font-bold border border-emerald-500/20"
+                >
+                  <span className="text-[10px] text-emerald-400/80 block font-sans font-medium">WhatsApp Booking:</span>
+                  {settings.whatsapp}
+                </a>
+              )}
               {settings?.landline && (
                 <div className="p-2 rounded-xl bg-white/5 text-white/80 font-mono text-[11px]">
                   <span className="text-[10px] text-white/60 block font-sans font-medium">Landline Desk:</span>
                   {settings.landline}
                 </div>
+              )}
+              {!settings?.phone && !settings?.whatsapp && !settings?.landline && (
+                <p className="text-[11px] text-white/50">Helpline details offline.</p>
               )}
             </div>
 

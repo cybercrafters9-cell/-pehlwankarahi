@@ -146,6 +146,20 @@ export default function AdminPage() {
           return;
         }
 
+        const allResults = [
+          menuData,
+          categoriesData,
+          ordersData,
+          resData,
+          settingsData,
+          statsData,
+          siteContentData,
+        ];
+        const hasNonAuthFailure = allResults.some(
+          (r) => r.status === "rejected" && !isAuthExpiredError(r.reason)
+        );
+        setApiConnected(!hasNonAuthFailure);
+
         if (menuData.status === "fulfilled") {
           setDishes(menuData.value);
         }
@@ -167,7 +181,6 @@ export default function AdminPage() {
         if (siteContentData.status === "fulfilled" && siteContentData.value.slots) {
           setSlots(Object.values(siteContentData.value.slots));
         }
-        setApiConnected(true);
       })
       .catch((err) => {
         if (checkAuthExpired(err)) return;
@@ -208,9 +221,11 @@ export default function AdminPage() {
     try {
       const newDish = await api.createDish(dishData);
       setDishes((prev) => [newDish, ...prev]);
+      setApiConnected(true);
       showToast(`🔥 Added "${newDish.name}" to menu!`);
     } catch (err: unknown) {
       if (checkAuthExpired(err)) return;
+      setApiConnected(false);
       showToast(getErrorMessage(err, "Failed to create dish"), "error");
     }
   };
@@ -219,9 +234,11 @@ export default function AdminPage() {
     try {
       const updated = await api.updateDish(id, updates);
       setDishes((prev) => prev.map((d) => (d.id === id ? updated : d)));
+      setApiConnected(true);
       showToast(`✅ Dish #${id} updated successfully!`);
     } catch (err: unknown) {
       if (checkAuthExpired(err)) return;
+      setApiConnected(false);
       showToast(getErrorMessage(err, `Failed to update dish #${id}`), "error");
     }
   };
@@ -230,9 +247,11 @@ export default function AdminPage() {
     try {
       await api.deleteDish(id);
       setDishes((prev) => prev.filter((d) => d.id !== id));
+      setApiConnected(true);
       showToast(`🗑️ Dish #${id} deleted from menu.`);
     } catch (err: unknown) {
       if (checkAuthExpired(err)) return;
+      setApiConnected(false);
       showToast(getErrorMessage(err, `Failed to delete dish #${id}`), "error");
     }
   };
@@ -241,9 +260,11 @@ export default function AdminPage() {
     try {
       const updated = await api.toggleDishAvailability(id);
       setDishes((prev) => prev.map((d) => (d.id === id ? updated : d)));
+      setApiConnected(true);
       showToast(`Dish #${id} marked as ${updated.isAvailable ? "Available" : "Sold Out"}`);
     } catch (err: unknown) {
       if (checkAuthExpired(err)) return;
+      setApiConnected(false);
       showToast(getErrorMessage(err, "Failed to toggle availability"), "error");
     }
   };
@@ -255,9 +276,11 @@ export default function AdminPage() {
         const map = new Map(prev.map((d) => [d.id, d]));
         return ids.map((id) => map.get(id)!).filter(Boolean);
       });
+      setApiConnected(true);
       showToast("Menu reordered successfully!");
     } catch (err: unknown) {
       if (checkAuthExpired(err)) return;
+      setApiConnected(false);
       showToast(getErrorMessage(err, "Failed to reorder menu"), "error");
     }
   };
@@ -266,9 +289,11 @@ export default function AdminPage() {
     try {
       const newCat = await api.createCategory(data);
       setCategories((prev) => [...prev, newCat]);
+      setApiConnected(true);
       showToast(`Category "${newCat.name}" created!`);
     } catch (err: unknown) {
       if (checkAuthExpired(err)) return;
+      setApiConnected(false);
       showToast(getErrorMessage(err, "Failed to create category"), "error");
     }
   };
@@ -277,9 +302,11 @@ export default function AdminPage() {
     try {
       const updated = await api.updateCategory(id, data);
       setCategories((prev) => prev.map((c) => (c.id === id ? updated : c)));
+      setApiConnected(true);
       showToast(`Category #${id} updated!`);
     } catch (err: unknown) {
       if (checkAuthExpired(err)) return;
+      setApiConnected(false);
       showToast(getErrorMessage(err, "Failed to update category"), "error");
     }
   };
@@ -288,9 +315,11 @@ export default function AdminPage() {
     try {
       await api.deleteCategory(id);
       setCategories((prev) => prev.filter((c) => c.id !== id));
+      setApiConnected(true);
       showToast(`Category #${id} deleted.`);
     } catch (err: unknown) {
       if (checkAuthExpired(err)) return;
+      setApiConnected(false);
       showToast(getErrorMessage(err, "Failed to delete category"), "error");
     }
   };
@@ -302,9 +331,11 @@ export default function AdminPage() {
         const map = new Map(prev.map((c) => [c.id, c]));
         return ids.map((id) => map.get(id)!).filter(Boolean);
       });
+      setApiConnected(true);
       showToast("Categories reordered successfully!");
     } catch (err: unknown) {
       if (checkAuthExpired(err)) return;
+      setApiConnected(false);
       showToast(getErrorMessage(err, "Failed to reorder categories"), "error");
     }
   };
@@ -314,9 +345,11 @@ export default function AdminPage() {
     try {
       const updated = await api.updateOrderStatus(id, status);
       setOrders((prev) => prev.map((o) => (o.id === id ? updated : o)));
+      setApiConnected(true);
       showToast(`📦 Order #${id} status changed to ${status.replace(/_/g, " ")}`);
     } catch (err: unknown) {
       if (checkAuthExpired(err)) return;
+      setApiConnected(false);
       showToast(getErrorMessage(err, `Failed to update order #${id}`), "error");
     }
   };
@@ -329,9 +362,11 @@ export default function AdminPage() {
     try {
       const updated = await api.updateReservationStatus(id, status);
       setReservations((prev) => prev.map((r) => (r.id === id ? updated : r)));
+      setApiConnected(true);
       showToast(`📅 Reservation #${id} marked as ${status}!`);
     } catch (err: unknown) {
       if (checkAuthExpired(err)) return;
+      setApiConnected(false);
       showToast(getErrorMessage(err, `Failed to update reservation #${id}`), "error");
     }
   };
@@ -341,9 +376,11 @@ export default function AdminPage() {
     try {
       const updated = await api.updateSettings(newSettings);
       setSettings(updated);
+      setApiConnected(true);
       showToast("💾 Restaurant info & settings saved successfully!");
     } catch (err: unknown) {
       if (checkAuthExpired(err)) return;
+      setApiConnected(false);
       showToast(getErrorMessage(err, "Failed to update settings"), "error");
     }
   };
@@ -352,9 +389,11 @@ export default function AdminPage() {
     try {
       const reset = await api.resetSettings();
       setSettings(reset);
-      showToast("🔄 Settings reset to factory defaults!");
+      setApiConnected(true);
+      showToast("🔄 Settings reset to factory defaults (payment numbers preserved)!");
     } catch (err: unknown) {
       if (checkAuthExpired(err)) return;
+      setApiConnected(false);
       showToast(getErrorMessage(err, "Failed to reset settings"), "error");
     }
   };
@@ -373,9 +412,11 @@ export default function AdminPage() {
     try {
       const updated = await api.updateSiteSlot(key, data);
       setSlots((prev) => prev.map((s) => (s.key === key ? updated : s)));
+      setApiConnected(true);
       showToast(`Site slot "${updated.label}" updated successfully!`);
     } catch (err: unknown) {
       if (checkAuthExpired(err)) return;
+      setApiConnected(false);
       showToast(getErrorMessage(err, "Failed to update site slot"), "error");
     }
   };

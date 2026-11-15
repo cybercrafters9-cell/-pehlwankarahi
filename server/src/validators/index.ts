@@ -19,16 +19,17 @@ export const normalizePhone = (phone?: string | null): string => {
 
 export const priceSchema = z
   .union([
-    z.number(),
+    z.number().int("Price must be an integer"),
     z
       .string()
       .trim()
-      .regex(/^\d+(\.\d+)?$/, "Price must be a valid number")
+      .regex(/^\d+$/, "Price must be an integer")
       .transform(Number),
   ])
   .pipe(
     z
       .number()
+      .int("Price must be an integer")
       .positive("Price must be greater than 0")
       .max(500000, "Price exceeds maximum allowed limit (500,000)")
   );
@@ -36,7 +37,13 @@ export const priceSchema = z
 export const imageUrlSchema = z
   .string()
   .trim()
-  .max(1000, "Image URL must not exceed 1000 characters");
+  .max(1000, "Image URL must not exceed 1000 characters")
+  .refine(
+    (url) => url.startsWith("https://") || url.startsWith("/api/media/"),
+    "Image URL must start with https:// or /api/media/"
+  );
+
+export const categorySlugRegex = /^[a-z0-9-]+$/;
 
 export const categoryFieldSchema = z.union([
   z.string().trim().min(1, "Category cannot be empty"),
@@ -46,7 +53,15 @@ export const categoryFieldSchema = z.union([
 export const createCategorySchema = z
   .object({
     name: z.string().trim().min(1, "Name is required").max(100),
-    slug: z.string().trim().max(100).optional(),
+    slug: z
+      .string()
+      .trim()
+      .max(100)
+      .regex(
+        categorySlugRegex,
+        "Category slug must contain only lowercase alphanumeric characters and hyphens"
+      )
+      .optional(),
     sortOrder: z.number().int().optional(),
     isActive: z.boolean().optional(),
   })
@@ -55,7 +70,16 @@ export const createCategorySchema = z
 export const updateCategorySchema = z
   .object({
     name: z.string().trim().min(1).max(100).optional(),
-    slug: z.string().trim().max(100).optional(),
+    slug: z
+      .string()
+      .trim()
+      .min(1, "Slug cannot be empty")
+      .max(100)
+      .regex(
+        categorySlugRegex,
+        "Category slug must contain only lowercase alphanumeric characters and hyphens"
+      )
+      .optional(),
     sortOrder: z.number().int().optional(),
     isActive: z.boolean().optional(),
   })
@@ -343,6 +367,7 @@ export const updateSettingsSchema = z
     phone: z
       .string()
       .trim()
+      .min(1, "Phone cannot be empty")
       .max(50, "Phone must not exceed 50 characters")
       .optional(),
     whatsapp: z
@@ -471,6 +496,33 @@ export const updateSettingsSchema = z
       .string()
       .trim()
       .max(255, "Payment account title must not exceed 255 characters")
+      .optional(),
+  })
+  .strip();
+
+// --- Site Slots Schemas ---
+export const updateSiteSlotSchema = z
+  .object({
+    mediaId: z.number().int().positive().nullable().optional(),
+    dishId: z.number().int().positive().nullable().optional(),
+    altText: z
+      .string()
+      .trim()
+      .max(255, "Alt text must not exceed 255 characters")
+      .optional(),
+    label: z
+      .string()
+      .trim()
+      .max(255, "Label must not exceed 255 characters")
+      .optional(),
+    fallbackUrl: z
+      .string()
+      .trim()
+      .max(1000)
+      .refine(
+        (url) => url.startsWith("https://") || url.startsWith("/api/media/"),
+        "Fallback URL must start with https:// or /api/media/"
+      )
       .optional(),
   })
   .strip();

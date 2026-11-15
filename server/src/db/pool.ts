@@ -93,18 +93,42 @@ export async function withTransaction<T>(
   fn: (conn: PoolConnection) => Promise<T>
 ): Promise<T> {
   const pool = getPool();
-  const conn = await pool.getConnection();
-  await conn.beginTransaction();
-  try {
-    const result = await fn(conn);
-    await conn.commit();
-    return result;
-  } catch (err) {
-    await conn.rollback();
-    throw err;
-  } finally {
-    conn.release();
+  const maxRetries = 3;
+
+  for (let attempt = 0; attempt <= maxRetries; attempt++) {
+    const conn = await pool.getConnection();
+    try {
+      await conn.beginTransaction();
+      const result = await fn(conn);
+      await conn.commit();
+      return result;
+    } catch (err: unknown) {
+      try {
+        await conn.rollback();
+      } catch {
+        // Ignore rollback failure if connection was already closed/lost
+      }
+
+      const dbErr = err as { code?: string; errno?: number };
+      const isDeadlockOrTimeout =
+        dbErr?.code === "ER_LOCK_DEADLOCK" ||
+        dbErr?.errno === 1213 ||
+        dbErr?.code === "ER_LOCK_WAIT_TIMEOUT" ||
+        dbErr?.errno === 1205;
+
+      if (isDeadlockOrTimeout && attempt < maxRetries) {
+        const backoffMs = Math.floor(20 + Math.random() * 60);
+        await new Promise((resolve) => setTimeout(resolve, backoffMs));
+        continue;
+      }
+
+      throw err;
+    } finally {
+      conn.release();
+    }
   }
+
+  throw new Error("[Database] Transaction failed after maximum retries.");
 }
 
 export async function checkDbHealth(): Promise<boolean> {

@@ -55,8 +55,8 @@ export const DEFAULT_SETTINGS: RestaurantSettings = {
   isLiveWokActive: true,
   isAcceptingOrders: true,
   freeDeliveryThreshold: 3000,
-  easypaisaNumber: "03001234567",
-  jazzcashNumber: "03219876543",
+  easypaisaNumber: "",
+  jazzcashNumber: "",
   paymentAccountTitle: "Pehalwan Karahi & DeraGhar",
 };
 
@@ -166,8 +166,8 @@ export const settingsRepository = {
       updates.freeDeliveryThreshold !== undefined
         ? updates.freeDeliveryThreshold
         : (current.freeDeliveryThreshold ?? 3000);
-    const easypaisaNumber = updates.easypaisaNumber ?? current.easypaisaNumber ?? "03001234567";
-    const jazzcashNumber = updates.jazzcashNumber ?? current.jazzcashNumber ?? "03219876543";
+    const easypaisaNumber = updates.easypaisaNumber ?? current.easypaisaNumber ?? "";
+    const jazzcashNumber = updates.jazzcashNumber ?? current.jazzcashNumber ?? "";
     const paymentAccountTitle =
       updates.paymentAccountTitle ?? current.paymentAccountTitle ?? "Pehalwan Karahi & DeraGhar";
 
@@ -233,6 +233,12 @@ export const settingsRepository = {
   },
 
   async reset(): Promise<RestaurantSettings> {
-    return this.update(DEFAULT_SETTINGS);
+    const current = await this.get();
+    return this.update({
+      ...DEFAULT_SETTINGS,
+      easypaisaNumber: current.easypaisaNumber,
+      jazzcashNumber: current.jazzcashNumber,
+      paymentAccountTitle: current.paymentAccountTitle,
+    });
   },
 };

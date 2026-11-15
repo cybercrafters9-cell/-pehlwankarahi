@@ -16,6 +16,8 @@ export interface Dish {
   rating: string;
   desc: string;
   image: string;
+  imageUrl?: string | null;
+  imageMediaId?: number | null;
   isAvailable?: boolean;
 }
 

@@ -1,3 +1,4 @@
+import crypto from "crypto";
 import { RowDataPacket, ResultSetHeader } from "mysql2/promise";
 import { query, queryOne, execute, withTransaction } from "../db/pool";
 import { Reservation, ReservationStatus } from "../types";
@@ -67,10 +68,11 @@ export const reservationRepository = {
     const guestsNum = parseGuests(data.guests);
 
     return withTransaction(async (conn) => {
+      const tempCode = `tmp-${crypto.randomUUID()}`;
       const [insertResult] = await conn.execute<ResultSetHeader>(
         `INSERT INTO reservations (code, name, phone, guests, time_slot, status)
-         VALUES ('', ?, ?, ?, ?, 'confirmed')`,
-        [data.name, data.phone, guestsNum, data.timeSlot]
+         VALUES (?, ?, ?, ?, ?, 'confirmed')`,
+        [tempCode, data.name, data.phone, guestsNum, data.timeSlot]
       );
 
       const resId = insertResult.insertId;

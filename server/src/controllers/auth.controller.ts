@@ -28,7 +28,7 @@ export const login = asyncHandler(async (req: Request, res: Response<ApiResponse
   const token = jwt.sign(
     { id: admin.id, role: admin.role, tokenVersion: admin.tokenVersion },
     getJwtSecret(),
-    { expiresIn: "8h" }
+    { expiresIn: "8h", algorithm: "HS256" }
   );
   const sanitizedUser = sanitizeAdmin(admin);
 
@@ -66,7 +66,11 @@ export const verifySession = asyncHandler(async (
     }
 
     try {
-      const decoded = jwt.verify(token, getJwtSecret()) as { id: string; role: string };
+      const decoded = jwt.verify(token, getJwtSecret(), { algorithms: ["HS256"] }) as {
+        id: string;
+        role: string;
+        tokenVersion: number;
+      };
       adminId = decoded.id;
     } catch {
       return res.status(401).json({

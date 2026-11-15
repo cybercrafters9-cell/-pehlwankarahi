@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import { dishRepository } from "../repositories/dish.repository";
+import { mediaRepository } from "../repositories/media.repository";
 import { ApiResponse, MenuItem } from "../types";
 import { asyncHandler } from "../middleware/asyncHandler";
 
@@ -64,6 +65,16 @@ export const createDish = asyncHandler(
       sortOrder,
     } = req.body;
 
+    if (imageMediaId !== undefined && imageMediaId !== null) {
+      const media = await mediaRepository.getById(imageMediaId);
+      if (!media) {
+        return res.status(400).json({
+          success: false,
+          error: `Media #${imageMediaId} does not exist`,
+        });
+      }
+    }
+
     const newDish = await dishRepository.create({
       name,
       category: category || "karahi",
@@ -96,6 +107,17 @@ export const updateDish = asyncHandler(
     const id = parseInt(String(req.params.id), 10);
     if (isNaN(id)) {
       return res.status(400).json({ success: false, error: "Invalid dish ID" });
+    }
+
+    const { imageMediaId } = req.body;
+    if (imageMediaId !== undefined && imageMediaId !== null) {
+      const media = await mediaRepository.getById(imageMediaId);
+      if (!media) {
+        return res.status(400).json({
+          success: false,
+          error: `Media #${imageMediaId} does not exist`,
+        });
+      }
     }
 
     const updated = await dishRepository.update(id, req.body);

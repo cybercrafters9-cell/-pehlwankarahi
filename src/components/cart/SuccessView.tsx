@@ -20,14 +20,14 @@ export default function SuccessView({ completedOrder, onClose, settings }: Succe
 
   const rawNumber =
     completedOrder.paymentMethod === "easypaisa"
-      ? settings?.easypaisaNumber || digitalCfg?.rawNumber || "03001234567"
+      ? settings?.easypaisaNumber?.trim() || ""
       : completedOrder.paymentMethod === "jazzcash"
-      ? settings?.jazzcashNumber || digitalCfg?.rawNumber || "03219876543"
-      : digitalCfg?.rawNumber || "";
-  const displayNumber = rawNumber;
+      ? settings?.jazzcashNumber?.trim() || ""
+      : "";
   const eta = settings?.deliveryEstimate || "28–35 mins";
-  const waTarget = (settings?.whatsapp || settings?.phone || "03219876543").replace(/\D/g, "");
-  const waNumber = waTarget.startsWith("0") ? `92${waTarget.slice(1)}` : waTarget;
+  const rawWa = settings?.whatsapp?.trim() || settings?.phone?.trim() || "";
+  const waTarget = rawWa.replace(/\D/g, "");
+  const waNumber = waTarget ? (waTarget.startsWith("0") ? `92${waTarget.slice(1)}` : waTarget) : "";
 
   const whatsappMessage = encodeURIComponent(
     `Assalam o Alaikum Pehalwan Karahi,\nI just placed Order *#${completedOrder.id}* for *Rs. ${completedOrder.totalAmount.toLocaleString()}*.\nName: ${completedOrder.customerName}\nPhone: ${completedOrder.customerPhone}\nPayment: ${completedOrder.paymentMethod.toUpperCase()}${completedOrder.transactionId ? ` (TID: ${completedOrder.transactionId})` : ""}\nPlease confirm my order!`
@@ -100,13 +100,13 @@ export default function SuccessView({ completedOrder, onClose, settings }: Succe
         </div>
 
         {/* Easypaisa / JazzCash Reminder using Config */}
-        {digitalCfg && (
+        {digitalCfg && rawNumber && (
           <div className="bg-amber-50 border border-amber-300 rounded-xl p-3 text-left text-xs text-amber-900">
             <p className="font-bold">⚠️ Payment Reminder:</p>
             <p className="text-[11px] mt-0.5">
               Please transfer <strong>Rs. {completedOrder.totalAmount.toLocaleString()}</strong> to{" "}
               <strong>
-                {displayNumber} ({digitalCfg.name})
+                {rawNumber} ({digitalCfg.name})
               </strong>{" "}
               and send a screenshot via WhatsApp for instant priority cooking!
             </p>
@@ -116,15 +116,17 @@ export default function SuccessView({ completedOrder, onClose, settings }: Succe
 
       {/* Bottom Actions */}
       <div className="space-y-2.5 pt-4">
-        <a
-          href={`https://wa.me/${waNumber}?text=${whatsappMessage}`}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs py-3.5 rounded-full shadow flex items-center justify-center gap-2 transition-all"
-        >
-          <Send className="w-4 h-4" />
-          <span>Confirm on WhatsApp</span>
-        </a>
+        {waNumber && (
+          <a
+            href={`https://wa.me/${waNumber}?text=${whatsappMessage}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs py-3.5 rounded-full shadow flex items-center justify-center gap-2 transition-all"
+          >
+            <Send className="w-4 h-4" />
+            <span>Confirm on WhatsApp</span>
+          </a>
+        )}
 
         <button
           type="button"

@@ -46,6 +46,7 @@ Create `server/.env` in the `server` directory (for Express & MySQL):
 ```env
 PORT=5000
 NODE_ENV=development
+TRUST_PROXY=1
 DB_HOST=localhost
 DB_PORT=3306
 DB_USER=root
@@ -53,8 +54,8 @@ DB_PASSWORD=your_local_password
 DB_NAME=pehalwan_karahi
 JWT_SECRET=super_secret_jwt_key_min_32_characters_long_12345
 ADMIN_USERNAME=admin
-ADMIN_EMAIL=admin@pehalwankarahi.com
-ADMIN_PASSWORD=MasterPehalwan2026!
+ADMIN_EMAIL=
+ADMIN_PASSWORD=
 CORS_ORIGIN=http://localhost:3000
 ```
 
