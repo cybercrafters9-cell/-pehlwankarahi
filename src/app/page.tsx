@@ -39,9 +39,9 @@ export default async function Home() {
           <Navbar />
           <Hero />
           <FeaturedStrip />
+          <MenuSection />
           <BentoGrid />
           <EditorialShowcase />
-          <MenuSection />
           <ReservationSection />
           <Footer />
           <CartDrawer />
