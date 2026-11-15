@@ -52,7 +52,7 @@ export default function VideoModal() {
         </div>
         <div className="p-6 space-y-4">
           <p className="text-xs sm:text-sm text-white/80 leading-relaxed">
-            Hamari har Karahi order par taaza gosht, desi tamatar, hari mirch aur adrak ke lachon ke sath tez aag par tayyar ki jati hai. Koyla Bar B Q par asli desi ghee ki buraish!
+            Every Karahi is freshly cooked to order over high heat with tender meat, fresh tomatoes, green chilies, and ginger juliennes. Basted with pure desi ghee over live charcoal BBQ!
           </p>
           <div className="flex justify-end gap-3">
             <button

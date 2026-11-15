@@ -21,7 +21,7 @@ export const login = asyncHandler(async (req: Request, res: Response<ApiResponse
   if (!admin) {
     return res.status(401).json({
       success: false,
-      error: "Ghalat Username ya Password. Please check your credentials.",
+      error: "Invalid Username or Password. Please check your credentials.",
     });
   }
 

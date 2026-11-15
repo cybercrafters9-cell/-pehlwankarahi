@@ -100,7 +100,7 @@ export const adminRepository = {
       admin.passwordHash
     );
     if (!matches) {
-      throw new Error("Ghalat current password. Current password is incorrect.");
+      throw new Error("Current password is incorrect. Please check and try again.");
     }
 
     let passwordHash = admin.passwordHash;
