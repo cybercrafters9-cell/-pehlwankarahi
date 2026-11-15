@@ -1,8 +1,10 @@
 "use client";
 
+import { useState } from "react";
 import Image from "next/image";
 import { resolveImageUrl } from "@/lib/media";
 import { useRestaurant } from "@/context/RestaurantContext";
+import { PortionSize } from "@/data/menu";
 import { Star, Plus, X } from "lucide-react";
 
 export default function MenuSection() {
@@ -15,6 +17,8 @@ export default function MenuSection() {
     setSearchQuery,
     addToCart,
   } = useRestaurant();
+
+  const [selectedPortions, setSelectedPortions] = useState<Record<number, PortionSize>>({});
 
   const filteredDishes = dishes.filter((dish) => {
     const matchesCategory =
@@ -140,17 +144,59 @@ export default function MenuSection() {
                   </p>
                 </div>
               </div>
+
+              {/* Portion / Quantity Weight Selector */}
+              <div className="px-4 py-2 bg-sand-100/70 border-t border-sand-200/50 flex items-center justify-between">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-charcoal-600">Portion:</span>
+                <div className="flex items-center gap-1.5">
+                  <button
+                    type="button"
+                    onClick={() => setSelectedPortions((p) => ({ ...p, [dish.id]: "half" }))}
+                    className={`px-2.5 py-0.5 rounded-full text-[10px] font-extrabold transition-all cursor-pointer ${
+                      (selectedPortions[dish.id] || "1kg") === "half"
+                        ? "bg-terracotta-500 text-white shadow-xs"
+                        : "bg-sand-200 text-charcoal-700 hover:bg-sand-300"
+                    }`}
+                  >
+                    Half KG
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setSelectedPortions((p) => ({ ...p, [dish.id]: "1kg" }))}
+                    className={`px-2.5 py-0.5 rounded-full text-[10px] font-extrabold transition-all cursor-pointer ${
+                      (selectedPortions[dish.id] || "1kg") === "1kg"
+                        ? "bg-terracotta-500 text-white shadow-xs"
+                        : "bg-sand-200 text-charcoal-700 hover:bg-sand-300"
+                    }`}
+                  >
+                    1 KG
+                  </button>
+                </div>
+              </div>
+
               <div className="px-4 pb-4 pt-2 flex items-center justify-between border-t border-sand-200/70">
                 <div>
                   <span className="text-[10px] uppercase font-bold text-charcoal-700/60 block">
-                    Price
+                    Price ({(selectedPortions[dish.id] || "1kg") === "half" ? "Half KG" : "1 KG"})
                   </span>
                   <span className="font-display font-extrabold text-base text-charcoal-900">
-                    Rs. {dish.price.toLocaleString()}
+                    Rs. {(
+                      (selectedPortions[dish.id] || "1kg") === "half"
+                        ? Math.round(dish.price / 2)
+                        : dish.price
+                    ).toLocaleString()}
                   </span>
                 </div>
                 <button
-                  onClick={() => addToCart(dish.id, dish.name, dish.price, dish.image)}
+                  onClick={() =>
+                    addToCart(
+                      dish.id,
+                      dish.name,
+                      dish.price,
+                      dish.image,
+                      selectedPortions[dish.id] || "1kg"
+                    )
+                  }
                   className="bg-charcoal-900 hover:bg-terracotta-500 text-white text-xs font-bold px-4 py-2.5 rounded-full transition-colors flex items-center gap-1.5 shadow cursor-pointer"
                 >
                   <span>Add</span>

@@ -3,7 +3,6 @@
 import React, { useState } from "react";
 import { useRestaurant } from "@/context/RestaurantContext";
 import { DrawerStep, CompletedOrderSummary, CheckoutFormData } from "./cart/types";
-import { useCartLoyalty } from "./cart/useCartLoyalty";
 import CartHeader from "./cart/CartHeader";
 import CartStep from "./cart/CartStep";
 import CheckoutForm from "./cart/CheckoutForm";
@@ -22,12 +21,11 @@ export default function CartDrawer() {
   const {
     cart,
     updateQty,
+    updatePortion,
     isCartOpen,
     setIsCartOpen,
     placeOrder,
     isSubmittingOrder,
-    spiceLevel,
-    setSpiceLevel,
     settings,
   } = useRestaurant();
 
@@ -35,27 +33,15 @@ export default function CartDrawer() {
   const [formData, setFormData] = useState<CheckoutFormData>(INITIAL_FORM);
   const [copiedAccount, setCopiedAccount] = useState<string | null>(null);
 
-  const {
-    loyaltyPhone,
-    setLoyaltyPhone,
-    loyaltyPass,
-    isCheckingLoyalty,
-    loyaltyMessage,
-    handleCheckLoyalty,
-    handleRemoveLoyalty,
-    resetLoyalty,
-  } = useCartLoyalty();
-
   // Completed Order State for Success Screen (strictly typed, no any)
   const [completedOrder, setCompletedOrder] = useState<CompletedOrderSummary | null>(null);
   const [errors, setErrors] = useState<{ name?: string; phone?: string; address?: string }>({});
 
   const subtotal = cart.reduce((sum, item) => sum + item.price * item.qty, 0);
-  const discount = loyaltyPass ? Math.round(subtotal * (loyaltyPass.discountPercent / 100)) : 0;
   const freeThreshold = settings?.freeDeliveryThreshold ?? 0;
   const baseDeliveryFee = typeof settings?.deliveryFee === "number" ? settings.deliveryFee : 0;
   const deliveryFee = freeThreshold > 0 && subtotal >= freeThreshold ? 0 : baseDeliveryFee;
-  const totalAmount = Math.max(0, subtotal + deliveryFee - discount);
+  const totalAmount = Math.max(0, subtotal + deliveryFee);
 
   const updateField = <K extends keyof CheckoutFormData>(field: K, val: CheckoutFormData[K]) => {
     setFormData((prev) => ({ ...prev, [field]: val }));
@@ -73,7 +59,6 @@ export default function CartDrawer() {
     if (step === "success") {
       setStep("cart");
       setCompletedOrder(null);
-      resetLoyalty();
     }
   };
 
@@ -90,16 +75,18 @@ export default function CartDrawer() {
     }
 
     const cleanPhone = formData.customerPhone.replace(/\D/g, "");
-    if (!formData.customerPhone.trim()) {
+    if (!cleanPhone) {
       errs.phone = "Phone number is compulsory";
     } else if (cleanPhone.length !== 11) {
       errs.phone = "Phone number must be exactly 11 digits (e.g. 03001234567)";
+    } else if (!cleanPhone.startsWith("03")) {
+      errs.phone = "Phone number must start with 03 (e.g. 03001234567)";
     }
 
     if (!formData.address.trim()) {
       errs.address = "Delivery address is compulsory";
     } else if (formData.address.trim().length < 5) {
-      errs.address = "Please enter a complete delivery address";
+      errs.address = "Please enter a complete delivery address (min 5 characters)";
     }
 
     setErrors(errs);
@@ -119,7 +106,6 @@ export default function CartDrawer() {
         paymentMethod: formData.paymentMethod,
         transactionId: formData.transactionId.trim() || undefined,
         notes: formData.notes.trim() || undefined,
-        loyaltyPhone: loyaltyPass ? loyaltyPhone.trim() : undefined,
       });
 
       if (result) {
@@ -130,7 +116,7 @@ export default function CartDrawer() {
           address: formData.address.trim(),
           subtotal: result.subtotal ?? subtotal,
           deliveryFee: result.deliveryFee ?? deliveryFee,
-          discount: result.discount ?? discount,
+          discount: 0,
           totalAmount: result.total,
           paymentMethod: formData.paymentMethod,
           transactionId: formData.transactionId.trim(),
@@ -163,18 +149,11 @@ export default function CartDrawer() {
           <CartStep
             cart={cart}
             updateQty={updateQty}
+            onUpdatePortion={updatePortion}
             isSubmittingOrder={isSubmittingOrder}
             subtotal={subtotal}
             deliveryFee={deliveryFee}
-            discount={discount}
             totalAmount={totalAmount}
-            loyaltyPhone={loyaltyPhone}
-            setLoyaltyPhone={setLoyaltyPhone}
-            loyaltyPass={loyaltyPass}
-            loyaltyMessage={loyaltyMessage}
-            isCheckingLoyalty={isCheckingLoyalty}
-            onCheckLoyalty={() => handleCheckLoyalty()}
-            onRemoveLoyalty={handleRemoveLoyalty}
             onProceed={() => setStep("checkout")}
             settings={settings}
           />
@@ -187,17 +166,9 @@ export default function CartDrawer() {
             setAddress={setAddress}
             subtotal={subtotal}
             totalAmount={totalAmount}
-            discount={discount}
             cartItemsCount={cart.reduce((s, i) => s + i.qty, 0)}
             copiedAccount={copiedAccount}
             onCopy={handleCopy}
-            loyaltyPhone={loyaltyPhone}
-            setLoyaltyPhone={setLoyaltyPhone}
-            loyaltyPass={loyaltyPass}
-            loyaltyMessage={loyaltyMessage}
-            isCheckingLoyalty={isCheckingLoyalty}
-            onCheckLoyalty={handleCheckLoyalty}
-            onRemoveLoyalty={handleRemoveLoyalty}
             errors={errors}
             setErrors={setErrors}
             onSubmit={handleSubmitOrder}

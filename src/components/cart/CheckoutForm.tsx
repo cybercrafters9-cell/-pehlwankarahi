@@ -1,8 +1,8 @@
 "use client";
 
 import React from "react";
-import { Loader2, ArrowRight, AlertCircle, Clock } from "lucide-react";
-import { LoyaltyPassSummary, RestaurantSettings } from "@/services/api";
+import { Loader2, AlertCircle, Clock, Send, AlertTriangle } from "lucide-react";
+import { RestaurantSettings } from "@/services/api";
 import { CheckoutFormData, getDeliverySchedule } from "./types";
 import CustomerSection from "./CustomerSection";
 import AddressSection from "./AddressSection";
@@ -15,17 +15,9 @@ interface CheckoutFormProps {
   setAddress: React.Dispatch<React.SetStateAction<string>>;
   subtotal: number;
   totalAmount: number;
-  discount: number;
   cartItemsCount: number;
   copiedAccount: string | null;
   onCopy: (text: string, label: string) => void;
-  loyaltyPhone: string;
-  setLoyaltyPhone: (v: string) => void;
-  loyaltyPass: LoyaltyPassSummary | null;
-  loyaltyMessage: { type: "success" | "error"; text: string } | null;
-  isCheckingLoyalty: boolean;
-  onCheckLoyalty: (phone?: string) => void;
-  onRemoveLoyalty: () => void;
   errors: { name?: string; phone?: string; address?: string };
   setErrors: React.Dispatch<React.SetStateAction<{ name?: string; phone?: string; address?: string }>>;
   onSubmit: (e: React.FormEvent) => void;
@@ -39,17 +31,9 @@ export default function CheckoutForm({
   setAddress,
   subtotal,
   totalAmount,
-  discount,
   cartItemsCount,
   copiedAccount,
   onCopy,
-  loyaltyPhone,
-  setLoyaltyPhone,
-  loyaltyPass,
-  loyaltyMessage,
-  isCheckingLoyalty,
-  onCheckLoyalty,
-  onRemoveLoyalty,
   errors,
   setErrors,
   onSubmit,
@@ -75,11 +59,6 @@ export default function CheckoutForm({
             <span className="font-display font-extrabold text-base text-terracotta-500">
               Rs. {totalAmount.toLocaleString()}
             </span>
-            {discount > 0 && loyaltyPass && (
-              <span className="text-[10px] text-emerald-700 font-bold block">
-                Includes {loyaltyPass.discountPercent}% VIP Discount (-Rs. {discount.toLocaleString()})
-              </span>
-            )}
           </div>
           <span className="bg-charcoal-900 text-white text-[10px] font-bold px-2.5 py-1 rounded-full">
             {cartItemsCount} Karahi Items
@@ -113,13 +92,6 @@ export default function CheckoutForm({
           }}
           nameError={errors.name}
           phoneError={errors.phone}
-          loyaltyPhone={loyaltyPhone}
-          setLoyaltyPhone={setLoyaltyPhone}
-          loyaltyPass={loyaltyPass}
-          loyaltyMessage={loyaltyMessage}
-          isCheckingLoyalty={isCheckingLoyalty}
-          onCheckLoyalty={onCheckLoyalty}
-          onRemoveLoyalty={onRemoveLoyalty}
         />
 
         {/* 2. Delivery Address */}
@@ -136,7 +108,7 @@ export default function CheckoutForm({
           error={errors.address}
         />
 
-        {/* Cooking & Delivery Notes (Spice level removed as requested) */}
+        {/* Cooking & Delivery Notes */}
         <SpiceAndNotesSection
           notes={notes}
           onNotesChange={(val) => updateField("notes", val)}
@@ -155,7 +127,7 @@ export default function CheckoutForm({
       </div>
 
       {/* Bottom Submit Action Bar */}
-      <div className="p-4 sm:p-5 bg-sand-50 border-t border-sand-200 shrink-0 space-y-2">
+      <div className="p-4 sm:p-5 bg-sand-50 border-t border-sand-200 shrink-0 space-y-2.5">
         {isClosed && (
           <div className="p-2.5 bg-red-50 border border-red-200 rounded-xl text-red-800 text-xs flex items-center gap-2">
             <AlertCircle className="w-4 h-4 text-red-600 shrink-0" />
@@ -173,15 +145,19 @@ export default function CheckoutForm({
           </div>
         )}
 
-        <div className="flex items-center justify-between text-xs font-bold text-charcoal-900">
-          <div>
-            <span>Total Amount:</span>
-            {discount > 0 && loyaltyPass && (
-              <span className="text-[10px] text-emerald-700 block font-normal">
-                (Includes {loyaltyPass.discountPercent}% VIP discount)
-              </span>
-            )}
+        {/* Compulsory WhatsApp Receipt Notice Box */}
+        <div className="p-3 bg-amber-500/15 border-2 border-amber-500/50 rounded-2xl text-left space-y-1">
+          <div className="flex items-center gap-1.5 text-amber-900 font-extrabold text-xs">
+            <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0 animate-bounce" />
+            <span>WhatsApp Payment Receipt Compulsory</span>
           </div>
+          <p className="text-[11px] text-amber-950 font-medium leading-relaxed">
+            Sending your payment screenshot on WhatsApp is <strong>strictly compulsory</strong> to confirm this order. Kitchen cooking will only start after receipt verification.
+          </p>
+        </div>
+
+        <div className="flex items-center justify-between text-xs font-bold text-charcoal-900">
+          <span>Total Payable:</span>
           <span className="font-extrabold text-base text-terracotta-500">
             Rs. {totalAmount.toLocaleString()}
           </span>
@@ -190,7 +166,7 @@ export default function CheckoutForm({
         <button
           type="submit"
           disabled={isSubmittingOrder || isClosed || isBelowMin}
-          className="w-full bg-terracotta-500 hover:bg-terracotta-600 text-white font-extrabold text-sm py-3.5 rounded-full shadow-glow transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+          className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-sm py-4 rounded-full shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {isSubmittingOrder ? (
             <>
@@ -203,8 +179,8 @@ export default function CheckoutForm({
             <span>Minimum Order Rs. {minOrder}</span>
           ) : (
             <>
-              <span>Place Order &amp; Proceed to Verification</span>
-              <ArrowRight className="w-4 h-4" />
+              <Send className="w-4 h-4" />
+              <span>Place Order &amp; Confirm on WhatsApp</span>
             </>
           )}
         </button>

@@ -23,7 +23,7 @@ export const createOrder = asyncHandler(
     const resolvedItems: OrderItem[] = [];
     let subtotal = 0;
 
-    for (const item of items as { id: number; qty: number }[]) {
+    for (const item of items as { id: number; qty: number; portion?: "1kg" | "half" }[]) {
       const dish = await dishRepository.getById(item.id);
       if (!dish) {
         return res.status(400).json({
@@ -38,15 +38,19 @@ export const createOrder = asyncHandler(
         });
       }
 
+      const isHalf = item.portion === "half";
+      const unitPrice = isHalf ? Math.round(dish.price / 2) : dish.price;
+      const itemName = isHalf ? `${dish.name} (Half KG)` : `${dish.name} (1 KG)`;
+
       resolvedItems.push({
         id: dish.id,
-        name: dish.name,
-        price: dish.price,
+        name: itemName,
+        price: unitPrice,
         qty: item.qty,
         image: dish.image,
       });
 
-      subtotal += dish.price * item.qty;
+      subtotal += unitPrice * item.qty;
     }
 
     const settings = await settingsRepository.get();

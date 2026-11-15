@@ -92,9 +92,15 @@ export default function ReservationSection() {
               <input
                 type="tel"
                 required
-                placeholder="0300-1234567"
+                maxLength={11}
+                placeholder="03001234567"
                 value={form.phone}
-                onChange={(e) => setForm({ ...form, phone: e.target.value })}
+                onChange={(e) =>
+                  setForm({
+                    ...form,
+                    phone: e.target.value.replace(/\D/g, "").slice(0, 11),
+                  })
+                }
                 className="w-full bg-sand-100 border border-sand-300 rounded-xl px-3.5 py-2.5 text-xs font-semibold focus:outline-none focus:border-terracotta-500"
               />
             </div>

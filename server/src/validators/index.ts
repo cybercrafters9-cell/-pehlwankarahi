@@ -277,6 +277,7 @@ export const createOrderItemInputSchema = z
       .int("Quantity must be an integer")
       .min(1, "Quantity must be at least 1")
       .max(20, "Quantity must not exceed 20"),
+    portion: z.enum(["1kg", "half"]).optional().default("1kg"),
   })
   .strip();
 
@@ -287,12 +288,15 @@ export const orderItemsInputSchema = z
   .min(1, "Cart cannot be empty. Please add items to your cart.")
   .max(30, "Cannot order more than 30 item lines.")
   .transform((items) => {
-    const merged = new Map<number, number>();
+    const merged = new Map<string, { id: number; qty: number; portion: "1kg" | "half" }>();
     for (const item of items) {
-      const current = merged.get(item.id) ?? 0;
-      merged.set(item.id, Math.min(20, current + item.qty));
+      const portion = item.portion || "1kg";
+      const key = `${item.id}-${portion}`;
+      const existing = merged.get(key);
+      const newQty = Math.min(20, (existing ? existing.qty : 0) + item.qty);
+      merged.set(key, { id: item.id, qty: newQty, portion });
     }
-    return Array.from(merged.entries()).map(([id, qty]) => ({ id, qty }));
+    return Array.from(merged.values());
   });
 
 export const createOrderSchema = z
@@ -307,8 +311,11 @@ export const createOrderSchema = z
       .trim()
       .min(1, "Phone number is required")
       .refine(
-        (val) => val.replace(/\D/g, "").length === 11,
-        "Phone number must be exactly 11 digits (e.g. 03001234567)"
+        (val) => {
+          const clean = val.replace(/\D/g, "");
+          return clean.length === 11 && clean.startsWith("03");
+        },
+        "Phone number must be exactly 11 digits starting with 03 (e.g. 03001234567)"
       ),
     address: z
       .string()

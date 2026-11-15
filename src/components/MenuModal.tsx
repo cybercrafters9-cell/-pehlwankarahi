@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import { useRestaurant } from "@/context/RestaurantContext";
-import { Dish } from "@/data/menu";
+import { Dish, PortionSize } from "@/data/menu";
 import { X, Plus, ShoppingBag, Phone, Check } from "lucide-react";
 import { resolveImageUrl } from "@/lib/media";
 
@@ -20,6 +20,7 @@ export default function MenuModal() {
   } = useRestaurant();
   const [filter, setFilter] = useState<string>("all");
   const [addedDishId, setAddedDishId] = useState<number | null>(null);
+  const [selectedPortions, setSelectedPortions] = useState<Record<number, PortionSize>>({});
 
   const totalCartCount = cart.reduce((sum, item) => sum + item.qty, 0);
 
@@ -48,7 +49,8 @@ export default function MenuModal() {
   });
 
   const handleAdd = (dish: Dish) => {
-    addToCart(dish.id, dish.name, dish.price, dish.image);
+    const portion = selectedPortions[dish.id] || "1kg";
+    addToCart(dish.id, dish.name, dish.price, dish.image, portion);
     setAddedDishId(dish.id);
     setTimeout(() => {
       setAddedDishId(null);
@@ -210,27 +212,61 @@ export default function MenuModal() {
 
                     {/* White Rounded Capsule Container */}
                     <div className="relative -mr-0 sm:-mr-12 md:-mr-14 flex-1 w-full sm:w-auto bg-sand-50/95 hover:bg-sand-50 rounded-3xl sm:rounded-full pt-8 pb-5 px-5 sm:py-5 sm:pr-16 sm:pl-6 md:pr-18 md:pl-8 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xl border border-white/60 z-10 transition-all text-charcoal-900 order-2 sm:order-1">
-                      {/* Golden / Saffron Price Pill Button */}
-                      <button
-                        onClick={() => handleAdd(dish)}
-                        className={`shrink-0 self-start sm:self-center order-2 sm:order-1 px-4 sm:px-5 py-2 sm:py-2.5 rounded-full font-extrabold text-xs sm:text-sm flex items-center gap-1.5 shadow-md cursor-pointer transition-all duration-200 ${
-                          isJustAdded
-                            ? "bg-emerald-600 text-white scale-105"
-                            : "bg-[#cda463] hover:bg-[#dfb572] text-[#2c120a] hover:scale-105 active:scale-95"
-                        }`}
-                      >
-                        {isJustAdded ? (
-                          <>
-                            <Check className="w-3.5 h-3.5" />
-                            <span>Added!</span>
-                          </>
-                        ) : (
-                          <>
-                            <Plus className="w-3.5 h-3.5" />
-                            <span>Rs. {dish.price.toLocaleString()}</span>
-                          </>
-                        )}
-                      </button>
+                      {/* Portion Toggle & Golden Price Pill Button */}
+                      <div className="shrink-0 self-start sm:self-center order-2 sm:order-1 flex flex-col sm:flex-row items-start sm:items-center gap-2">
+                        {/* 1 KG / Half KG Switcher */}
+                        <div className="flex items-center gap-1 bg-sand-200/90 rounded-full p-0.5">
+                          <button
+                            type="button"
+                            onClick={() => setSelectedPortions((p) => ({ ...p, [dish.id]: "half" }))}
+                            className={`px-2.5 py-1 rounded-full text-[10px] font-extrabold transition-all cursor-pointer ${
+                              (selectedPortions[dish.id] || "1kg") === "half"
+                                ? "bg-terracotta-500 text-white shadow-xs"
+                                : "text-charcoal-700 hover:text-charcoal-900"
+                            }`}
+                          >
+                            Half KG
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setSelectedPortions((p) => ({ ...p, [dish.id]: "1kg" }))}
+                            className={`px-2.5 py-1 rounded-full text-[10px] font-extrabold transition-all cursor-pointer ${
+                              (selectedPortions[dish.id] || "1kg") === "1kg"
+                                ? "bg-terracotta-500 text-white shadow-xs"
+                                : "text-charcoal-700 hover:text-charcoal-900"
+                            }`}
+                          >
+                            1 KG
+                          </button>
+                        </div>
+
+                        <button
+                          onClick={() => handleAdd(dish)}
+                          className={`px-4 sm:px-5 py-2 sm:py-2.5 rounded-full font-extrabold text-xs sm:text-sm flex items-center gap-1.5 shadow-md cursor-pointer transition-all duration-200 ${
+                            isJustAdded
+                              ? "bg-emerald-600 text-white scale-105"
+                              : "bg-[#cda463] hover:bg-[#dfb572] text-[#2c120a] hover:scale-105 active:scale-95"
+                          }`}
+                        >
+                          {isJustAdded ? (
+                            <>
+                              <Check className="w-3.5 h-3.5" />
+                              <span>Added!</span>
+                            </>
+                          ) : (
+                            <>
+                              <Plus className="w-3.5 h-3.5" />
+                              <span>
+                                Rs. {(
+                                  (selectedPortions[dish.id] || "1kg") === "half"
+                                    ? Math.round(dish.price / 2)
+                                    : dish.price
+                                ).toLocaleString()}
+                              </span>
+                            </>
+                          )}
+                        </button>
+                      </div>
 
                       <div className="space-y-1 text-left sm:text-right pl-0 sm:pl-4 order-1 sm:order-2">
                         <h3 className="font-display font-extrabold text-base sm:text-lg md:text-xl text-[#3d1810] tracking-wide uppercase leading-tight">

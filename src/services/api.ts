@@ -28,6 +28,7 @@ const API_BASE = getApiBaseUrl();
 export interface CreateOrderItemPayload {
   id: number;
   qty: number;
+  portion?: "1kg" | "half";
 }
 
 export interface CreateOrderPayload {

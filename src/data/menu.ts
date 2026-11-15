@@ -21,10 +21,14 @@ export interface Dish {
   isAvailable?: boolean;
 }
 
+export type PortionSize = "1kg" | "half";
+
 export interface CartItem {
   id: number;
   name: string;
   price: number;
   qty: number;
   image: string;
+  portion?: PortionSize;
+  basePrice?: number;
 }

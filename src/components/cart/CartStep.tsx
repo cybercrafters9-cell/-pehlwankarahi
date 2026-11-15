@@ -3,26 +3,18 @@
 import Image from "next/image";
 import { resolveImageUrl } from "@/lib/media";
 import { CookingPot, Plus, Minus, ArrowRight, AlertCircle, Clock } from "lucide-react";
-import { CartItem } from "@/data/menu";
-import { LoyaltyPassSummary, RestaurantSettings } from "@/services/api";
-import LoyaltyPassInput from "./LoyaltyPassInput";
+import { CartItem, PortionSize } from "@/data/menu";
+import { RestaurantSettings } from "@/services/api";
 import { getDeliverySchedule } from "./types";
 
 interface CartStepProps {
   cart: CartItem[];
-  updateQty: (id: number, delta: number) => void;
+  updateQty: (id: number, delta: number, portion?: PortionSize) => void;
+  onUpdatePortion: (id: number, currentPortion: PortionSize, newPortion: PortionSize) => void;
   isSubmittingOrder: boolean;
   subtotal: number;
   deliveryFee: number;
-  discount: number;
   totalAmount: number;
-  loyaltyPhone: string;
-  setLoyaltyPhone: (val: string) => void;
-  loyaltyPass: LoyaltyPassSummary | null;
-  loyaltyMessage: { type: "success" | "error"; text: string } | null;
-  isCheckingLoyalty: boolean;
-  onCheckLoyalty: () => void;
-  onRemoveLoyalty: () => void;
   onProceed: () => void;
   settings?: RestaurantSettings | null;
 }
@@ -30,18 +22,11 @@ interface CartStepProps {
 export default function CartStep({
   cart,
   updateQty,
+  onUpdatePortion,
   isSubmittingOrder,
   subtotal,
   deliveryFee,
-  discount,
   totalAmount,
-  loyaltyPhone,
-  setLoyaltyPhone,
-  loyaltyPass,
-  loyaltyMessage,
-  isCheckingLoyalty,
-  onCheckLoyalty,
-  onRemoveLoyalty,
   onProceed,
   settings,
 }: CartStepProps) {
@@ -60,46 +45,85 @@ export default function CartStep({
             <p className="text-xs mt-1">Add some sizzling Mutton or Chicken Karahi to get started!</p>
           </div>
         ) : (
-          cart.map((item) => (
-            <div
-              key={item.id}
-              className="bg-sand-50 border border-sand-200 rounded-2xl p-3 flex items-center gap-3 shadow-sm hover:border-sand-300 transition-all"
-            >
-              <div className="relative w-14 h-14 rounded-xl overflow-hidden shrink-0 bg-charcoal-900">
-                <Image
-                  src={resolveImageUrl(item.image)}
-                  alt={item.name}
-                  fill
-                  unoptimized={Boolean(item.image && item.image.includes("/api/media/"))}
-                  sizes="56px"
-                  className="object-cover"
-                />
+          cart.map((item) => {
+            const currentPortion: PortionSize = item.portion || "1kg";
+            const base1kg = currentPortion === "half" ? (item.basePrice || item.price * 2) : (item.basePrice || item.price);
+            const halfPrice = Math.round(base1kg / 2);
+
+            return (
+              <div
+                key={`${item.id}-${currentPortion}`}
+                className="bg-sand-50 border border-sand-200 rounded-2xl p-3 space-y-2.5 shadow-sm hover:border-sand-300 transition-all"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="relative w-14 h-14 rounded-xl overflow-hidden shrink-0 bg-charcoal-900">
+                    <Image
+                      src={resolveImageUrl(item.image)}
+                      alt={item.name}
+                      fill
+                      unoptimized={Boolean(item.image && item.image.includes("/api/media/"))}
+                      sizes="56px"
+                      className="object-cover"
+                    />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <h4 className="font-bold text-xs sm:text-sm text-charcoal-900 truncate">{item.name}</h4>
+                    <p className="text-xs font-extrabold text-terracotta-500 mt-0.5">
+                      Rs. {(item.price * item.qty).toLocaleString()}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-2 bg-sand-200/80 rounded-full px-2 py-1">
+                    <button
+                      onClick={() => updateQty(item.id, -1, currentPortion)}
+                      disabled={isSubmittingOrder}
+                      className="w-5 h-5 rounded-full bg-white text-charcoal-900 flex items-center justify-center text-xs font-bold hover:bg-terracotta-500 hover:text-white transition-colors cursor-pointer disabled:opacity-50"
+                    >
+                      <Minus className="w-3 h-3" />
+                    </button>
+                    <span className="text-xs font-extrabold w-4 text-center">{item.qty}</span>
+                    <button
+                      onClick={() => updateQty(item.id, 1, currentPortion)}
+                      disabled={isSubmittingOrder}
+                      className="w-5 h-5 rounded-full bg-charcoal-900 text-white flex items-center justify-center text-xs font-bold hover:bg-terracotta-500 transition-colors cursor-pointer disabled:opacity-50"
+                    >
+                      <Plus className="w-3 h-3" />
+                    </button>
+                  </div>
+                </div>
+
+                {/* Portion / Weight Selector (1 KG vs Half KG) */}
+                <div className="pt-2 border-t border-sand-200/80 flex items-center justify-between text-[11px]">
+                  <span className="text-charcoal-600 font-bold text-[10px] uppercase tracking-wide">
+                    Portion:
+                  </span>
+                  <div className="flex items-center gap-1.5">
+                    <button
+                      type="button"
+                      onClick={() => onUpdatePortion(item.id, currentPortion, "half")}
+                      className={`px-2.5 py-0.5 rounded-full text-[10px] font-extrabold transition-all cursor-pointer ${
+                        currentPortion === "half"
+                          ? "bg-terracotta-500 text-white shadow-xs"
+                          : "bg-sand-200/80 text-charcoal-700 hover:bg-sand-300"
+                      }`}
+                    >
+                      Half KG (Rs. {halfPrice.toLocaleString()})
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => onUpdatePortion(item.id, currentPortion, "1kg")}
+                      className={`px-2.5 py-0.5 rounded-full text-[10px] font-extrabold transition-all cursor-pointer ${
+                        currentPortion === "1kg"
+                          ? "bg-terracotta-500 text-white shadow-xs"
+                          : "bg-sand-200/80 text-charcoal-700 hover:bg-sand-300"
+                      }`}
+                    >
+                      1 KG (Rs. {base1kg.toLocaleString()})
+                    </button>
+                  </div>
+                </div>
               </div>
-              <div className="flex-1 min-w-0">
-                <h4 className="font-bold text-xs sm:text-sm text-charcoal-900 truncate">{item.name}</h4>
-                <p className="text-xs font-extrabold text-terracotta-500 mt-0.5">
-                  Rs. {(item.price * item.qty).toLocaleString()}
-                </p>
-              </div>
-              <div className="flex items-center gap-2 bg-sand-200/80 rounded-full px-2 py-1">
-                <button
-                  onClick={() => updateQty(item.id, -1)}
-                  disabled={isSubmittingOrder}
-                  className="w-5 h-5 rounded-full bg-white text-charcoal-900 flex items-center justify-center text-xs font-bold hover:bg-terracotta-500 hover:text-white transition-colors cursor-pointer disabled:opacity-50"
-                >
-                  <Minus className="w-3 h-3" />
-                </button>
-                <span className="text-xs font-extrabold w-4 text-center">{item.qty}</span>
-                <button
-                  onClick={() => updateQty(item.id, 1)}
-                  disabled={isSubmittingOrder}
-                  className="w-5 h-5 rounded-full bg-charcoal-900 text-white flex items-center justify-center text-xs font-bold hover:bg-terracotta-500 transition-colors cursor-pointer disabled:opacity-50"
-                >
-                  <Plus className="w-3 h-3" />
-                </button>
-              </div>
-            </div>
-          ))
+            );
+          })
         )}
       </div>
 
@@ -109,17 +133,6 @@ export default function CartStep({
           Free
         </span>
       </div>
-
-      <LoyaltyPassInput
-        title="Shahi VIP Loyalty Pass"
-        loyaltyPhone={loyaltyPhone}
-        setLoyaltyPhone={setLoyaltyPhone}
-        loyaltyPass={loyaltyPass}
-        loyaltyMessage={loyaltyMessage}
-        isCheckingLoyalty={isCheckingLoyalty}
-        onCheckLoyalty={onCheckLoyalty}
-        onRemoveLoyalty={onRemoveLoyalty}
-      />
 
       <div className="p-5 sm:p-6 bg-sand-50 border-t border-sand-200 space-y-4">
         <div className="space-y-1.5 text-xs">
@@ -140,12 +153,6 @@ export default function CartStep({
             <Clock className="w-3.5 h-3.5 text-amber-600 shrink-0" />
             <span>{deliverySchedule.policyNote}</span>
           </div>
-          {discount > 0 && loyaltyPass && (
-            <div className="flex justify-between text-emerald-700 font-bold">
-              <span>👑 Shahi VIP Discount ({loyaltyPass.discountPercent}%)</span>
-              <span>- Rs. {discount.toLocaleString()}</span>
-            </div>
-          )}
           <div className="flex justify-between text-base font-extrabold text-charcoal-900 pt-2 border-t border-sand-200">
             <span>Total Payable</span>
             <span className="text-terracotta-500">Rs. {totalAmount.toLocaleString()}</span>

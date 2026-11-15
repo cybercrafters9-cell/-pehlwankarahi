@@ -1,14 +1,13 @@
 "use client";
 
 import { createContext, useContext, useState, useEffect, useRef, ReactNode, useCallback } from "react";
-import { Dish, CartItem, CategoryItem } from "@/data/menu";
+import { Dish, CartItem, CategoryItem, PortionSize } from "@/data/menu";
 import {
   api,
   CreateOrderPayload,
   CreateReservationPayload,
   OrderRecord,
   ReservationRecord,
-  LoyaltyPassSummary,
   RestaurantSettings,
   getErrorMessage,
 } from "@/services/api";
@@ -25,8 +24,15 @@ interface RestaurantContextType {
   refreshMenu: () => Promise<void>;
   refreshCategories: () => Promise<void>;
   cart: CartItem[];
-  addToCart: (id: number, name: string, price: number, image: string) => void;
-  updateQty: (id: number, delta: number) => void;
+  addToCart: (
+    id: number,
+    name: string,
+    price: number,
+    image: string,
+    portion?: PortionSize
+  ) => void;
+  updateQty: (id: number, delta: number, portion?: PortionSize) => void;
+  updatePortion: (id: number, currentPortion: PortionSize, newPortion: PortionSize) => void;
   clearCart: () => void;
   isCartOpen: boolean;
   setIsCartOpen: (open: boolean) => void;
@@ -44,14 +50,13 @@ interface RestaurantContextType {
   showToast: (message: string) => void;
   placeOrder: (customerData?: Partial<CreateOrderPayload>) => Promise<OrderRecord>;
   reserveTable: (payload: CreateReservationPayload) => Promise<ReservationRecord>;
-  activateLoyalty: (phone: string, name?: string) => Promise<LoyaltyPassSummary>;
   isSubmittingOrder: boolean;
 }
 
 const RestaurantContext = createContext<RestaurantContextType | undefined>(undefined);
 
 function revalidateCartItems(
-  stored: Array<{ id: number; qty: number }>,
+  stored: Array<{ id: number; qty: number; portion?: PortionSize }>,
   menuList: Dish[]
 ): CartItem[] {
   if (!Array.isArray(stored) || !Array.isArray(menuList)) return [];
@@ -62,12 +67,18 @@ function revalidateCartItems(
     }
     const dish = menuList.find((d) => d.id === item.id);
     if (dish && dish.isAvailable !== false) {
+      const portion: PortionSize = item.portion === "half" ? "half" : "1kg";
+      const isHalf = portion === "half";
+      const unitPrice = isHalf ? Math.round(dish.price / 2) : dish.price;
+      const displayName = `${dish.name} (${isHalf ? "Half KG" : "1 KG"})`;
       valid.push({
         id: dish.id,
-        name: dish.name,
-        price: dish.price,
+        name: displayName,
+        price: unitPrice,
         qty: item.qty,
         image: dish.image,
+        portion,
+        basePrice: dish.price,
       });
     }
   }
@@ -96,7 +107,7 @@ export function RestaurantProvider({ children }: { children: ReactNode }) {
       if (Array.isArray(data)) {
         setDishes(data);
         setCart((prev) => {
-          const minimal = prev.map((i) => ({ id: i.id, qty: i.qty }));
+          const minimal = prev.map((i) => ({ id: i.id, qty: i.qty, portion: i.portion }));
           return revalidateCartItems(minimal, data);
         });
       }
@@ -141,7 +152,7 @@ export function RestaurantProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (!isHydratedRef.current) return;
     try {
-      const minimal = cart.map((item) => ({ id: item.id, qty: item.qty }));
+      const minimal = cart.map((item) => ({ id: item.id, qty: item.qty, portion: item.portion }));
       localStorage.setItem("pk_cart", JSON.stringify(minimal));
     } catch {
       // Storage quota or localStorage disabled
@@ -158,7 +169,7 @@ export function RestaurantProvider({ children }: { children: ReactNode }) {
         if (isMounted && Array.isArray(data)) {
           setDishes(data);
           setCart((prev) => {
-            const minimal = prev.map((i) => ({ id: i.id, qty: i.qty }));
+            const minimal = prev.map((i) => ({ id: i.id, qty: i.qty, portion: i.portion }));
             return revalidateCartItems(minimal, data);
           });
         }
@@ -203,34 +214,111 @@ export function RestaurantProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const addToCart = useCallback(
-    (id: number, name: string, price: number, image: string) => {
+    (
+      id: number,
+      name: string,
+      price: number,
+      image: string,
+      portion: PortionSize = "1kg"
+    ) => {
+      const isHalf = portion === "half";
+      const unitPrice = isHalf ? Math.round(price / 2) : price;
+      const cleanName = name.replace(/\s*\((?:1\s*KG|Half\s*KG)\)/gi, "").trim();
+      const displayName = `${cleanName} (${isHalf ? "Half KG" : "1 KG"})`;
+
       setCart((prev) => {
-        const existing = prev.find((item) => item.id === id);
+        const existing = prev.find(
+          (item) => item.id === id && (item.portion || "1kg") === portion
+        );
         if (existing) {
           return prev.map((item) =>
-            item.id === id ? { ...item, qty: item.qty + 1 } : item
+            item.id === id && (item.portion || "1kg") === portion
+              ? { ...item, qty: item.qty + 1 }
+              : item
           );
         }
-        return [...prev, { id, name, price, qty: 1, image }];
+        return [
+          ...prev,
+          {
+            id,
+            name: displayName,
+            price: unitPrice,
+            qty: 1,
+            image,
+            portion,
+            basePrice: price,
+          },
+        ];
       });
-      showToast(`Added ${name} to your cart!`);
+      showToast(`Added ${displayName} to your cart!`);
     },
     [showToast]
   );
 
-  const updateQty = useCallback((id: number, delta: number) => {
-    setCart((prev) =>
-      prev
-        .map((item) => {
-          if (item.id === id) {
-            const newQty = item.qty + delta;
-            return newQty > 0 ? { ...item, qty: newQty } : null;
-          }
-          return item;
-        })
-        .filter((item): item is CartItem => item !== null)
-    );
-  }, []);
+  const updateQty = useCallback(
+    (id: number, delta: number, portion: PortionSize = "1kg") => {
+      setCart((prev) =>
+        prev
+          .map((item) => {
+            if (item.id === id && (item.portion || "1kg") === portion) {
+              const newQty = item.qty + delta;
+              return newQty > 0 ? { ...item, qty: newQty } : null;
+            }
+            return item;
+          })
+          .filter((item): item is CartItem => item !== null)
+      );
+    },
+    []
+  );
+
+  const updatePortion = useCallback(
+    (id: number, currentPortion: PortionSize, newPortion: PortionSize) => {
+      if (currentPortion === newPortion) return;
+      setCart((prev) => {
+        const currentItem = prev.find(
+          (item) => item.id === id && (item.portion || "1kg") === currentPortion
+        );
+        if (!currentItem) return prev;
+
+        const basePrice = currentItem.basePrice || currentItem.price;
+        const targetPrice = newPortion === "half" ? Math.round(basePrice / 2) : basePrice;
+        const cleanName = currentItem.name.replace(/\s*\((?:1\s*KG|Half\s*KG)\)/gi, "").trim();
+        const targetName = `${cleanName} (${newPortion === "half" ? "Half KG" : "1 KG"})`;
+
+        const existingTarget = prev.find(
+          (item) => item.id === id && (item.portion || "1kg") === newPortion
+        );
+
+        if (existingTarget) {
+          return prev
+            .filter(
+              (item) =>
+                !(item.id === id && (item.portion || "1kg") === currentPortion)
+            )
+            .map((item) =>
+              item.id === id && (item.portion || "1kg") === newPortion
+                ? { ...item, qty: item.qty + currentItem.qty }
+                : item
+            );
+        } else {
+          return prev.map((item) => {
+            if (item.id === id && (item.portion || "1kg") === currentPortion) {
+              return {
+                ...item,
+                portion: newPortion,
+                price: targetPrice,
+                name: targetName,
+                basePrice,
+              };
+            }
+            return item;
+          });
+        }
+      });
+    },
+    []
+  );
 
   const clearCart = useCallback(() => {
     setCart([]);
@@ -252,6 +340,7 @@ export function RestaurantProvider({ children }: { children: ReactNode }) {
         const items = cart.map((item) => ({
           id: item.id,
           qty: item.qty,
+          portion: item.portion || "1kg",
         }));
 
         const payload: CreateOrderPayload = {
@@ -264,7 +353,6 @@ export function RestaurantProvider({ children }: { children: ReactNode }) {
           paymentStatus: customerData?.paymentStatus || "pending",
           transactionId: customerData?.transactionId,
           notes: customerData?.notes,
-          loyaltyPhone: customerData?.loyaltyPhone,
         };
 
         const order = await api.placeOrder(payload);
@@ -298,21 +386,6 @@ export function RestaurantProvider({ children }: { children: ReactNode }) {
     [showToast]
   );
 
-  const activateLoyalty = useCallback(
-    async (phone: string, name?: string): Promise<LoyaltyPassSummary> => {
-      try {
-        const pass = await api.activateLoyaltyPass(phone, name);
-        showToast("👑 Shahi Loyalty Pass Activated! 15% VIP discount enabled.");
-        return pass;
-      } catch (err: unknown) {
-        const msg = getErrorMessage(err, "Failed to activate pass. Please try again.");
-        showToast(msg);
-        throw err;
-      }
-    },
-    [showToast]
-  );
-
   return (
     <RestaurantContext.Provider
       value={{
@@ -324,6 +397,7 @@ export function RestaurantProvider({ children }: { children: ReactNode }) {
         cart,
         addToCart,
         updateQty,
+        updatePortion,
         clearCart,
         isCartOpen,
         setIsCartOpen,
@@ -341,7 +415,6 @@ export function RestaurantProvider({ children }: { children: ReactNode }) {
         showToast,
         placeOrder,
         reserveTable,
-        activateLoyalty,
         isSubmittingOrder,
       }}
     >
