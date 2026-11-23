@@ -52,20 +52,20 @@ export default function Hero() {
         <div className="inline-flex items-center gap-2 bg-sand-200/80 border border-sand-300 w-fit px-3 py-1 rounded-full">
           <span className="w-2 h-2 rounded-full bg-terracotta-500 animate-ping" />
           <span className="text-[10px] sm:text-[11px] font-extrabold uppercase tracking-wider text-charcoal-800">
-            Live Wok &amp; Sizzling Karahi
+            🔥 Fresh &amp; Sizzling • Special Karahi House
           </span>
         </div>
 
-        {/* Clean, Scaled Heading (Fits perfectly in 3 lines without giant vertical stretching) */}
+        {/* Clean, Scaled Heading */}
         <h1 className="font-display font-extrabold text-2xl sm:text-3xl md:text-4xl lg:text-[2.35rem] xl:text-[2.75rem] leading-[1.08] tracking-tight text-charcoal-900 uppercase">
-          Fresh &amp; Sizzling <br />
-          <span className="text-terracotta-500">Authentic Karahi</span> For <br />
-          Every Taste
+          Explore The Real <br />
+          Taste Of <br />
+          <span className="text-terracotta-500">Authentic Karahi</span>
         </h1>
 
-        {/* Concise Description */}
+        {/* Description */}
         <p className="text-charcoal-700/85 text-xs sm:text-sm leading-relaxed max-w-lg">
-          Signature Peshawari Mutton Karahi, Royal Chaamp, Machli Shank, and fresh Desi Murgh cooked live in pure desi ghee with vine tomatoes, ginger juliennes, and freshly cracked black pepper.
+          Enjoy freshly prepared Chicken Karahi, Mutton Karahi, Chicken Mince Karahi, Mutton Mince Karahi and a delicious variety of traditional meat specialties. From Boneless Chicken Karahi to Mutton Chops Karahi and Desi Murgh Karahi, every dish brings rich spices, fresh ingredients and authentic Pakistani flavours to your table.
         </p>
 
         {/* Actions Button Row */}

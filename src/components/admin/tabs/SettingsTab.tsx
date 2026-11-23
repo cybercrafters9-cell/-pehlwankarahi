@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { RestaurantSettings, api } from "@/services/api";
 import { Card } from "../ui/Card";
 import { Input } from "../ui/Input";
@@ -78,6 +78,12 @@ function SettingsForm({
   const [isSaving, setIsSaving] = useState(false);
   const [isResetConfirmOpen, setIsResetConfirmOpen] = useState(false);
   const [isResetting, setIsResetting] = useState(false);
+
+  useEffect(() => {
+    if (settings) {
+      setForm(settings);
+    }
+  }, [settings]);
 
   // Password Change State
   const [pwForm, setPwForm] = useState({
@@ -292,12 +298,14 @@ function SettingsForm({
                   <Input
                     label="Primary Phone (Call / Helpline) *"
                     required
+                    placeholder="e.g. 0300-1234567"
                     value={form.phone}
                     onChange={(e) => setForm({ ...form, phone: e.target.value })}
                   />
                   <Input
                     label="WhatsApp Ordering Number *"
                     required
+                    placeholder="e.g. 0321-9876543"
                     value={form.whatsapp}
                     onChange={(e) => setForm({ ...form, whatsapp: e.target.value })}
                   />
@@ -390,6 +398,7 @@ function SettingsForm({
                   label="Main Physical Address *"
                   required
                   rows={2}
+                  placeholder="e.g. Main Boulevard, Kohinoor City / Canal Road Rooftop, Faisalabad, Pakistan"
                   value={form.address}
                   onChange={(e) => setForm({ ...form, address: e.target.value })}
                 />
@@ -491,6 +500,7 @@ function SettingsForm({
               <div className="space-y-3.5">
                 <Input
                   label="Official Account Title *"
+                  placeholder="e.g. Pehalwan Karahi & DeraGhar"
                   value={form.paymentAccountTitle || "Pehalwan Karahi & DeraGhar"}
                   onChange={(e) => setForm({ ...form, paymentAccountTitle: e.target.value })}
                 />
@@ -498,11 +508,13 @@ function SettingsForm({
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <Input
                     label="Easypaisa Account Number"
+                    placeholder="e.g. 03001234567"
                     value={form.easypaisaNumber || ""}
                     onChange={(e) => setForm({ ...form, easypaisaNumber: e.target.value })}
                   />
                   <Input
                     label="JazzCash Account Number"
+                    placeholder="e.g. 03219876543"
                     value={form.jazzcashNumber || ""}
                     onChange={(e) => setForm({ ...form, jazzcashNumber: e.target.value })}
                   />
