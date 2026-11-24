@@ -29,9 +29,9 @@ export default function Hero() {
   const dish2 = plate2.dishId ? dishes.find((d) => d.id === plate2.dishId) : null;
   const dish3 = plate3.dishId ? dishes.find((d) => d.id === plate3.dishId) : null;
 
-  const img1 = plate1.slot?.mediaId ? plate1.url : (dish1?.image || plate1.url);
-  const img2 = plate2.slot?.mediaId ? plate2.url : (dish2?.image || plate2.url);
-  const img3 = plate3.slot?.mediaId ? plate3.url : (dish3?.image || plate3.url);
+  const img1 = plate1.url;
+  const img2 = plate2.url;
+  const img3 = plate3.url;
 
   const scrollTo = (id: string) => {
     const el = document.getElementById(id);
@@ -140,6 +140,7 @@ export default function Hero() {
                   src={img1}
                   alt={dish1 ? dish1.name : plate1.alt}
                   fill
+                  priority
                   unoptimized={img1.includes("/api/media/")}
                   sizes="(max-width: 640px) 144px, 176px"
                   className={`object-cover ${dish1 ? "group-hover:scale-105" : ""} transition-transform duration-300`}

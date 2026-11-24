@@ -403,6 +403,7 @@ export default function AdminPage() {
     key: string,
     data: {
       mediaId?: number | null;
+      customUrl?: string | null;
       dishId?: number | null;
       label?: string;
       altText?: string;
@@ -413,6 +414,12 @@ export default function AdminPage() {
       const updated = await api.updateSiteSlot(key, data);
       setSlots((prev) => prev.map((s) => (s.key === key ? updated : s)));
       setApiConnected(true);
+      if (typeof window !== "undefined") {
+        window.dispatchEvent(new Event("pehalwan_slots_updated"));
+        try {
+          localStorage.setItem("pehalwan_slots_version", Date.now().toString());
+        } catch {}
+      }
       showToast(`Site slot "${updated.label}" updated successfully!`);
     } catch (err: unknown) {
       if (checkAuthExpired(err)) return;

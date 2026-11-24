@@ -24,6 +24,7 @@ interface SiteImagesTabProps {
     key: string,
     data: {
       mediaId?: number | null;
+      customUrl?: string | null;
       dishId?: number | null;
       label?: string;
       altText?: string;
@@ -53,6 +54,7 @@ const ASPECT_RATIO_HINTS: Record<string, string> = {
   "bento.main": "4:3 Landscape (Min 1000×750)",
   "bento.deal": "16:9 Landscape (Min 600×350)",
   "bento.sub1": "4:3 Landscape (Min 600×450)",
+  "bento.sub2": "4:3 Landscape (Min 600×450)",
   "bento.sub3": "4:3 Landscape (Min 600×450)",
   "bento.sub4": "4:3 Landscape (Min 600×450)",
   "editorial.main": "3:4 Portrait (Min 600×800)",
@@ -71,6 +73,7 @@ const DISH_SLOT_KEYS = new Set([
   "bento.main",
   "bento.deal",
   "bento.sub1",
+  "bento.sub2",
   "bento.sub3",
   "bento.sub4",
   "reservation.main",
@@ -113,7 +116,8 @@ export function SiteImagesTab({
 
       await onUpdateSlot(editingSlot.key, {
         mediaId: mediaId || null,
-        fallbackUrl: !mediaId && replaceUrl ? replaceUrl : undefined,
+        customUrl: !mediaId && replaceUrl ? replaceUrl.trim() : null,
+        fallbackUrl: !mediaId && replaceUrl ? replaceUrl.trim() : undefined,
         altText: altText.trim() || editingSlot.altText,
       });
       setEditingSlot(null);
@@ -150,6 +154,7 @@ export function SiteImagesTab({
     try {
       await onUpdateSlot(slot.key, {
         mediaId: null,
+        customUrl: null,
       });
     } finally {
       setIsSubmitting(false);
@@ -207,7 +212,7 @@ export function SiteImagesTab({
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
                 {sectionSlots.map((slot) => {
                   const resolvedUrl = resolveImageUrl(slot.effectiveUrl);
-                  const isMediaCustom = Boolean(slot.mediaId);
+                  const isMediaCustom = Boolean(slot.mediaId || (slot.customUrl && slot.customUrl.trim()));
                   const isDishSlot = DISH_SLOT_KEYS.has(slot.key);
                   const isDishLinked = Boolean(slot.dishId);
                   const matchedDish = dishes.find((d) => d.id === slot.dishId);
@@ -234,7 +239,9 @@ export function SiteImagesTab({
                           {/* Source Status Tags */}
                           <div className="absolute top-3 left-3 flex flex-wrap gap-1 max-w-[85%]">
                             {isMediaCustom && (
-                              <Badge variant="saffron">Custom Media</Badge>
+                              <Badge variant="saffron">
+                                {slot.mediaId ? "Uploaded Media" : "Custom URL"}
+                              </Badge>
                             )}
                             {isDishSlot ? (
                               isDishLinked ? (

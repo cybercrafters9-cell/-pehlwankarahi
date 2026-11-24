@@ -95,6 +95,7 @@ export interface SiteSlot {
   label: string;
   altText: string;
   effectiveUrl: string;
+  customUrl?: string | null;
   mediaId: number | null;
   dishId: number | null;
   dishName?: string;
@@ -394,6 +395,7 @@ export const api = {
     key: string,
     data: {
       mediaId?: number | null;
+      customUrl?: string | null;
       dishId?: number | null;
       label?: string;
       altText?: string;

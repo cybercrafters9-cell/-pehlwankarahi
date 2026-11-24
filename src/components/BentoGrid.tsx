@@ -23,6 +23,11 @@ export default function BentoGrid() {
     alt: "Matka Handi & Garlic Naan",
   });
 
+  const bentoSub2 = useSlot("bento.sub2", {
+    url: "https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=600&q=80",
+    alt: "Peshawari Tradition & Desi Ghee",
+  });
+
   const bentoSub3 = useSlot("bento.sub3", {
     url: "https://images.unsplash.com/photo-1585937421612-70a008356fbe?auto=format&fit=crop&w=600&q=80",
     alt: "Mutton Muscles (Machli) Karahi",
@@ -36,44 +41,36 @@ export default function BentoGrid() {
   const dishMain = bentoMain.dishId
     ? dishes.find((d) => d.id === bentoMain.dishId)
     : null;
-  const imgMain = bentoMain.slot?.mediaId
-    ? bentoMain.url
-    : (dishMain?.image || bentoMain.url);
+  const imgMain = bentoMain.url;
   const nameMain = dishMain ? dishMain.name : (bentoMain.dishName || bentoMain.alt);
   const catMain = dishMain?.category || "Special Royal Chaamp";
 
   const dishDeal = bentoDeal.dishId
     ? dishes.find((d) => d.id === bentoDeal.dishId)
     : null;
-  const imgDeal = bentoDeal.slot?.mediaId
-    ? bentoDeal.url
-    : (dishDeal?.image || bentoDeal.url);
+  const imgDeal = bentoDeal.url;
   const nameDeal = dishDeal ? dishDeal.name : (bentoDeal.dishName || bentoDeal.alt);
 
   const dishSub1 = bentoSub1.dishId
     ? dishes.find((d) => d.id === bentoSub1.dishId)
     : null;
-  const imgSub1 = bentoSub1.slot?.mediaId
-    ? bentoSub1.url
-    : (dishSub1?.image || bentoSub1.url);
+  const imgSub1 = bentoSub1.url;
   const nameSub1 = dishSub1 ? dishSub1.name : (bentoSub1.dishName || bentoSub1.alt);
   const tagSub1 = dishSub1?.category || "Organic Desi Ghee";
+
+  const imgSub2 = bentoSub2.url;
 
   const dishSub3 = bentoSub3.dishId
     ? dishes.find((d) => d.id === bentoSub3.dishId)
     : null;
-  const imgSub3 = bentoSub3.slot?.mediaId
-    ? bentoSub3.url
-    : (dishSub3?.image || bentoSub3.url);
+  const imgSub3 = bentoSub3.url;
   const nameSub3 = dishSub3 ? dishSub3.name : (bentoSub3.dishName || bentoSub3.alt);
   const tagSub3 = dishSub3?.category || "Mutton Shank Special";
 
   const dishSub4 = bentoSub4.dishId
     ? dishes.find((d) => d.id === bentoSub4.dishId)
     : null;
-  const imgSub4 = bentoSub4.slot?.mediaId
-    ? bentoSub4.url
-    : (dishSub4?.image || bentoSub4.url);
+  const imgSub4 = bentoSub4.url;
   const nameSub4 = dishSub4 ? dishSub4.name : (bentoSub4.dishName || bentoSub4.alt);
   const tagSub4 = dishSub4?.category || "Tender & Juicy";
 
@@ -144,8 +141,20 @@ export default function BentoGrid() {
 
         {/* Bottom-Left Card: Wide Dark-to-Terracotta Gradient Promo Card */}
         <div className="bento-card reference-promo-gradient rounded-4xl p-6 sm:p-7 text-white shadow-card relative overflow-hidden flex flex-col sm:flex-row items-start sm:items-center justify-between gap-5 min-h-[175px]">
+          {imgDeal && (
+            <Image
+              src={imgDeal}
+              alt={nameDeal}
+              fill
+              unoptimized={imgDeal.includes("/api/media/")}
+              sizes="(max-width: 1024px) 100vw, 50vw"
+              className="zoom-img object-cover opacity-25 pointer-events-none"
+            />
+          )}
+          <div className="absolute inset-0 bg-gradient-to-r from-charcoal-950 via-charcoal-900/85 to-terracotta-900/75 pointer-events-none" />
+
           {/* Left Side */}
-          <div className="space-y-2 max-w-[230px]">
+          <div className="relative z-10 space-y-2 max-w-[230px]">
             <span className="inline-block text-[10px] font-extrabold uppercase tracking-widest bg-white/15 px-2.5 py-1 rounded-full text-saffron-400">
               Weekend Dawat Deal
             </span>
@@ -171,7 +180,7 @@ export default function BentoGrid() {
           </div>
 
           {/* Right Side */}
-          <div className="sm:border-l sm:border-white/20 sm:pl-6 max-w-[240px]">
+          <div className="relative z-10 sm:border-l sm:border-white/20 sm:pl-6 max-w-[240px]">
             <p className="font-serif italic text-saffron-400 text-sm">Fresh Clay Tandoor</p>
             <h4 className="font-display font-bold text-lg sm:text-xl leading-snug mt-0.5">
               100% Pure Chakki &amp; Desi Ghee Tarka
@@ -223,8 +232,18 @@ export default function BentoGrid() {
         </div>
 
         {/* Sub-Card 2 (Top-Right): Warm Saffron Gold Card (Informational Menu Link) */}
-        <div className="bento-card h-[265px] rounded-4xl bg-saffron-400 p-6 flex flex-col justify-between text-charcoal-900 shadow-card">
-          <div>
+        <div className="bento-card relative h-[265px] rounded-4xl bg-saffron-400 p-6 flex flex-col justify-between text-charcoal-900 shadow-card overflow-hidden group">
+          {imgSub2 && (
+            <Image
+              src={imgSub2}
+              alt="Peshawari Tradition"
+              fill
+              unoptimized={imgSub2.includes("/api/media/")}
+              sizes="(max-width: 640px) 100vw, 25vw"
+              className="zoom-img object-cover opacity-20 pointer-events-none group-hover:scale-105 transition-transform duration-500"
+            />
+          )}
+          <div className="relative z-10">
             <span className="text-[10px] font-extrabold uppercase tracking-widest bg-charcoal-900/10 px-2.5 py-1 rounded-full">
               Peshawari Tradition
             </span>
@@ -237,7 +256,7 @@ export default function BentoGrid() {
           </div>
           <button
             onClick={() => scrollToMenu("karahi")}
-            className="w-full bg-charcoal-900 hover:bg-terracotta-500 text-white font-bold text-xs py-3 px-4 rounded-full transition-colors flex items-center justify-center gap-2 cursor-pointer"
+            className="relative z-10 w-full bg-charcoal-900 hover:bg-terracotta-500 text-white font-bold text-xs py-3 px-4 rounded-full transition-colors flex items-center justify-center gap-2 cursor-pointer"
           >
             <span>Explore Karahi Menu</span>
             <ArrowUpRight className="w-4 h-4" />
@@ -245,8 +264,19 @@ export default function BentoGrid() {
         </div>
 
         {/* Sub-Card 3 (Bottom-Left): Deep Charcoal Card */}
-        <div className="bento-card h-[265px] rounded-4xl bg-charcoal-900 p-6 flex flex-col justify-between text-white shadow-card">
-          <div>
+        <div className="bento-card relative h-[265px] rounded-4xl bg-charcoal-900 p-6 flex flex-col justify-between text-white shadow-card overflow-hidden group">
+          {imgSub3 && (
+            <Image
+              src={imgSub3}
+              alt={nameSub3}
+              fill
+              unoptimized={imgSub3.includes("/api/media/")}
+              sizes="(max-width: 640px) 100vw, 25vw"
+              className="zoom-img object-cover opacity-35 group-hover:opacity-55 group-hover:scale-105 transition-all duration-500 pointer-events-none"
+            />
+          )}
+          <div className="absolute inset-0 bg-gradient-to-t from-charcoal-950 via-charcoal-900/80 to-charcoal-900/50 pointer-events-none" />
+          <div className="relative z-10">
             <span className="text-[10px] font-extrabold uppercase tracking-widest bg-white/10 text-saffron-400 px-2.5 py-1 rounded-full">
               {tagSub3}
             </span>
@@ -262,7 +292,7 @@ export default function BentoGrid() {
               onClick={() =>
                 addToCart(dishSub3.id, dishSub3.name, dishSub3.price, imgSub3)
               }
-              className="w-full bg-terracotta-500 hover:bg-saffron-400 hover:text-charcoal-900 text-white font-bold text-xs py-3 px-4 rounded-full transition-colors flex items-center justify-center gap-2 cursor-pointer"
+              className="relative z-10 w-full bg-terracotta-500 hover:bg-saffron-400 hover:text-charcoal-900 text-white font-bold text-xs py-3 px-4 rounded-full transition-colors flex items-center justify-center gap-2 cursor-pointer"
             >
               <span>
                 Order {dishSub3.name} (Rs. {dishSub3.price.toLocaleString()})

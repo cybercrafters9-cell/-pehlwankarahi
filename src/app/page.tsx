@@ -20,7 +20,7 @@ async function getInitialSlots(): Promise<Record<string, SiteSlot>> {
     const rawUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5050/api";
     const cleanUrl = rawUrl.replace(/\/+$/, "");
     const res = await fetch(`${cleanUrl}/site-content`, {
-      next: { revalidate: 60 },
+      next: { revalidate: 15 },
     });
     if (!res.ok) return {};
     const json = await res.json();

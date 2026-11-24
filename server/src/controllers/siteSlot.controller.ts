@@ -39,7 +39,7 @@ export const updateSiteSlot = asyncHandler(
       });
     }
 
-    const { mediaId, dishId, label, altText, fallbackUrl } = req.body;
+    const { mediaId, customUrl, dishId, label, altText, fallbackUrl } = req.body;
 
     if (mediaId !== undefined && mediaId !== null) {
       const media = await mediaRepository.getById(mediaId);
@@ -63,6 +63,7 @@ export const updateSiteSlot = asyncHandler(
 
     const updated = await siteSlotRepository.update(key, {
       mediaId: mediaId !== undefined ? mediaId : undefined,
+      customUrl: customUrl !== undefined ? customUrl : undefined,
       dishId: dishId !== undefined ? dishId : undefined,
       label,
       altText,

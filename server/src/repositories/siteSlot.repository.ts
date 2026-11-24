@@ -8,6 +8,7 @@ export interface SiteSlotRecord {
   label: string;
   altText: string;
   effectiveUrl: string;
+  customUrl?: string | null;
   mediaId: number | null;
   dishId: number | null;
   dishName?: string;
@@ -21,6 +22,7 @@ interface SiteSlotRow extends RowDataPacket {
   label: string;
   alt_text: string;
   fallback_url: string;
+  custom_url?: string | null;
   media_id: number | null;
   dish_id: number | null;
   sort_order: number;
@@ -29,13 +31,46 @@ interface SiteSlotRow extends RowDataPacket {
   dish_image_url?: string | null;
 }
 
+let isEnsured = false;
+async function ensureCustomUrlAndSlots(): Promise<void> {
+  if (isEnsured) return;
+  try {
+    await execute(`
+      ALTER TABLE site_slots 
+      ADD COLUMN IF NOT EXISTS custom_url VARCHAR(1000) NULL AFTER fallback_url
+    `);
+    await execute(`
+      INSERT IGNORE INTO site_slots (slot_key, section, label, alt_text, fallback_url, dish_id, sort_order) 
+      VALUES (
+        'bento.sub2', 
+        'BentoGrid', 
+        'Bento Sub-Tile 2 (Top-Right Tradition Card)', 
+        'Peshawari Tradition & Desi Ghee', 
+        'https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=600&q=80', 
+        NULL, 
+        10
+      )
+    `);
+    isEnsured = true;
+  } catch (err) {
+    console.warn("Auto-migration for site_slots columns/slots warning:", err);
+  }
+}
+
 function mapRow(row: SiteSlotRow): SiteSlotRecord {
   let effectiveUrl = row.fallback_url;
   let effectiveAlt = row.alt_text;
 
+  // 1. Custom uploaded media takes precedence
   if (row.media_id) {
     effectiveUrl = `/api/media/${row.media_id}`;
-  } else if (row.dish_id) {
+  } 
+  // 2. Custom direct URL set by admin takes precedence over linked dish default
+  else if (row.custom_url && row.custom_url.trim()) {
+    effectiveUrl = row.custom_url.trim();
+  } 
+  // 3. Otherwise fall back to linked dish photo if dish is set
+  else if (row.dish_id) {
     if (row.dish_image_media_id) {
       effectiveUrl = `/api/media/${row.dish_image_media_id}`;
     } else if (row.dish_image_url) {
@@ -52,6 +87,7 @@ function mapRow(row: SiteSlotRow): SiteSlotRecord {
     label: row.label,
     altText: effectiveAlt,
     effectiveUrl,
+    customUrl: row.custom_url || null,
     mediaId: row.media_id,
     dishId: row.dish_id,
     dishName: row.dish_name,
@@ -62,6 +98,7 @@ function mapRow(row: SiteSlotRow): SiteSlotRecord {
 
 export const siteSlotRepository = {
   async getAll(): Promise<SiteSlotRecord[]> {
+    await ensureCustomUrlAndSlots();
     const rows = await query<SiteSlotRow>(`
       SELECT 
         s.*,
@@ -76,6 +113,7 @@ export const siteSlotRepository = {
   },
 
   async getByKey(slotKey: string): Promise<SiteSlotRecord | null> {
+    await ensureCustomUrlAndSlots();
     const row = await queryOne<SiteSlotRow>(
       `
       SELECT 
@@ -96,12 +134,14 @@ export const siteSlotRepository = {
     slotKey: string,
     updates: {
       mediaId?: number | null;
+      customUrl?: string | null;
       dishId?: number | null;
       label?: string;
       altText?: string;
       fallbackUrl?: string;
     }
   ): Promise<SiteSlotRecord> {
+    await ensureCustomUrlAndSlots();
     const existing = await this.getByKey(slotKey);
     if (!existing) {
       throw new Error(`Site slot '${slotKey}' not found.`);
@@ -110,6 +150,16 @@ export const siteSlotRepository = {
     const oldMediaId = existing.mediaId;
     const mediaId =
       updates.mediaId !== undefined ? updates.mediaId : existing.mediaId;
+
+    // If mediaId was updated to a valid ID, clear custom_url
+    // If customUrl was explicitly provided (even null), use it; else retain existing
+    let customUrl: string | null | undefined = existing.customUrl;
+    if (updates.customUrl !== undefined) {
+      customUrl = updates.customUrl ? updates.customUrl.trim() : null;
+    } else if (updates.mediaId) {
+      customUrl = null;
+    }
+
     const dishId =
       updates.dishId !== undefined ? updates.dishId : existing.dishId;
     const label =
@@ -121,9 +171,9 @@ export const siteSlotRepository = {
 
     await execute(
       `UPDATE site_slots 
-       SET media_id = ?, dish_id = ?, label = ?, alt_text = ?, fallback_url = ? 
+       SET media_id = ?, custom_url = ?, dish_id = ?, label = ?, alt_text = ?, fallback_url = ? 
        WHERE slot_key = ?`,
-      [mediaId, dishId, label, altText, fallbackUrl, slotKey]
+      [mediaId, customUrl, dishId, label, altText, fallbackUrl, slotKey]
     );
 
     if (oldMediaId && oldMediaId !== mediaId) {

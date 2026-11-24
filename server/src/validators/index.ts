@@ -526,6 +526,12 @@ export const updateSiteSlotSchema = z
   .object({
     mediaId: z.number().int().positive().nullable().optional(),
     dishId: z.number().int().positive().nullable().optional(),
+    customUrl: z
+      .string()
+      .trim()
+      .max(1000)
+      .nullable()
+      .optional(),
     altText: z
       .string()
       .trim()
@@ -540,10 +546,6 @@ export const updateSiteSlotSchema = z
       .string()
       .trim()
       .max(1000)
-      .refine(
-        (url) => url.startsWith("https://") || url.startsWith("/api/media/"),
-        "Fallback URL must start with https:// or /api/media/"
-      )
       .optional(),
   })
   .strip();

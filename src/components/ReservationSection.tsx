@@ -13,7 +13,7 @@ export default function ReservationSection() {
     alt: "Sizzling Charcoal Sajji & Lemon Chops",
   });
   const dishRes = resSlot.dishId ? dishes.find((d) => d.id === resSlot.dishId) : null;
-  const imgRes = resSlot.slot?.mediaId ? resSlot.url : (dishRes?.image || resSlot.url);
+  const imgRes = resSlot.url;
   const nameRes = dishRes ? dishRes.name : (resSlot.dishName || "Smoky Lamb Chops & Whole Sajji");
   const catRes = dishRes?.category || "Balochi & Peshawari Fusion";
   const [isSubmitting, setIsSubmitting] = useState(false);

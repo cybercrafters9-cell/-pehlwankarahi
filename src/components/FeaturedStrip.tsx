@@ -86,9 +86,7 @@ export default function FeaturedStrip() {
             const dish = currentSlot?.dishId
               ? dishes.find((d) => d.id === currentSlot.dishId)
               : null;
-            const effectiveImage = currentSlot?.slot?.mediaId
-              ? currentSlot.url
-              : (dish?.image || currentSlot?.url || cfg.fallbackUrl);
+            const effectiveImage = currentSlot?.url || dish?.image || cfg.fallbackUrl;
             const effectiveName = dish
               ? dish.name
               : (currentSlot?.dishName || currentSlot?.alt || cfg.fallbackAlt);

@@ -1,12 +1,22 @@
 "use client";
 
-import { createContext, useContext, ReactNode, useState, useMemo } from "react";
-import { SiteSlot } from "@/services/api";
+import {
+  createContext,
+  useContext,
+  ReactNode,
+  useState,
+  useMemo,
+  useEffect,
+  useCallback,
+} from "react";
+import { SiteSlot, api } from "@/services/api";
 import { resolveImageUrl } from "@/lib/media";
 
 interface SiteContentContextType {
   slots: Record<string, SiteSlot>;
   setSlot: (slot: SiteSlot) => void;
+  refreshSlots: () => Promise<void>;
+  isLoading: boolean;
 }
 
 const SiteContentContext = createContext<SiteContentContextType | undefined>(
@@ -23,15 +33,63 @@ export function SiteContentProvider({
   initialSlots = {},
 }: SiteContentProviderProps) {
   const [slots, setSlots] = useState<Record<string, SiteSlot>>(initialSlots);
+  const [isLoading, setIsLoading] = useState(false);
 
-  const setSlot = (slot: SiteSlot) => {
+  const setSlot = useCallback((slot: SiteSlot) => {
     setSlots((prev) => ({
       ...prev,
       [slot.key]: slot,
     }));
-  };
+  }, []);
 
-  const value = useMemo(() => ({ slots, setSlot }), [slots]);
+  const refreshSlots = useCallback(async () => {
+    try {
+      setIsLoading(true);
+      const res = await api.getSiteContent();
+      if (res && res.slots) {
+        setSlots(res.slots);
+      }
+    } catch {
+      // Keep existing slots on transient network fail
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  // Sync slots on mount and revalidate on tab focus or cross-tab updates
+  useEffect(() => {
+    // If initialSlots was empty or for initial freshness, fetch in background
+    refreshSlots();
+
+    const handleFocus = () => {
+      refreshSlots();
+    };
+
+    const handleCustomUpdate = () => {
+      refreshSlots();
+    };
+
+    const handleStorage = (e: StorageEvent) => {
+      if (e.key === "pehalwan_slots_version") {
+        refreshSlots();
+      }
+    };
+
+    window.addEventListener("focus", handleFocus);
+    window.addEventListener("pehalwan_slots_updated", handleCustomUpdate);
+    window.addEventListener("storage", handleStorage);
+
+    return () => {
+      window.removeEventListener("focus", handleFocus);
+      window.removeEventListener("pehalwan_slots_updated", handleCustomUpdate);
+      window.removeEventListener("storage", handleStorage);
+    };
+  }, [refreshSlots]);
+
+  const value = useMemo(
+    () => ({ slots, setSlot, refreshSlots, isLoading }),
+    [slots, setSlot, refreshSlots, isLoading]
+  );
 
   return (
     <SiteContentContext.Provider value={value}>
