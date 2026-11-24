@@ -24,7 +24,7 @@ export const statsRepository = {
       SELECT 
         COALESCE(SUM(CASE WHEN status != 'cancelled' THEN total ELSE 0 END), 0) AS totalRevenue,
         COUNT(*) AS totalOrders,
-        COALESCE(SUM(CASE WHEN status IN ('preparing', 'cooking_in_wok', 'out_for_delivery') THEN 1 ELSE 0 END), 0) AS pendingOrders
+        COALESCE(SUM(CASE WHEN status IN ('pending_verification', 'preparing', 'cooking_in_wok', 'out_for_delivery') THEN 1 ELSE 0 END), 0) AS pendingOrders
       FROM orders
     `);
 

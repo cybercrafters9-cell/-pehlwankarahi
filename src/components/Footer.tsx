@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useRestaurant } from "@/context/RestaurantContext";
+import { resolveImageUrl } from "@/lib/media";
 import {
   Phone,
   MapPin,
@@ -81,9 +82,19 @@ export default function Footer() {
           {/* Column 1: Brand Heritage (Span 4) */}
           <div className="lg:col-span-4 space-y-4">
             <div>
-              <span className="font-serif italic font-bold text-3xl tracking-tight text-white block">
-                Pehalwan <span className="text-terracotta-500">Karahi.</span>
-              </span>
+              {settings?.logoUrl ? (
+                <div className="mb-2">
+                  <img
+                    src={resolveImageUrl(settings.logoUrl)}
+                    alt={settings.restaurantName || "Pehalwan Karahi"}
+                    className="h-10 sm:h-12 w-auto max-w-[200px] object-contain drop-shadow"
+                  />
+                </div>
+              ) : (
+                <span className="font-serif italic font-bold text-3xl tracking-tight text-white block">
+                  Pehalwan <span className="text-terracotta-500">Karahi.</span>
+                </span>
+              )}
               <span className="text-[11px] font-extrabold uppercase tracking-widest text-saffron-400 block mt-1">
                 Authentic Heritage • Since 1998
               </span>

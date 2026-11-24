@@ -23,7 +23,13 @@ export interface OrderItem {
   image: string;
 }
 
-export type OrderStatus = "preparing" | "cooking_in_wok" | "out_for_delivery" | "delivered" | "cancelled";
+export type OrderStatus =
+  | "pending_verification"
+  | "preparing"
+  | "cooking_in_wok"
+  | "out_for_delivery"
+  | "delivered"
+  | "cancelled";
 
 export type PaymentMethod = "cod" | "easypaisa" | "jazzcash";
 
@@ -106,6 +112,8 @@ export interface RestaurantSettings {
   easypaisaNumber?: string;
   jazzcashNumber?: string;
   paymentAccountTitle?: string;
+  logoUrl?: string;
+  faviconUrl?: string;
 }
 
 export interface DashboardStats {

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRestaurant } from "@/context/RestaurantContext";
+import { resolveImageUrl } from "@/lib/media";
 import { ShoppingBag, ArrowUpRight, Menu, X } from "lucide-react";
 
 export default function Navbar() {
@@ -43,9 +44,17 @@ export default function Navbar() {
             window.scrollTo({ top: 0, behavior: "smooth" });
           }}
         >
-          <span className="font-serif italic font-bold text-2xl sm:text-3xl tracking-tight text-charcoal-900 group-hover:opacity-90 transition-opacity">
-            Pehalwan <span className="text-terracotta-500">Karahi.</span>
-          </span>
+          {settings?.logoUrl ? (
+            <img
+              src={resolveImageUrl(settings.logoUrl)}
+              alt={settings.restaurantName || "Pehalwan Karahi"}
+              className="h-8 sm:h-10 w-auto max-w-[160px] sm:max-w-[200px] object-contain group-hover:opacity-90 transition-opacity"
+            />
+          ) : (
+            <span className="font-serif italic font-bold text-2xl sm:text-3xl tracking-tight text-charcoal-900 group-hover:opacity-90 transition-opacity">
+              Pehalwan <span className="text-terracotta-500">Karahi.</span>
+            </span>
+          )}
         </a>
 
         {/* Center: Simplified Navigation (Home & Restaurant Menu) */}

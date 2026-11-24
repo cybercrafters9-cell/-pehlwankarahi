@@ -27,6 +27,7 @@ export default function CartDrawer() {
     placeOrder,
     isSubmittingOrder,
     settings,
+    setPendingVerificationOrder,
   } = useRestaurant();
 
   const [step, setStep] = useState<DrawerStep>("cart");
@@ -35,7 +36,12 @@ export default function CartDrawer() {
 
   // Completed Order State for Success Screen (strictly typed, no any)
   const [completedOrder, setCompletedOrder] = useState<CompletedOrderSummary | null>(null);
-  const [errors, setErrors] = useState<{ name?: string; phone?: string; address?: string }>({});
+  const [errors, setErrors] = useState<{
+    name?: string;
+    phone?: string;
+    address?: string;
+    transactionId?: string;
+  }>({});
 
   const subtotal = cart.reduce((sum, item) => sum + item.price * item.qty, 0);
   const freeThreshold = settings?.freeDeliveryThreshold ?? 0;
@@ -59,6 +65,8 @@ export default function CartDrawer() {
     if (step === "success") {
       setStep("cart");
       setCompletedOrder(null);
+      setFormData(INITIAL_FORM);
+      setErrors({});
     }
   };
 
@@ -89,6 +97,12 @@ export default function CartDrawer() {
       errs.address = "Please enter a complete delivery address (min 5 characters)";
     }
 
+    if (!formData.transactionId.trim()) {
+      errs.transactionId = "Transaction ID ya Sender Mobile Number lazmi darj karein";
+    } else if (formData.transactionId.trim().length < 4) {
+      errs.transactionId = "Transaction ID kam az kam 4 characters ka hona chahiye";
+    }
+
     setErrors(errs);
     return Object.keys(errs).length === 0;
   };
@@ -104,12 +118,12 @@ export default function CartDrawer() {
         address: formData.address.trim(),
         spiceLevel: "Standard",
         paymentMethod: formData.paymentMethod,
-        transactionId: formData.transactionId.trim() || undefined,
+        transactionId: formData.transactionId.trim(),
         notes: formData.notes.trim() || undefined,
       });
 
       if (result) {
-        setCompletedOrder({
+        const orderSummary: CompletedOrderSummary = {
           id: result.id,
           customerName: formData.customerName.trim(),
           customerPhone: formData.customerPhone.trim(),
@@ -121,8 +135,14 @@ export default function CartDrawer() {
           paymentMethod: formData.paymentMethod,
           transactionId: formData.transactionId.trim(),
           items: cart.map((i) => ({ id: i.id, name: i.name, price: i.price, qty: i.qty })),
-        });
-        setStep("success");
+        };
+        // 1. Trigger the prominent website on-screen verification pop-up modal!
+        setPendingVerificationOrder(orderSummary);
+        // 2. Wipe form data clean so stale values do NOT appear on future orders!
+        setFormData(INITIAL_FORM);
+        setErrors({});
+        setStep("cart");
+        setIsCartOpen(false);
       }
     } catch {
       // Stay on checkout step; toast displayed by placeOrder

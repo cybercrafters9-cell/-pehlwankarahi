@@ -10,6 +10,7 @@ import MenuSection from "@/components/MenuSection";
 import ReservationSection from "@/components/ReservationSection";
 import Footer from "@/components/Footer";
 import CartDrawer from "@/components/CartDrawer";
+import OrderVerificationModal from "@/components/OrderVerificationModal";
 import VideoModal from "@/components/VideoModal";
 import MenuModal from "@/components/MenuModal";
 import ToastContainer from "@/components/Toast";
@@ -45,6 +46,7 @@ export default async function Home() {
           <ReservationSection />
           <Footer />
           <CartDrawer />
+          <OrderVerificationModal />
           <VideoModal />
           <MenuModal />
           <ToastContainer />

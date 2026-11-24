@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { RestaurantSettings, api } from "@/services/api";
+import { resolveImageUrl } from "@/lib/media";
 import { Card } from "../ui/Card";
 import { Input } from "../ui/Input";
 import { Textarea } from "../ui/Textarea";
@@ -23,6 +24,9 @@ import {
   Clock,
   CreditCard,
   Megaphone,
+  Upload,
+  Image as ImageIcon,
+  Globe,
 } from "lucide-react";
 
 interface SettingsTabProps {
@@ -64,6 +68,8 @@ const DEFAULT_SETTINGS: RestaurantSettings = {
   easypaisaNumber: "",
   jazzcashNumber: "",
   paymentAccountTitle: "Pehalwan Karahi & DeraGhar",
+  logoUrl: "",
+  faviconUrl: "",
 };
 
 function SettingsForm({
@@ -78,6 +84,46 @@ function SettingsForm({
   const [isSaving, setIsSaving] = useState(false);
   const [isResetConfirmOpen, setIsResetConfirmOpen] = useState(false);
   const [isResetting, setIsResetting] = useState(false);
+
+  // Logo & Favicon Upload States
+  const [isUploadingLogo, setIsUploadingLogo] = useState(false);
+  const [isUploadingFavicon, setIsUploadingFavicon] = useState(false);
+  const logoInputRef = useRef<HTMLInputElement | null>(null);
+  const faviconInputRef = useRef<HTMLInputElement | null>(null);
+
+  const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    e.target.value = "";
+    setIsUploadingLogo(true);
+    try {
+      const res = await api.uploadMedia(file, file.name);
+      setForm((prev) => ({ ...prev, logoUrl: res.url }));
+      if (onShowToast) onShowToast("Website logo uploaded successfully!", "success");
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Failed to upload logo image.";
+      if (onShowToast) onShowToast(msg, "error");
+    } finally {
+      setIsUploadingLogo(false);
+    }
+  };
+
+  const handleFaviconUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    e.target.value = "";
+    setIsUploadingFavicon(true);
+    try {
+      const res = await api.uploadMedia(file, file.name);
+      setForm((prev) => ({ ...prev, faviconUrl: res.url }));
+      if (onShowToast) onShowToast("Website favicon uploaded successfully!", "success");
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Failed to upload favicon image.";
+      if (onShowToast) onShowToast(msg, "error");
+    } finally {
+      setIsUploadingFavicon(false);
+    }
+  };
 
   useEffect(() => {
     if (settings) {
@@ -242,6 +288,175 @@ function SettingsForm({
                     setForm({ ...form, description: e.target.value, tagline: e.target.value })
                   }
                 />
+              </div>
+            </Card>
+
+            {/* Website Logo & Favicon Card */}
+            <Card
+              title="Website Logo & Favicon"
+              subtitle="Upload your custom restaurant logo and browser tab icon"
+              badge={<ImageIcon className="w-4 h-4 text-terracotta-500" />}
+            >
+              <div className="space-y-4">
+                {/* 1. Website Logo Section */}
+                <div className="space-y-3 p-4 rounded-2xl bg-sand-100 border border-sand-200">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-xs font-bold text-charcoal-900">Website Brand Logo</p>
+                      <p className="text-[11px] text-charcoal-600">
+                        Displayed on Navbar, Footer &amp; Menu Modal (Transparent PNG or SVG recommended)
+                      </p>
+                    </div>
+                    {form.logoUrl && (
+                      <button
+                        type="button"
+                        onClick={() => setForm({ ...form, logoUrl: "" })}
+                        className="text-[11px] font-bold text-red-600 hover:text-red-700 cursor-pointer flex items-center gap-1"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                        <span>Remove Logo</span>
+                      </button>
+                    )}
+                  </div>
+
+                  {/* Logo Live Previews */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1">
+                    {/* Light background preview (Navbar) */}
+                    <div className="p-3 rounded-xl bg-sand-200/90 border border-sand-300 text-center flex flex-col items-center justify-center min-h-[75px]">
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-charcoal-500 block mb-1">
+                        Navbar Preview (Light)
+                      </span>
+                      {form.logoUrl ? (
+                        <img
+                          src={resolveImageUrl(form.logoUrl)}
+                          alt="Logo Preview"
+                          className="h-9 w-auto max-w-[160px] object-contain"
+                        />
+                      ) : (
+                        <span className="font-serif italic font-bold text-lg text-charcoal-900">
+                          {form.restaurantName || "Pehalwan Karahi"}
+                        </span>
+                      )}
+                    </div>
+
+                    {/* Dark background preview (Footer) */}
+                    <div className="p-3 rounded-xl bg-charcoal-900 border border-charcoal-800 text-center flex flex-col items-center justify-center min-h-[75px]">
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-charcoal-400 block mb-1">
+                        Footer Preview (Dark)
+                      </span>
+                      {form.logoUrl ? (
+                        <img
+                          src={resolveImageUrl(form.logoUrl)}
+                          alt="Logo Preview"
+                          className="h-9 w-auto max-w-[160px] object-contain drop-shadow"
+                        />
+                      ) : (
+                        <span className="font-serif italic font-bold text-lg text-white">
+                          {form.restaurantName || "Pehalwan Karahi"}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Upload & URL Controls */}
+                  <div className="flex flex-col sm:flex-row gap-2 pt-1">
+                    <input
+                      ref={logoInputRef}
+                      type="file"
+                      accept="image/png,image/jpeg,image/webp,image/svg+xml"
+                      onChange={handleLogoUpload}
+                      className="hidden"
+                    />
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      isLoading={isUploadingLogo}
+                      onClick={() => logoInputRef.current?.click()}
+                      icon={<Upload className="w-3.5 h-3.5 text-terracotta-500" />}
+                      className="border-charcoal-300 shrink-0"
+                    >
+                      {form.logoUrl ? "Change Logo File" : "Upload Logo File"}
+                    </Button>
+                    <div className="flex-1">
+                      <Input
+                        placeholder="Or paste direct image URL (e.g. https://... or /logo.png)"
+                        value={form.logoUrl || ""}
+                        onChange={(e) => setForm({ ...form, logoUrl: e.target.value })}
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* 2. Website Favicon Section */}
+                <div className="space-y-3 p-4 rounded-2xl bg-sand-100 border border-sand-200">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-xs font-bold text-charcoal-900">Browser Tab Favicon</p>
+                      <p className="text-[11px] text-charcoal-600">
+                        Small square icon shown in the browser tab (Square PNG or ICO recommended)
+                      </p>
+                    </div>
+                    {form.faviconUrl && (
+                      <button
+                        type="button"
+                        onClick={() => setForm({ ...form, faviconUrl: "" })}
+                        className="text-[11px] font-bold text-red-600 hover:text-red-700 cursor-pointer flex items-center gap-1"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                        <span>Remove Favicon</span>
+                      </button>
+                    )}
+                  </div>
+
+                  {/* Browser Tab Mock Preview */}
+                  <div className="p-2.5 rounded-xl bg-charcoal-900 border border-charcoal-800 flex items-center gap-2 max-w-xs text-xs text-sand-100">
+                    <div className="w-5 h-5 rounded bg-sand-200/20 flex items-center justify-center shrink-0 overflow-hidden">
+                      {form.faviconUrl ? (
+                        <img
+                          src={resolveImageUrl(form.faviconUrl)}
+                          alt="Favicon"
+                          className="w-4 h-4 object-contain"
+                        />
+                      ) : (
+                        <Globe className="w-3.5 h-3.5 text-saffron-400" />
+                      )}
+                    </div>
+                    <span className="truncate font-medium text-[11px]">
+                      {form.restaurantName || "Pehalwan Karahi & DeraGhar"}
+                    </span>
+                    <span className="text-charcoal-500 ml-auto text-[10px]">✕</span>
+                  </div>
+
+                  {/* Upload & URL Controls */}
+                  <div className="flex flex-col sm:flex-row gap-2 pt-1">
+                    <input
+                      ref={faviconInputRef}
+                      type="file"
+                      accept="image/x-icon,image/png,image/svg+xml,image/webp,image/jpeg"
+                      onChange={handleFaviconUpload}
+                      className="hidden"
+                    />
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      isLoading={isUploadingFavicon}
+                      onClick={() => faviconInputRef.current?.click()}
+                      icon={<Upload className="w-3.5 h-3.5 text-terracotta-500" />}
+                      className="border-charcoal-300 shrink-0"
+                    >
+                      {form.faviconUrl ? "Change Favicon File" : "Upload Favicon File"}
+                    </Button>
+                    <div className="flex-1">
+                      <Input
+                        placeholder="Or paste direct favicon URL (e.g. /favicon.ico)"
+                        value={form.faviconUrl || ""}
+                        onChange={(e) => setForm({ ...form, faviconUrl: e.target.value })}
+                      />
+                    </div>
+                  </div>
+                </div>
               </div>
             </Card>
 

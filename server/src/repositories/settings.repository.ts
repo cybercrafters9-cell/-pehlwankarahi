@@ -26,6 +26,8 @@ interface SettingsRow extends RowDataPacket {
   easypaisa_number: string;
   jazzcash_number: string;
   payment_account_title: string;
+  logo_url?: string;
+  favicon_url?: string;
 }
 
 export const DEFAULT_SETTINGS: RestaurantSettings = {
@@ -58,6 +60,8 @@ export const DEFAULT_SETTINGS: RestaurantSettings = {
   easypaisaNumber: "",
   jazzcashNumber: "",
   paymentAccountTitle: "Pehalwan Karahi & DeraGhar",
+  logoUrl: "",
+  faviconUrl: "",
 };
 
 function parseBranches(raw: string): string[] {
@@ -108,11 +112,42 @@ function mapSettings(row: SettingsRow): RestaurantSettings {
     easypaisaNumber: row.easypaisa_number,
     jazzcashNumber: row.jazzcash_number,
     paymentAccountTitle: row.payment_account_title,
+    logoUrl: row.logo_url || "",
+    faviconUrl: row.favicon_url || "",
   };
+}
+
+let logoColumnsEnsured = false;
+async function ensureLogoAndFaviconColumns(): Promise<void> {
+  if (logoColumnsEnsured) return;
+  try {
+    await execute("ALTER TABLE settings ADD COLUMN IF NOT EXISTS logo_url VARCHAR(1000) NULL AFTER payment_account_title");
+    await execute("ALTER TABLE settings ADD COLUMN IF NOT EXISTS favicon_url VARCHAR(1000) NULL AFTER logo_url");
+    logoColumnsEnsured = true;
+  } catch {
+    try {
+      const existing = await queryOne<RowDataPacket>(
+        "SELECT COUNT(*) as cnt FROM information_schema.columns WHERE table_name = 'settings' AND column_name = 'logo_url'"
+      );
+      if (existing && Number(existing.cnt) === 0) {
+        await execute("ALTER TABLE settings ADD COLUMN logo_url VARCHAR(1000) NULL AFTER payment_account_title");
+      }
+      const existingFav = await queryOne<RowDataPacket>(
+        "SELECT COUNT(*) as cnt FROM information_schema.columns WHERE table_name = 'settings' AND column_name = 'favicon_url'"
+      );
+      if (existingFav && Number(existingFav.cnt) === 0) {
+        await execute("ALTER TABLE settings ADD COLUMN favicon_url VARCHAR(1000) NULL AFTER logo_url");
+      }
+      logoColumnsEnsured = true;
+    } catch {
+      // Continue even if database is offline or constrained
+    }
+  }
 }
 
 export const settingsRepository = {
   async get(): Promise<RestaurantSettings> {
+    await ensureLogoAndFaviconColumns();
     const row = await queryOne<SettingsRow>("SELECT * FROM settings WHERE id = 1");
     if (!row) {
       return DEFAULT_SETTINGS;
@@ -170,6 +205,10 @@ export const settingsRepository = {
     const jazzcashNumber = updates.jazzcashNumber ?? current.jazzcashNumber ?? "";
     const paymentAccountTitle =
       updates.paymentAccountTitle ?? current.paymentAccountTitle ?? "Pehalwan Karahi & DeraGhar";
+    const logoUrl = updates.logoUrl !== undefined ? updates.logoUrl : (current.logoUrl ?? "");
+    const faviconUrl = updates.faviconUrl !== undefined ? updates.faviconUrl : (current.faviconUrl ?? "");
+
+    await ensureLogoAndFaviconColumns();
 
     await execute(
       `INSERT INTO settings (
@@ -177,9 +216,10 @@ export const settingsRepository = {
         address, branches, timings, delivery_fee, min_order, delivery_estimate,
         announcement, is_live_wok_active, is_accepting_orders, announcement_enabled,
         opening_time, closing_time, free_delivery_threshold,
-        easypaisa_number, jazzcash_number, payment_account_title
+        easypaisa_number, jazzcash_number, payment_account_title,
+        logo_url, favicon_url
       ) VALUES (
-        1, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
+        1, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
       ) ON DUPLICATE KEY UPDATE
         restaurant_name = VALUES(restaurant_name),
         tagline = VALUES(tagline),
@@ -202,7 +242,9 @@ export const settingsRepository = {
         free_delivery_threshold = VALUES(free_delivery_threshold),
         easypaisa_number = VALUES(easypaisa_number),
         jazzcash_number = VALUES(jazzcash_number),
-        payment_account_title = VALUES(payment_account_title)`,
+        payment_account_title = VALUES(payment_account_title),
+        logo_url = VALUES(logo_url),
+        favicon_url = VALUES(favicon_url)`,
       [
         restaurantName,
         tagline,
@@ -226,6 +268,8 @@ export const settingsRepository = {
         easypaisaNumber,
         jazzcashNumber,
         paymentAccountTitle,
+        logoUrl,
+        faviconUrl,
       ]
     );
 
@@ -239,6 +283,8 @@ export const settingsRepository = {
       easypaisaNumber: current.easypaisaNumber,
       jazzcashNumber: current.jazzcashNumber,
       paymentAccountTitle: current.paymentAccountTitle,
+      logoUrl: current.logoUrl,
+      faviconUrl: current.faviconUrl,
     });
   },
 };

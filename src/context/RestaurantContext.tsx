@@ -2,6 +2,8 @@
 
 import { createContext, useContext, useState, useEffect, useRef, ReactNode, useCallback } from "react";
 import { Dish, CartItem, CategoryItem, PortionSize } from "@/data/menu";
+import { CompletedOrderSummary } from "@/components/cart/types";
+import { resolveImageUrl } from "@/lib/media";
 import {
   api,
   CreateOrderPayload,
@@ -51,6 +53,8 @@ interface RestaurantContextType {
   placeOrder: (customerData?: Partial<CreateOrderPayload>) => Promise<OrderRecord>;
   reserveTable: (payload: CreateReservationPayload) => Promise<ReservationRecord>;
   isSubmittingOrder: boolean;
+  pendingVerificationOrder: CompletedOrderSummary | null;
+  setPendingVerificationOrder: (order: CompletedOrderSummary | null) => void;
 }
 
 const RestaurantContext = createContext<RestaurantContextType | undefined>(undefined);
@@ -100,6 +104,7 @@ export function RestaurantProvider({ children }: { children: ReactNode }) {
   const [spiceLevel, setSpiceLevel] = useState("Standard");
   const [toasts, setToasts] = useState<ToastMessage[]>([]);
   const [isSubmittingOrder, setIsSubmittingOrder] = useState(false);
+  const [pendingVerificationOrder, setPendingVerificationOrder] = useState<CompletedOrderSummary | null>(null);
 
   const refreshMenu = useCallback(async () => {
     try {
@@ -204,6 +209,21 @@ export function RestaurantProvider({ children }: { children: ReactNode }) {
       isMounted = false;
     };
   }, []);
+
+  // 4. Dynamically update browser tab favicon if custom faviconUrl is configured
+  useEffect(() => {
+    if (typeof document === "undefined") return;
+    if (settings?.faviconUrl) {
+      const resolved = resolveImageUrl(settings.faviconUrl);
+      let link: HTMLLinkElement | null = document.querySelector("link[rel*='icon']");
+      if (!link) {
+        link = document.createElement("link");
+        link.rel = "shortcut icon";
+        document.head.appendChild(link);
+      }
+      link.href = resolved;
+    }
+  }, [settings?.faviconUrl]);
 
   const showToast = useCallback((message: string) => {
     const id = Date.now();
@@ -416,6 +436,8 @@ export function RestaurantProvider({ children }: { children: ReactNode }) {
         placeOrder,
         reserveTable,
         isSubmittingOrder,
+        pendingVerificationOrder,
+        setPendingVerificationOrder,
       }}
     >
       {children}

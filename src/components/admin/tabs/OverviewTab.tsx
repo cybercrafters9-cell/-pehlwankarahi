@@ -42,6 +42,8 @@ export function OverviewTab({
 
   const statusVariant = (status: string): BadgeProps["variant"] => {
     switch (status) {
+      case "pending_verification":
+        return "warning";
       case "preparing":
         return "warning";
       case "cooking_in_wok":

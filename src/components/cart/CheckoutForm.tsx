@@ -18,8 +18,8 @@ interface CheckoutFormProps {
   cartItemsCount: number;
   copiedAccount: string | null;
   onCopy: (text: string, label: string) => void;
-  errors: { name?: string; phone?: string; address?: string };
-  setErrors: React.Dispatch<React.SetStateAction<{ name?: string; phone?: string; address?: string }>>;
+  errors: { name?: string; phone?: string; address?: string; transactionId?: string };
+  setErrors: React.Dispatch<React.SetStateAction<{ name?: string; phone?: string; address?: string; transactionId?: string }>>;
   onSubmit: (e: React.FormEvent) => void;
   isSubmittingOrder: boolean;
   settings?: RestaurantSettings | null;
@@ -119,10 +119,14 @@ export default function CheckoutForm({
           paymentMethod={paymentMethod}
           setPaymentMethod={(method) => updateField("paymentMethod", method)}
           transactionId={transactionId}
-          setTransactionId={(id) => updateField("transactionId", id)}
+          setTransactionId={(id) => {
+            updateField("transactionId", id);
+            if (errors.transactionId) setErrors((p) => ({ ...p, transactionId: undefined }));
+          }}
           copiedAccount={copiedAccount}
           onCopy={onCopy}
           settings={settings}
+          error={errors.transactionId}
         />
       </div>
 

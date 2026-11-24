@@ -5,7 +5,7 @@ import Image from "next/image";
 import { resolveImageUrl } from "@/lib/media";
 import { OrderRecord } from "@/services/api";
 import { Badge } from "../ui/Badge";
-import { Search, Phone, Bike, Clock, Loader2 } from "lucide-react";
+import { Search, Phone, Bike, Clock, Loader2, CheckCircle, MessageCircle } from "lucide-react";
 import { ClientDate } from "../ui/ClientDate";
 
 interface OrdersTabProps {
@@ -15,7 +15,8 @@ interface OrdersTabProps {
 }
 
 const statusOptions = [
-  { value: "preparing", label: "🍳 Preparing Order" },
+  { value: "pending_verification", label: "⏳ Pending WhatsApp Receipt" },
+  { value: "preparing", label: "🍳 Preparing Order (Verified)" },
   { value: "cooking_in_wok", label: "🔥 Cooking in Live Wok" },
   { value: "out_for_delivery", label: "🛵 Out for Delivery" },
   { value: "delivered", label: "✅ Delivered" },
@@ -50,6 +51,8 @@ export function OrdersTab({ orders, onUpdateOrderStatus, isLoading }: OrdersTabP
 
   const getStatusBadge = (status: OrderRecord["status"]) => {
     switch (status) {
+      case "pending_verification":
+        return <Badge variant="warning" dot>⏳ Awaiting WhatsApp Screenshot</Badge>;
       case "preparing":
         return <Badge variant="warning" dot>Preparing</Badge>;
       case "cooking_in_wok":
@@ -84,9 +87,14 @@ export function OrdersTab({ orders, onUpdateOrderStatus, isLoading }: OrdersTabP
       <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4">
         {/* Status Filters */}
         <div className="flex items-center gap-2 overflow-x-auto pb-2 md:pb-0 scrollbar-none">
-          {["all", "preparing", "cooking_in_wok", "out_for_delivery", "delivered", "cancelled"].map((st) => {
+          {["all", "pending_verification", "preparing", "cooking_in_wok", "out_for_delivery", "delivered", "cancelled"].map((st) => {
             const count = st === "all" ? orders.length : orders.filter((o) => o.status === st).length;
-            const label = st === "all" ? "All Orders" : st.replace(/_/g, " ");
+            const label =
+              st === "all"
+                ? "All Orders"
+                : st === "pending_verification"
+                ? "⏳ Awaiting WhatsApp"
+                : st.replace(/_/g, " ");
             const isActive = filterStatus === st;
             return (
               <button
@@ -190,6 +198,42 @@ export function OrdersTab({ orders, onUpdateOrderStatus, isLoading }: OrdersTabP
                   </select>
                 </div>
               </div>
+
+              {/* Awaiting WhatsApp Screenshot Verification Banner */}
+              {order.status === "pending_verification" && (
+                <div className="mt-3 p-3 bg-amber-500/15 border border-amber-400/60 rounded-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs">
+                  <div className="flex items-center gap-2">
+                    <span className="w-2.5 h-2.5 rounded-full bg-amber-500 animate-ping shrink-0" />
+                    <div>
+                      <p className="font-extrabold text-amber-950">
+                        ⏳ Awaiting WhatsApp Screenshot Verification
+                      </p>
+                      <p className="text-[11px] text-amber-900/80 mt-0.5">
+                        Customer placed order with TID: <strong className="font-mono text-amber-950">{order.transactionId || "N/A"}</strong>. Verify receipt on WhatsApp before starting cooking.
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2 shrink-0">
+                    <a
+                      href={`https://wa.me/${order.customerPhone.replace(/\D/g, "").startsWith("0") ? "92" + order.customerPhone.replace(/\D/g, "").slice(1) : order.customerPhone.replace(/\D/g, "")}?text=${encodeURIComponent(`Hello ${order.customerName}, regarding your order #${order.id} on Pehalwan Karahi: Please share your payment screenshot so we can verify and start cooking!`)}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[11px] transition-colors flex items-center gap-1"
+                    >
+                      <MessageCircle className="w-3.5 h-3.5" />
+                      <span>Chat on WhatsApp</span>
+                    </a>
+                    <button
+                      type="button"
+                      onClick={() => handleStatusChange(order.id, "preparing")}
+                      className="px-3 py-1.5 rounded-xl bg-charcoal-900 hover:bg-charcoal-800 text-saffron-400 font-bold text-[11px] transition-colors flex items-center gap-1 cursor-pointer"
+                    >
+                      <CheckCircle className="w-3.5 h-3.5" />
+                      <span>Verify &amp; Start Cooking</span>
+                    </button>
+                  </div>
+                </div>
+              )}
 
               {/* Middle Row: Customer Info & Items List */}
               <div className="grid grid-cols-1 md:grid-cols-12 gap-5 py-4 items-start">

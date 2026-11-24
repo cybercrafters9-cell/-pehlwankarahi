@@ -77,6 +77,8 @@ export interface RestaurantSettings {
   easypaisaNumber?: string;
   jazzcashNumber?: string;
   paymentAccountTitle?: string;
+  logoUrl?: string;
+  faviconUrl?: string;
 }
 
 export interface UploadedMedia {
@@ -124,7 +126,13 @@ export interface OrderRecord {
   discount: number;
   total: number;
   spiceLevel: string;
-  status: "preparing" | "cooking_in_wok" | "out_for_delivery" | "delivered" | "cancelled";
+  status:
+    | "pending_verification"
+    | "preparing"
+    | "cooking_in_wok"
+    | "out_for_delivery"
+    | "delivered"
+    | "cancelled";
   paymentMethod?: "cod" | "easypaisa" | "jazzcash" | string;
   paymentStatus?: "pending" | "paid" | string;
   transactionId?: string;

@@ -14,6 +14,7 @@ import {
   Upload,
   Loader2,
   Check,
+  Sparkles,
 } from "lucide-react";
 
 interface SiteImagesTabProps {
@@ -170,6 +171,14 @@ export function SiteImagesTab({
             Control every prominent image on the homepage. Link a slot directly to a menu dish (so it stays in sync with live dish photos) or upload custom imagery stored in MySQL.
           </p>
         </div>
+      </div>
+
+      {/* Quick notice for Logo & Favicon */}
+      <div className="bg-sand-100 border border-sand-200 rounded-2xl p-4 flex items-center gap-3 text-xs">
+        <Sparkles className="w-4 h-4 text-terracotta-500 shrink-0" />
+        <p className="text-charcoal-700">
+          <strong>Tip:</strong> Looking to change the <strong>Website Brand Logo</strong> or <strong>Browser Tab Favicon</strong>? You can upload and configure them under the <strong>Settings (⚙️)</strong> tab with live previews!
+        </p>
       </div>
 
       {isLoading && slots.length === 0 ? (

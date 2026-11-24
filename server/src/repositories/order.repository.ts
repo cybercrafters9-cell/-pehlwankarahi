@@ -135,7 +135,7 @@ export const orderRepository = {
           payment_method, payment_status, transaction_id,
           estimated_delivery_mins, notes
         ) VALUES (
-          ?, ?, ?, ?, ?, ?, ?, ?, ?, 'preparing', ?, ?, ?, ?, ?
+          ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending_verification', ?, ?, ?, ?, ?
         )`,
         [
           tempCode,

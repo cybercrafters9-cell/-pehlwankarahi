@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { Banknote, Check, Copy, ShieldCheck } from "lucide-react";
 import { PaymentType, PAYMENT_ACCOUNTS, DigitalPaymentMethod } from "./types";
 import { RestaurantSettings } from "@/services/api";
@@ -13,6 +13,7 @@ interface PaymentPickerProps {
   copiedAccount: string | null;
   onCopy: (text: string, label: string) => void;
   settings?: RestaurantSettings | null;
+  error?: string;
 }
 
 export default function PaymentPicker({
@@ -23,23 +24,37 @@ export default function PaymentPicker({
   copiedAccount,
   onCopy,
   settings,
+  error,
 }: PaymentPickerProps) {
-  const easypaisaNumber = settings?.easypaisaNumber?.trim() || "03001234567";
-  const jazzcashNumber = settings?.jazzcashNumber?.trim() || "03219876543";
+  const easypaisaNumber = settings?.easypaisaNumber?.trim() || "";
+  const jazzcashNumber = settings?.jazzcashNumber?.trim() || "";
 
-  // Ensure selected method is always valid (easypaisa or jazzcash)
+  // Available methods strictly based on whether the admin has configured the number
+  const displayMethods = useMemo((): DigitalPaymentMethod[] => {
+    const available: DigitalPaymentMethod[] = [];
+    if (jazzcashNumber) available.push("jazzcash");
+    if (easypaisaNumber) available.push("easypaisa");
+
+    // Fallback only if absolutely no payment method has been set yet by admin
+    return available.length > 0 ? available : ["jazzcash", "easypaisa"];
+  }, [jazzcashNumber, easypaisaNumber]);
+
+  // Ensure selected method is always one of the currently available methods
   useEffect(() => {
-    if (paymentMethod !== "easypaisa" && paymentMethod !== "jazzcash") {
-      setPaymentMethod("easypaisa");
+    if (!displayMethods.includes(paymentMethod as DigitalPaymentMethod)) {
+      setPaymentMethod(displayMethods[0]);
     }
-  }, [paymentMethod, setPaymentMethod]);
+  }, [displayMethods, paymentMethod, setPaymentMethod]);
 
-  const activeDigital = PAYMENT_ACCOUNTS[paymentMethod as DigitalPaymentMethod] || PAYMENT_ACCOUNTS.easypaisa;
+  const activeDigital =
+    PAYMENT_ACCOUNTS[paymentMethod as DigitalPaymentMethod] ||
+    PAYMENT_ACCOUNTS[displayMethods[0]] ||
+    PAYMENT_ACCOUNTS.jazzcash;
 
   const rawNumber =
     activeDigital.id === "easypaisa"
-      ? easypaisaNumber
-      : jazzcashNumber;
+      ? easypaisaNumber || "Not configured"
+      : jazzcashNumber || "Not configured";
 
   const accountTitle =
     settings?.paymentAccountTitle?.trim() || "Pehalwan Karahi & DeraGhar";
@@ -58,12 +73,12 @@ export default function PaymentPicker({
       </div>
 
       <p className="text-[11px] text-charcoal-600 leading-relaxed">
-        Select your preferred digital transfer method. Transfer the exact bill amount and send the payment screenshot via WhatsApp on the next screen to confirm your order.
+        Select your payment method below. Transfer the exact bill amount and send the payment screenshot via WhatsApp to confirm your order.
       </p>
 
-      {/* 2 Payment Methods: Easypaisa & JazzCash */}
-      <div className="grid grid-cols-2 gap-2.5">
-        {(["easypaisa", "jazzcash"] as const).map((key) => {
+      {/* Available Payment Methods (Only shows configured accounts) */}
+      <div className={`grid ${displayMethods.length === 1 ? "grid-cols-1" : "grid-cols-2"} gap-2.5`}>
+        {displayMethods.map((key) => {
           const cfg = PAYMENT_ACCOUNTS[key];
           const isSelected = paymentMethod === key;
 
@@ -139,19 +154,30 @@ export default function PaymentPicker({
         </div>
 
         <div>
-          <label className={`block text-[11px] font-bold ${activeDigital.theme.headerText} mb-1`}>
-            Transaction ID (TID) / Sender Number (Optional):
+          <label className={`block text-[11px] font-bold ${activeDigital.theme.headerText} mb-1 flex items-center justify-between`}>
+            <span>
+              Transaction ID (TID) / Sender Number <span className="text-red-500">* (Compulsory)</span>
+            </span>
           </label>
           <input
             type="text"
-            placeholder="e.g. TID 84920491 or Sender Mobile Number"
+            required
+            placeholder="e.g. TID 84920491 or Sender Mobile (03XXXXXXXXX)"
             value={transactionId}
             onChange={(e) => setTransactionId(e.target.value)}
-            className={`w-full bg-white border ${activeDigital.theme.inputBorder} rounded-xl px-3 py-2 text-xs text-charcoal-900 focus:outline-none`}
+            className={`w-full bg-white border ${
+              error ? "border-red-500 ring-1 ring-red-400" : activeDigital.theme.inputBorder
+            } rounded-xl px-3 py-2 text-xs text-charcoal-900 focus:outline-none`}
           />
-          <p className="text-[10px] text-charcoal-500 mt-1">
-            Note: You can also attach the payment receipt directly on WhatsApp after placing this order.
-          </p>
+          {error ? (
+            <p className="text-[11px] text-red-600 font-bold mt-1">
+              ⚠️ {error}
+            </p>
+          ) : (
+            <p className="text-[10px] text-charcoal-600 mt-1">
+              ⚠️ <strong>Compulsory:</strong> Payment verify karwane ke liye apna Transaction ID (TID) ya bhejne wale ka mobile number lazmi likhein.
+            </p>
+          )}
         </div>
       </div>
     </div>

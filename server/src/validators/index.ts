@@ -250,6 +250,7 @@ export const updateReservationStatusSchema = z
 
 // --- Order Schemas ---
 export const orderStatusEnum = z.enum([
+  "pending_verification",
   "preparing",
   "cooking_in_wok",
   "out_for_delivery",
@@ -342,8 +343,8 @@ export const createOrderSchema = z
     transactionId: z
       .string()
       .trim()
-      .max(100, "Transaction ID must not exceed 100 characters")
-      .optional(),
+      .min(1, "Transaction ID (TID) or sender number is required")
+      .max(100, "Transaction ID must not exceed 100 characters"),
   })
   .strip();
 
@@ -504,6 +505,18 @@ export const updateSettingsSchema = z
       .string()
       .trim()
       .max(255, "Payment account title must not exceed 255 characters")
+      .optional(),
+    logoUrl: z
+      .string()
+      .trim()
+      .max(1000, "Logo URL must not exceed 1000 characters")
+      .nullable()
+      .optional(),
+    faviconUrl: z
+      .string()
+      .trim()
+      .max(1000, "Favicon URL must not exceed 1000 characters")
+      .nullable()
       .optional(),
   })
   .strip();

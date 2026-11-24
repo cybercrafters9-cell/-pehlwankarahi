@@ -80,12 +80,22 @@ export default function MenuModal() {
 
           {/* Brand Logo in Header Top-Left */}
           <div className="absolute top-5 left-5 sm:top-7 sm:left-8 text-left hidden xs:block">
-            <span className="font-serif italic font-bold text-base sm:text-lg tracking-tight text-white block leading-tight">
-              Pehalwan
-            </span>
-            <span className="text-[10px] font-extrabold uppercase tracking-widest text-saffron-300 block">
-              Karahi.
-            </span>
+            {settings?.logoUrl ? (
+              <img
+                src={resolveImageUrl(settings.logoUrl)}
+                alt="Logo"
+                className="h-8 sm:h-9 w-auto max-w-[130px] object-contain drop-shadow"
+              />
+            ) : (
+              <>
+                <span className="font-serif italic font-bold text-base sm:text-lg tracking-tight text-white block leading-tight">
+                  Pehalwan
+                </span>
+                <span className="text-[10px] font-extrabold uppercase tracking-widest text-saffron-300 block">
+                  Karahi.
+                </span>
+              </>
+            )}
           </div>
 
           {/* Subtitle & Giant 'MENU' Title matching reference image */}

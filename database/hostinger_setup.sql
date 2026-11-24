@@ -97,7 +97,9 @@ CREATE TABLE IF NOT EXISTS settings (
   free_delivery_threshold INT NOT NULL DEFAULT 3000,
   easypaisa_number VARCHAR(50) NOT NULL DEFAULT '03001234567',
   jazzcash_number VARCHAR(50) NOT NULL DEFAULT '03219876543',
-  payment_account_title VARCHAR(255) NOT NULL DEFAULT 'Pehalwan Karahi & DeraGhar'
+  payment_account_title VARCHAR(255) NOT NULL DEFAULT 'Pehalwan Karahi & DeraGhar',
+  logo_url VARCHAR(1000) NULL,
+  favicon_url VARCHAR(1000) NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- 7. Orders Table
