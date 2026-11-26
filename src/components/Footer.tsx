@@ -89,6 +89,10 @@ export default function Footer() {
                 <img
                   src={settings?.logoUrl ? resolveImageUrl(settings.logoUrl) : "/logo.png"}
                   alt={settings?.restaurantName || "Pehlwan Karahi"}
+                  onError={(e) => {
+                    e.currentTarget.onerror = null;
+                    e.currentTarget.src = "/logo.png";
+                  }}
                   className="h-14 sm:h-16 w-auto max-w-[240px] object-contain"
                 />
               </div>

@@ -47,6 +47,10 @@ export default function Navbar() {
           <img
             src={settings?.logoUrl ? resolveImageUrl(settings.logoUrl) : "/logo.png"}
             alt={settings?.restaurantName || "Pehlwan Karahi"}
+            onError={(e) => {
+              e.currentTarget.onerror = null;
+              e.currentTarget.src = "/logo.png";
+            }}
             className="h-12 sm:h-14 lg:h-16 w-auto max-w-[190px] sm:max-w-[240px] object-contain group-hover:opacity-95 transition-opacity"
           />
         </a>

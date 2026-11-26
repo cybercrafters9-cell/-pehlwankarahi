@@ -84,6 +84,10 @@ export default function MenuModal() {
               <img
                 src={settings?.logoUrl ? resolveImageUrl(settings.logoUrl) : "/logo.png"}
                 alt={settings?.restaurantName || "Pehlwan Karahi"}
+                onError={(e) => {
+                  e.currentTarget.onerror = null;
+                  e.currentTarget.src = "/logo.png";
+                }}
                 className="h-7 md:h-9 w-auto max-w-[130px] md:max-w-[165px] object-contain"
               />
             </div>
