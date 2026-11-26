@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import Image from "next/image";
 import { useRestaurant } from "@/context/RestaurantContext";
 import { useSlot } from "@/context/SiteContentContext";
-import { Flame, Play, Star, Bike, Plus, Search, ChevronRight } from "lucide-react";
+import { Flame, Play, Star, Clock, Plus, Search, ChevronRight } from "lucide-react";
 
 export default function Hero() {
   const { addToCart, setIsVideoOpen, setSearchQuery, setIsMenuModalOpen, dishes } = useRestaurant();
@@ -49,23 +49,27 @@ export default function Hero() {
       {/* Left Column: Compact, Elegantly Aligned Editorial Typography */}
       <div className="lg:col-span-6 flex flex-col justify-center space-y-3.5 sm:space-y-4 pr-0 lg:pr-2">
         {/* Live Status Pill */}
-        <div className="inline-flex items-center gap-2 bg-sand-200/80 border border-sand-300 w-fit px-3 py-1 rounded-full">
+        <div className="inline-flex items-center gap-2 bg-gradient-to-r from-terracotta-500/15 via-saffron-500/15 to-sand-200/90 border border-terracotta-500/25 w-fit px-3.5 py-1.5 rounded-full">
           <span className="w-2 h-2 rounded-full bg-terracotta-500 animate-ping" />
-          <span className="text-[10px] sm:text-[11px] font-extrabold uppercase tracking-wider text-charcoal-800">
-            🔥 Fresh &amp; Sizzling • Special Karahi House
+          <span className="text-[10px] sm:text-[11px] font-extrabold uppercase tracking-wider text-charcoal-900">
+            🔥 From Pack to Plate – Just Heat &amp; Enjoy!
           </span>
         </div>
 
         {/* Clean, Scaled Heading */}
-        <h1 className="font-display font-extrabold text-2xl sm:text-3xl md:text-4xl lg:text-[2.35rem] xl:text-[2.75rem] leading-[1.08] tracking-tight text-charcoal-900 uppercase">
-          Explore The Real <br />
-          Taste Of <br />
-          <span className="text-terracotta-500">Authentic Karahi</span>
+        <h1 className="font-display font-extrabold text-3xl sm:text-4xl lg:text-[2.6rem] xl:text-[2.95rem] leading-[1.08] tracking-tight text-charcoal-900">
+          The True Art of <br />
+          <span className="bg-gradient-to-r from-terracotta-600 via-terracotta-500 to-saffron-500 bg-clip-text text-transparent">
+            Sizzling Karahi.
+          </span>
         </h1>
 
         {/* Description */}
-        <p className="text-charcoal-700/85 text-xs sm:text-sm leading-relaxed max-w-lg">
-          Enjoy freshly prepared Chicken Karahi, Mutton Karahi, Chicken Mince Karahi, Mutton Mince Karahi and a delicious variety of traditional meat specialties. From Boneless Chicken Karahi to Mutton Chops Karahi and Desi Murgh Karahi, every dish brings rich spices, fresh ingredients and authentic Pakistani flavours to your table.
+        <p className="text-charcoal-700/90 text-xs sm:text-sm leading-relaxed max-w-md">
+          Freshly cooked Mutton, Desi Murgh, and Boneless Karahi crafted with pure desi ghee and hand-roasted spices.{" "}
+          <span className="font-semibold text-terracotta-600">
+            Order before 7 PM for confirmed next-day delivery.
+          </span>
         </p>
 
         {/* Actions Button Row */}
@@ -103,9 +107,9 @@ export default function Hero() {
             </span>
           </div>
           <div className="flex items-center gap-1.5">
-            <Bike className="w-3.5 h-3.5 text-terracotta-500" />
+            <Clock className="w-3.5 h-3.5 text-terracotta-500" />
             <span>
-              <strong className="text-charcoal-900">30 Min</strong> Garam Delivery
+              <strong className="text-charcoal-900">Order Before 7 PM</strong> • Next-Day Delivery
             </span>
           </div>
         </div>

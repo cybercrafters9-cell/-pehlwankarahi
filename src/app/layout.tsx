@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Pehlwan Karahi & DeraGhar — Authentic Pakistani Karahi, Bar B Q & Desi Cuisine",
+  title: "Pehlwan Karahi — From Pack to Plate – Just Heat & Enjoy!",
   description:
-    "Authentic Peshawari Shinwari Karahi, smoky Charcoal Seekh Kebabs, and Matka Dum Biryani crafted with 100% pure desi ghee and hand-roasted spices.",
+    "From Pack to Plate – Just Heat & Enjoy! Authentic Pakistani Karahi crafted with pure desi ghee and hand-roasted spices. Order before 7 PM for confirmed next-day delivery.",
   icons: {
     icon: [
       { url: "/favicon.ico", sizes: "any" },

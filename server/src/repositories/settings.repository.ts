@@ -55,7 +55,7 @@ export const DEFAULT_SETTINGS: RestaurantSettings = {
   closingTime: "02:00 AM",
   deliveryFee: 0,
   minOrder: 500,
-  deliveryEstimate: "28–35 mins",
+  deliveryEstimate: "Order before 7 PM • Next-Day Delivery",
   announcement: "🔥 Live Koyla Grill & Freshly slaughtered Halal Meat prepared in pure Desi Ghee!",
   announcementText: "🔥 Live Koyla Grill & Freshly slaughtered Halal Meat prepared in pure Desi Ghee!",
   announcementEnabled: true,

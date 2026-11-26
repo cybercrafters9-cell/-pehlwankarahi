@@ -51,7 +51,7 @@ export default function Footer() {
             Craving Authentic Sizzling Karahi?
           </h3>
           <p className="text-white/85 text-xs sm:text-sm max-w-xl">
-            Order your favorite Mutton, Chaamp, or Desi Murgh Karahi delivered steaming hot to your doorstep in 30 minutes.
+            Order your favorite Mutton, Chaamp, or Desi Murgh Karahi before 7:00 PM to get your order confirmed and delivered the next day.
           </p>
         </div>
 
@@ -97,7 +97,7 @@ export default function Footer() {
                 />
               </div>
               <span className="text-[11px] font-extrabold uppercase tracking-widest text-saffron-400 block mt-1">
-                Authentic Heritage • Since 1998
+                From Pack to Plate – Just Heat &amp; Enjoy!
               </span>
             </div>
 
