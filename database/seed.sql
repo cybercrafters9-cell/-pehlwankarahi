@@ -1,6 +1,6 @@
 -- first import only
 -- ============================================================
--- PEHALWAN KARAHI & DERAGHAR — HOSTINGER DATABASE SEED DATA
+-- PEHLWAN KARAHI & DERAGHAR — HOSTINGER DATABASE SEED DATA
 -- Exported from MySQL Database (Categories, Menu, Settings & Slots)
 -- Run this script in phpMyAdmin on Hostinger MySQL
 -- ============================================================
@@ -52,12 +52,12 @@ INSERT IGNORE INTO settings (
   easypaisa_number, jazzcash_number, payment_account_title
 ) VALUES (
   1,
-  'Pehalwan Karahi & DeraGhar',
+  'Pehlwan Karahi & DeraGhar',
   'Authentic Pakistani Karahi, Charcoal Bar B Q & Desi Handi',
   '0300-1234567',
   '0321-9876543',
   '041-8899221',
-  'info@pehalwankarahi.com',
+  'info@pehlwankarahi.com',
   'Main Boulevard, Kohinoor City / Canal Road Rooftop, Faisalabad, Pakistan',
   '[\"Gulberg / Kohinoor City Branch\",\"Canal Road Rooftop Family Dera\",\"Express Takeaway & Cloud Kitchen\"]',
   '12:00 PM – 02:00 AM Daily',
@@ -73,7 +73,7 @@ INSERT IGNORE INTO settings (
   3000,
   '03001234567',
   '03219876543',
-  'Pehalwan Karahi & DeraGhar'
+  'Pehlwan Karahi & DeraGhar'
 );
 
 -- Site Slots (only inserted when missing; linked to real dishes by name match where possible)

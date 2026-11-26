@@ -88,7 +88,7 @@ app.use(morgan(process.env.NODE_ENV === "production" ? "combined" : "dev"));
 app.get("/api", (_req, res) => {
   res.json({
     status: "ok",
-    service: "Pehalwan Karahi & Bar B Q API",
+    service: "Pehlwan Karahi & Bar B Q API",
     version: "1.0.0",
     health: "/api/health",
     documentation: {
@@ -110,7 +110,7 @@ app.get("/api/health", async (_req, res) => {
   res.status(statusCode).json({
     status: isDbUp ? "ok" : "degraded",
     db: isDbUp ? "up" : "down",
-    service: "Pehalwan Karahi & Bar B Q API",
+    service: "Pehlwan Karahi & Bar B Q API",
     version: "1.0.0",
     uptime: Math.floor(process.uptime()),
     timestamp: new Date().toISOString(),
@@ -189,7 +189,7 @@ async function bootstrap() {
   server = app.listen(PORT, HOST, () => {
     console.log(`
   ======================================================
-  🔥 PEHALWAN KARAHI & DERA GHAR — EXPRESS BACKEND 🔥
+  🔥 PEHLWAN KARAHI & DERA GHAR — EXPRESS BACKEND 🔥
   ======================================================
   🚀 Host:             ${HOST}
   🚪 Port:             ${PORT}

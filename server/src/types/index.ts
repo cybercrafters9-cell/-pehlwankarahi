@@ -31,7 +31,7 @@ export type OrderStatus =
   | "delivered"
   | "cancelled";
 
-export type PaymentMethod = "cod" | "easypaisa" | "jazzcash";
+export type PaymentMethod = "cod" | "easypaisa" | "jazzcash" | "bank";
 
 export interface Order {
   id: string; // e.g. "PK-5821"
@@ -112,6 +112,11 @@ export interface RestaurantSettings {
   easypaisaNumber?: string;
   jazzcashNumber?: string;
   paymentAccountTitle?: string;
+  bankName?: string;
+  bankBranch?: string;
+  bankAccountTitle?: string;
+  bankAccountNumber?: string;
+  bankIban?: string;
   logoUrl?: string;
   faviconUrl?: string;
 }

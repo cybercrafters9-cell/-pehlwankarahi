@@ -61,7 +61,7 @@ export async function seedAdminUserIfEmpty(): Promise<void> {
 
   if (count === 0) {
     const username = process.env.ADMIN_USERNAME || "admin";
-    const email = process.env.ADMIN_EMAIL || "admin@pehalwankarahi.com";
+    const email = process.env.ADMIN_EMAIL || "admin@pehlwankarahi.com";
     const rawPassword = process.env.ADMIN_PASSWORD;
 
     if (!rawPassword || rawPassword.trim() === "") {
@@ -75,7 +75,7 @@ export async function seedAdminUserIfEmpty(): Promise<void> {
     await query(
       `INSERT INTO admin_users (username, email, password_hash, name, role, token_version)
        VALUES (?, ?, ?, ?, 'superadmin', 0)`,
-      [username, email, passwordHash, "Master Pehalwan"]
+      [username, email, passwordHash, "Master Pehlwan"]
     );
 
     console.log(

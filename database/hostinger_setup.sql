@@ -1,5 +1,5 @@
 -- ============================================================
--- PEHALWAN KARAHI & DERAGHAR — COMPLETE HOSTINGER ALL-IN-ONE SQL
+-- PEHLWAN KARAHI & DERAGHAR — COMPLETE HOSTINGER ALL-IN-ONE SQL
 -- Imports all tables, default admin, initial menu, and settings.
 -- Run this directly in phpMyAdmin on Hostinger MySQL.
 -- ============================================================
@@ -98,7 +98,12 @@ CREATE TABLE IF NOT EXISTS settings (
   free_delivery_threshold INT NOT NULL DEFAULT 3000,
   easypaisa_number VARCHAR(50) NOT NULL DEFAULT '03001234567',
   jazzcash_number VARCHAR(50) NOT NULL DEFAULT '03219876543',
-  payment_account_title VARCHAR(255) NOT NULL DEFAULT 'Pehalwan Karahi & DeraGhar',
+  payment_account_title VARCHAR(255) NOT NULL DEFAULT 'Pehlwan Karahi & DeraGhar',
+  bank_name VARCHAR(255) NULL DEFAULT 'Dubai Islamic Bank',
+  bank_branch VARCHAR(255) NULL DEFAULT 'Riphah Branch, Faisalabad',
+  bank_account_title VARCHAR(255) NULL DEFAULT 'Muhammad Zuber',
+  bank_account_number VARCHAR(100) NULL DEFAULT '0792749002',
+  bank_iban VARCHAR(100) NULL DEFAULT 'PK90DUIB0000000792749002',
   logo_url VARCHAR(1000) NULL,
   favicon_url VARCHAR(1000) NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -176,7 +181,7 @@ CREATE TABLE IF NOT EXISTS admin_users (
 
 -- 12. Insert Default Master Admin (pehlwankarahi / CyberCrafters@.90)
 INSERT INTO admin_users (username, email, password_hash, name, role, token_version)
-VALUES ('pehlwankarahi', 'admin@pehalwankarahi.com', '$2b$10$wu6ZHsMWUtzt7Nlsin5v5e/zrJzKqhqW7UNLu0O77ZsieWTfc.7c.', 'Master Pehalwan', 'superadmin', 0)
+VALUES ('pehlwankarahi', 'admin@pehlwankarahi.com', '$2b$10$wu6ZHsMWUtzt7Nlsin5v5e/zrJzKqhqW7UNLu0O77ZsieWTfc.7c.', 'Master Pehlwan', 'superadmin', 0)
 ON DUPLICATE KEY UPDATE password_hash = VALUES(password_hash);
 
 -- 13. Categories Seed
@@ -205,15 +210,16 @@ INSERT IGNORE INTO settings (
   address, branches, timings, delivery_fee, min_order, delivery_estimate,
   announcement, is_live_wok_active, is_accepting_orders, announcement_enabled,
   opening_time, closing_time, free_delivery_threshold,
-  easypaisa_number, jazzcash_number, payment_account_title
+  easypaisa_number, jazzcash_number, payment_account_title,
+  bank_name, bank_branch, bank_account_title, bank_account_number, bank_iban
 ) VALUES (
   1,
-  'Pehalwan Karahi & DeraGhar',
+  'Pehlwan Karahi & DeraGhar',
   'Authentic Pakistani Karahi, Charcoal Bar B Q & Desi Handi',
   '0300-1234567',
   '0321-9876543',
   '041-8899221',
-  'info@pehalwankarahi.com',
+  'info@pehlwankarahi.com',
   'Main Boulevard, Kohinoor City / Canal Road Rooftop, Faisalabad, Pakistan',
   '[\"Gulberg / Kohinoor City Branch\", \"Canal Road Rooftop Family Dera\", \"Express Takeaway & Cloud Kitchen\"]',
   '12:00 PM – 02:00 AM Daily',
@@ -229,7 +235,12 @@ INSERT IGNORE INTO settings (
   3000,
   '03001234567',
   '03219876543',
-  'Pehalwan Karahi & DeraGhar'
+  'Pehlwan Karahi & DeraGhar',
+  'Dubai Islamic Bank',
+  'Riphah Branch, Faisalabad',
+  'Muhammad Zuber',
+  '0792749002',
+  'PK90DUIB0000000792749002'
 );
 
 -- 16. Site Slots Seed

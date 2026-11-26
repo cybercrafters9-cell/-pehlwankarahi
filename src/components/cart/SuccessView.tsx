@@ -13,15 +13,38 @@ interface SuccessViewProps {
 export default function SuccessView({ completedOrder, onClose, settings }: SuccessViewProps) {
   const isDigitalPayment =
     completedOrder.paymentMethod === "easypaisa" ||
-    completedOrder.paymentMethod === "jazzcash";
+    completedOrder.paymentMethod === "jazzcash" ||
+    completedOrder.paymentMethod === "bank";
+  const digitalKey: DigitalPaymentMethod =
+    completedOrder.paymentMethod === "bank"
+      ? "bank"
+      : completedOrder.paymentMethod === "jazzcash"
+      ? "jazzcash"
+      : "easypaisa";
   const digitalCfg = isDigitalPayment
-    ? PAYMENT_ACCOUNTS[completedOrder.paymentMethod as DigitalPaymentMethod]
+    ? PAYMENT_ACCOUNTS[digitalKey]
     : PAYMENT_ACCOUNTS.easypaisa;
 
+  const bankName = settings?.bankName?.trim() || "Dubai Islamic Bank";
+  const bankBranch = settings?.bankBranch?.trim() || "Riphah Branch, Faisalabad";
+  const bankAccountNumber = settings?.bankAccountNumber?.trim() || "0792749002";
+  const bankIban = settings?.bankIban?.trim() || "PK90DUIB0000000792749002";
+  const bankAccountTitle =
+    settings?.bankAccountTitle?.trim() ||
+    settings?.paymentAccountTitle?.trim() ||
+    "Muhammad Zuber";
+
   const rawNumber =
-    completedOrder.paymentMethod === "easypaisa"
+    digitalKey === "easypaisa"
       ? settings?.easypaisaNumber?.trim() || "03001234567"
-      : settings?.jazzcashNumber?.trim() || "03219876543";
+      : digitalKey === "jazzcash"
+      ? settings?.jazzcashNumber?.trim() || "03219876543"
+      : bankAccountNumber;
+
+  const accountTitle =
+    digitalKey === "bank"
+      ? bankAccountTitle
+      : settings?.paymentAccountTitle?.trim() || "Pehlwan Karahi & DeraGhar";
 
   const rawWa = settings?.whatsapp?.trim() || settings?.phone?.trim() || "03001234567";
   const waTarget = rawWa.replace(/\D/g, "");
@@ -35,8 +58,13 @@ export default function SuccessView({ completedOrder, onClose, settings }: Succe
         .join("\n")
     : "Items listed in kitchen docket";
 
+  const paymentDetailsText =
+    digitalKey === "bank"
+      ? `• Bank: ${bankName} (${bankBranch})\n• Beneficiary / Title: ${accountTitle}\n• Account Number: ${bankAccountNumber}\n• IBAN: ${bankIban}`
+      : `• Transferred to: ${digitalCfg.name} (${rawNumber})\n• Account Title: ${accountTitle}`;
+
   const whatsappMessage = encodeURIComponent(
-    `Hello Pehalwan Karahi & DeraGhar,\n\n⚠️ *PAYMENT RECEIPT SUBMISSION (ORDER CONFIRMATION)*\n\nI have placed an order and am sending my payment receipt screenshot to confirm it.\n\n*ORDER DETAILS:*\n• Order ID: #${completedOrder.id}\n• Customer Name: ${completedOrder.customerName}\n• Contact Phone: ${completedOrder.customerPhone}\n• Delivery Address: ${completedOrder.address}\n\n*ITEMS ORDERED:*\n${itemsListText}\n\n*BILL SUMMARY:*\n• Subtotal: Rs. ${(completedOrder.subtotal ?? completedOrder.totalAmount).toLocaleString()}\n• Delivery Fee: ${completedOrder.deliveryFee === 0 ? "FREE" : `Rs. ${completedOrder.deliveryFee ?? 0}`}\n• *Total Payable: Rs. ${completedOrder.totalAmount.toLocaleString()}*\n\n*PAYMENT METHOD:*\n• Transferred to: ${digitalCfg.name} (${rawNumber})\n• Account Title: ${settings?.paymentAccountTitle || "Pehalwan Karahi & DeraGhar"}\n${completedOrder.transactionId ? `• Transaction Reference / TID: ${completedOrder.transactionId}\n` : ""}\n*DELIVERY SCHEDULE:*\n• ${deliverySchedule.etaText} (${deliverySchedule.policyNote})\n\n📎 *I have attached my payment receipt screenshot below. Please verify and confirm my order!*`
+    `Hello Pehlwan Karahi & DeraGhar,\n\n⚠️ *PAYMENT RECEIPT SUBMISSION (ORDER CONFIRMATION)*\n\nI have placed an order and am sending my payment receipt screenshot to confirm it.\n\n*ORDER DETAILS:*\n• Order ID: #${completedOrder.id}\n• Customer Name: ${completedOrder.customerName}\n• Contact Phone: ${completedOrder.customerPhone}\n• Delivery Address: ${completedOrder.address}\n\n*ITEMS ORDERED:*\n${itemsListText}\n\n*BILL SUMMARY:*\n• Subtotal: Rs. ${(completedOrder.subtotal ?? completedOrder.totalAmount).toLocaleString()}\n• Delivery Fee: ${completedOrder.deliveryFee === 0 ? "FREE" : `Rs. ${completedOrder.deliveryFee ?? 0}`}\n• *Total Payable: Rs. ${completedOrder.totalAmount.toLocaleString()}*\n\n*PAYMENT METHOD:*\n${paymentDetailsText}\n${completedOrder.transactionId ? `• Transaction Reference / TID: ${completedOrder.transactionId}\n` : ""}\n*DELIVERY SCHEDULE:*\n• ${deliverySchedule.etaText} (${deliverySchedule.policyNote})\n\n📎 *I have attached my payment receipt screenshot below. Please verify and confirm my order!*`
   );
 
   return (
@@ -107,6 +135,7 @@ export default function SuccessView({ completedOrder, onClose, settings }: Succe
             <span className="font-extrabold uppercase text-terracotta-600">
               {completedOrder.paymentMethod === "easypaisa" && "🟢 Easypaisa"}
               {completedOrder.paymentMethod === "jazzcash" && "🔴 JazzCash"}
+              {completedOrder.paymentMethod === "bank" && "🏦 Bank Transfer"}
             </span>
           </div>
           {completedOrder.transactionId && (
@@ -128,10 +157,25 @@ export default function SuccessView({ completedOrder, onClose, settings }: Succe
           <p className="font-bold text-charcoal-900">
             Payment Transfer Instructions:
           </p>
-          <p className="text-[11px] text-charcoal-700 leading-relaxed">
-            Please transfer <strong>Rs. {completedOrder.totalAmount.toLocaleString()}</strong> to{" "}
-            <strong>{rawNumber} ({digitalCfg.name})</strong>, then click the button below to send your payment screenshot on WhatsApp.
-          </p>
+          {digitalKey === "bank" ? (
+            <div className="text-[11px] text-charcoal-700 leading-relaxed space-y-1">
+              <p>
+                Please transfer <strong>Rs. {completedOrder.totalAmount.toLocaleString()}</strong> to our official bank account:
+              </p>
+              <div className="bg-white/80 border border-sand-200 rounded-lg p-2 font-mono text-[11px] text-charcoal-900 space-y-0.5">
+                <p><strong>Bank:</strong> {bankName} ({bankBranch})</p>
+                <p><strong>Title:</strong> {accountTitle}</p>
+                <p><strong>Account#:</strong> {bankAccountNumber}</p>
+                <p><strong>IBAN:</strong> {bankIban}</p>
+              </div>
+              <p>Then click the button below to send your payment screenshot on WhatsApp.</p>
+            </div>
+          ) : (
+            <p className="text-[11px] text-charcoal-700 leading-relaxed">
+              Please transfer <strong>Rs. {completedOrder.totalAmount.toLocaleString()}</strong> to{" "}
+              <strong>{rawNumber} ({digitalCfg.name})</strong>, then click the button below to send your payment screenshot on WhatsApp.
+            </p>
+          )}
         </div>
       </div>
 

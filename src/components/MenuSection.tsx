@@ -41,7 +41,7 @@ export default function MenuSection() {
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-7">
         <div>
           <span className="text-terracotta-500 text-xs font-extrabold uppercase tracking-widest">
-            Pehalwan Signature Karahi
+            Pehlwan Signature Karahi
           </span>
           <h2 className="font-display font-extrabold text-3xl sm:text-4xl text-charcoal-900 mt-1">
             Authentic Live Wok Karahi Menu

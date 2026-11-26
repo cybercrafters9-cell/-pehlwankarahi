@@ -39,14 +39,14 @@ interface SettingsTabProps {
 }
 
 const DEFAULT_SETTINGS: RestaurantSettings = {
-  restaurantName: "Pehalwan Karahi & DeraGhar",
-  name: "Pehalwan Karahi & DeraGhar",
+  restaurantName: "Pehlwan Karahi & DeraGhar",
+  name: "Pehlwan Karahi & DeraGhar",
   tagline: "Authentic Pakistani Karahi, Charcoal Bar B Q & Desi Handi",
   description: "Authentic Pakistani Karahi, Charcoal Bar B Q & Desi Handi",
   phone: "0300-1234567",
   whatsapp: "0321-9876543",
   landline: "041-8899221",
-  email: "info@pehalwankarahi.com",
+  email: "info@pehlwankarahi.com",
   address: "Main Boulevard, Kohinoor City / Canal Road Rooftop, Faisalabad, Pakistan",
   branches: [
     "Gulberg / Kohinoor City Branch",
@@ -67,7 +67,12 @@ const DEFAULT_SETTINGS: RestaurantSettings = {
   freeDeliveryThreshold: 3000,
   easypaisaNumber: "",
   jazzcashNumber: "",
-  paymentAccountTitle: "Pehalwan Karahi & DeraGhar",
+  paymentAccountTitle: "Pehlwan Karahi & DeraGhar",
+  bankName: "Dubai Islamic Bank",
+  bankBranch: "Riphah Branch, Faisalabad",
+  bankAccountTitle: "Muhammad Zuber",
+  bankAccountNumber: "0792749002",
+  bankIban: "PK90DUIB0000000792749002",
   logoUrl: "",
   faviconUrl: "",
 };
@@ -334,7 +339,7 @@ function SettingsForm({
                         />
                       ) : (
                         <span className="font-serif italic font-bold text-lg text-charcoal-900">
-                          {form.restaurantName || "Pehalwan Karahi"}
+                          {form.restaurantName || "Pehlwan Karahi"}
                         </span>
                       )}
                     </div>
@@ -352,7 +357,7 @@ function SettingsForm({
                         />
                       ) : (
                         <span className="font-serif italic font-bold text-lg text-white">
-                          {form.restaurantName || "Pehalwan Karahi"}
+                          {form.restaurantName || "Pehlwan Karahi"}
                         </span>
                       )}
                     </div>
@@ -423,7 +428,7 @@ function SettingsForm({
                       )}
                     </div>
                     <span className="truncate font-medium text-[11px]">
-                      {form.restaurantName || "Pehalwan Karahi & DeraGhar"}
+                      {form.restaurantName || "Pehlwan Karahi & DeraGhar"}
                     </span>
                     <span className="text-charcoal-500 ml-auto text-[10px]">✕</span>
                   </div>
@@ -505,7 +510,7 @@ function SettingsForm({
             {/* Contact Numbers & Desk Card */}
             <Card
               title="Contact Numbers & Helplines"
-              subtitle="Numbers displayed for customer orders & table reservations"
+              subtitle="Numbers displayed for customer orders & customer service"
               badge={<Phone className="w-4 h-4 text-emerald-600" />}
             >
               <div className="space-y-3.5">
@@ -709,30 +714,83 @@ function SettingsForm({
             {/* Payment Accounts */}
             <Card
               title="Online Payment Accounts"
-              subtitle="Easypaisa and JazzCash mobile transfer accounts shown at checkout"
+              subtitle="Easypaisa, JazzCash & Direct Bank Transfer accounts shown at checkout"
               badge={<CreditCard className="w-4 h-4 text-saffron-500" />}
             >
-              <div className="space-y-3.5">
-                <Input
-                  label="Official Account Title *"
-                  placeholder="e.g. Pehalwan Karahi & DeraGhar"
-                  value={form.paymentAccountTitle || "Pehalwan Karahi & DeraGhar"}
-                  onChange={(e) => setForm({ ...form, paymentAccountTitle: e.target.value })}
-                />
+              <div className="space-y-4">
+                <div className="space-y-3.5">
+                  <div className="flex items-center gap-2 border-b border-sand-200 pb-1.5">
+                    <span className="text-xs font-bold uppercase tracking-wider text-charcoal-700">
+                      📱 Mobile Wallets (Easypaisa / JazzCash)
+                    </span>
+                  </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <Input
-                    label="Easypaisa Account Number"
-                    placeholder="e.g. 03001234567"
-                    value={form.easypaisaNumber || ""}
-                    onChange={(e) => setForm({ ...form, easypaisaNumber: e.target.value })}
+                    label="Mobile Wallet Account Title *"
+                    placeholder="e.g. Pehlwan Karahi & DeraGhar"
+                    value={form.paymentAccountTitle || "Pehlwan Karahi & DeraGhar"}
+                    onChange={(e) => setForm({ ...form, paymentAccountTitle: e.target.value })}
                   />
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <Input
+                      label="Easypaisa Account Number"
+                      placeholder="e.g. 03001234567"
+                      value={form.easypaisaNumber || ""}
+                      onChange={(e) => setForm({ ...form, easypaisaNumber: e.target.value })}
+                    />
+                    <Input
+                      label="JazzCash Account Number"
+                      placeholder="e.g. 03219876543"
+                      value={form.jazzcashNumber || ""}
+                      onChange={(e) => setForm({ ...form, jazzcashNumber: e.target.value })}
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-3.5 pt-2 border-t border-sand-200">
+                  <div className="flex items-center gap-2 border-b border-sand-200 pb-1.5">
+                    <span className="text-xs font-bold uppercase tracking-wider text-blue-900">
+                      🏦 Direct Bank Transfer Account
+                    </span>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <Input
+                      label="Bank Name *"
+                      placeholder="e.g. Dubai Islamic Bank"
+                      value={form.bankName || ""}
+                      onChange={(e) => setForm({ ...form, bankName: e.target.value })}
+                    />
+                    <Input
+                      label="Branch Name / City"
+                      placeholder="e.g. Riphah Branch, Faisalabad"
+                      value={form.bankBranch || ""}
+                      onChange={(e) => setForm({ ...form, bankBranch: e.target.value })}
+                    />
+                  </div>
+
                   <Input
-                    label="JazzCash Account Number"
-                    placeholder="e.g. 03219876543"
-                    value={form.jazzcashNumber || ""}
-                    onChange={(e) => setForm({ ...form, jazzcashNumber: e.target.value })}
+                    label="Bank Account Title / Beneficiary *"
+                    placeholder="e.g. Muhammad Zuber"
+                    value={form.bankAccountTitle || ""}
+                    onChange={(e) => setForm({ ...form, bankAccountTitle: e.target.value })}
                   />
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <Input
+                      label="Account Number *"
+                      placeholder="e.g. 0792749002"
+                      value={form.bankAccountNumber || ""}
+                      onChange={(e) => setForm({ ...form, bankAccountNumber: e.target.value })}
+                    />
+                    <Input
+                      label="IBAN Number *"
+                      placeholder="e.g. PK90DUIB0000000792749002"
+                      value={form.bankIban || ""}
+                      onChange={(e) => setForm({ ...form, bankIban: e.target.value })}
+                    />
+                  </div>
                 </div>
               </div>
             </Card>
@@ -750,7 +808,7 @@ function SettingsForm({
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <Input
               label="New Admin Username (optional)"
-              placeholder="e.g. master_pehalwan"
+              placeholder="e.g. master_pehlwan"
               value={pwForm.newUsername}
               onChange={(e) => setPwForm({ ...pwForm, newUsername: e.target.value })}
             />

@@ -1,6 +1,6 @@
 export type DrawerStep = "cart" | "checkout" | "success";
-export type PaymentType = "easypaisa" | "jazzcash";
-export type DigitalPaymentMethod = "easypaisa" | "jazzcash";
+export type PaymentType = "easypaisa" | "jazzcash" | "bank";
+export type DigitalPaymentMethod = "easypaisa" | "jazzcash" | "bank";
 
 export interface CompletedOrderSummary {
   id: string;
@@ -82,6 +82,28 @@ export const PAYMENT_ACCOUNTS: Record<DigitalPaymentMethod, PaymentAccountConfig
       cardHoverBg: "hover:bg-red-50/20",
       subtitleColor: "text-red-800",
       radioAccent: "accent-red-600",
+    },
+  },
+  bank: {
+    id: "bank",
+    name: "Bank Transfer",
+    badgeLabel: "Bank Transfer",
+    badgeBg: "bg-blue-600",
+    theme: {
+      panelBg: "bg-blue-50",
+      panelBorder: "border-blue-300",
+      headerText: "text-blue-950",
+      badgeBg: "bg-blue-600",
+      cardBorder: "border-blue-200",
+      numberColor: "text-blue-800",
+      copyBtn: "bg-blue-100 hover:bg-blue-200 text-blue-900",
+      checkIcon: "text-blue-700",
+      inputBorder: "border-blue-300",
+      cardActiveBorder: "border-blue-600",
+      cardActiveBg: "bg-blue-50/50",
+      cardHoverBg: "hover:bg-blue-50/20",
+      subtitleColor: "text-blue-800",
+      radioAccent: "accent-blue-600",
     },
   },
 };

@@ -1,4 +1,4 @@
--- Migration 001: Initial Schema for Pehalwan Karahi CMS & MySQL Store
+-- Migration 001: Initial Schema for Pehlwan Karahi CMS & MySQL Store
 -- Character set utf8mb4, Engine InnoDB, compatible with MySQL 5.7/8 and MariaDB 10.x
 
 CREATE TABLE IF NOT EXISTS categories (
@@ -75,7 +75,7 @@ CREATE TABLE IF NOT EXISTS settings (
   free_delivery_threshold INT NOT NULL DEFAULT 3000,
   easypaisa_number VARCHAR(50) NOT NULL DEFAULT '03001234567',
   jazzcash_number VARCHAR(50) NOT NULL DEFAULT '03219876543',
-  payment_account_title VARCHAR(255) NOT NULL DEFAULT 'Pehalwan Karahi & DeraGhar'
+  payment_account_title VARCHAR(255) NOT NULL DEFAULT 'Pehlwan Karahi & DeraGhar'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS orders (
@@ -153,12 +153,12 @@ INSERT INTO settings (
   easypaisa_number, jazzcash_number, payment_account_title
 ) VALUES (
   1,
-  'Pehalwan Karahi & DeraGhar',
+  'Pehlwan Karahi & DeraGhar',
   'Authentic Pakistani Karahi, Charcoal Bar B Q & Desi Handi',
   '0300-1234567',
   '0321-9876543',
   '041-8899221',
-  'info@pehalwankarahi.com',
+  'info@pehlwankarahi.com',
   'Main Boulevard, Kohinoor City / Canal Road Rooftop, Faisalabad, Pakistan',
   '["Gulberg / Kohinoor City Branch", "Canal Road Rooftop Family Dera", "Express Takeaway & Cloud Kitchen"]',
   '12:00 PM – 02:00 AM Daily',
@@ -174,7 +174,7 @@ INSERT INTO settings (
   3000,
   '03001234567',
   '03219876543',
-  'Pehalwan Karahi & DeraGhar'
+  'Pehlwan Karahi & DeraGhar'
 ) ON DUPLICATE KEY UPDATE id=1;
 
 -- Seed Initial 13 Homepage Site Slots

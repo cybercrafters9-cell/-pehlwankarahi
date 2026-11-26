@@ -26,19 +26,24 @@ interface SettingsRow extends RowDataPacket {
   easypaisa_number: string;
   jazzcash_number: string;
   payment_account_title: string;
+  bank_name?: string;
+  bank_branch?: string;
+  bank_account_title?: string;
+  bank_account_number?: string;
+  bank_iban?: string;
   logo_url?: string;
   favicon_url?: string;
 }
 
 export const DEFAULT_SETTINGS: RestaurantSettings = {
-  restaurantName: "Pehalwan Karahi & DeraGhar",
-  name: "Pehalwan Karahi & DeraGhar",
+  restaurantName: "Pehlwan Karahi & DeraGhar",
+  name: "Pehlwan Karahi & DeraGhar",
   tagline: "Authentic Pakistani Karahi, Charcoal Bar B Q & Desi Handi",
   description: "Authentic Pakistani Karahi, Charcoal Bar B Q & Desi Handi",
   phone: "0300-1234567",
   whatsapp: "0321-9876543",
   landline: "041-8899221",
-  email: "info@pehalwankarahi.com",
+  email: "info@pehlwankarahi.com",
   address: "Main Boulevard, Kohinoor City / Canal Road Rooftop, Faisalabad, Pakistan",
   branches: [
     "Gulberg / Kohinoor City Branch",
@@ -59,7 +64,12 @@ export const DEFAULT_SETTINGS: RestaurantSettings = {
   freeDeliveryThreshold: 3000,
   easypaisaNumber: "",
   jazzcashNumber: "",
-  paymentAccountTitle: "Pehalwan Karahi & DeraGhar",
+  paymentAccountTitle: "Pehlwan Karahi & DeraGhar",
+  bankName: "Dubai Islamic Bank",
+  bankBranch: "Riphah Branch, Faisalabad",
+  bankAccountTitle: "Muhammad Zuber",
+  bankAccountNumber: "0792749002",
+  bankIban: "PK90DUIB0000000792749002",
   logoUrl: "",
   faviconUrl: "",
 };
@@ -112,6 +122,11 @@ function mapSettings(row: SettingsRow): RestaurantSettings {
     easypaisaNumber: row.easypaisa_number,
     jazzcashNumber: row.jazzcash_number,
     paymentAccountTitle: row.payment_account_title,
+    bankName: row.bank_name || DEFAULT_SETTINGS.bankName,
+    bankBranch: row.bank_branch || DEFAULT_SETTINGS.bankBranch,
+    bankAccountTitle: row.bank_account_title || DEFAULT_SETTINGS.bankAccountTitle,
+    bankAccountNumber: row.bank_account_number || DEFAULT_SETTINGS.bankAccountNumber,
+    bankIban: row.bank_iban || DEFAULT_SETTINGS.bankIban,
     logoUrl: row.logo_url || "",
     faviconUrl: row.favicon_url || "",
   };
@@ -123,6 +138,11 @@ async function ensureLogoAndFaviconColumns(): Promise<void> {
   try {
     await execute("ALTER TABLE settings ADD COLUMN IF NOT EXISTS logo_url VARCHAR(1000) NULL AFTER payment_account_title");
     await execute("ALTER TABLE settings ADD COLUMN IF NOT EXISTS favicon_url VARCHAR(1000) NULL AFTER logo_url");
+    await execute("ALTER TABLE settings ADD COLUMN IF NOT EXISTS bank_name VARCHAR(255) NULL AFTER payment_account_title");
+    await execute("ALTER TABLE settings ADD COLUMN IF NOT EXISTS bank_branch VARCHAR(255) NULL AFTER bank_name");
+    await execute("ALTER TABLE settings ADD COLUMN IF NOT EXISTS bank_account_title VARCHAR(255) NULL AFTER bank_branch");
+    await execute("ALTER TABLE settings ADD COLUMN IF NOT EXISTS bank_account_number VARCHAR(100) NULL AFTER bank_account_title");
+    await execute("ALTER TABLE settings ADD COLUMN IF NOT EXISTS bank_iban VARCHAR(100) NULL AFTER bank_account_number");
     logoColumnsEnsured = true;
   } catch {
     try {
@@ -137,6 +157,16 @@ async function ensureLogoAndFaviconColumns(): Promise<void> {
       );
       if (existingFav && Number(existingFav.cnt) === 0) {
         await execute("ALTER TABLE settings ADD COLUMN favicon_url VARCHAR(1000) NULL AFTER logo_url");
+      }
+      const existingBank = await queryOne<RowDataPacket>(
+        "SELECT COUNT(*) as cnt FROM information_schema.columns WHERE table_name = 'settings' AND column_name = 'bank_name'"
+      );
+      if (existingBank && Number(existingBank.cnt) === 0) {
+        await execute("ALTER TABLE settings ADD COLUMN bank_name VARCHAR(255) NULL AFTER payment_account_title");
+        await execute("ALTER TABLE settings ADD COLUMN bank_branch VARCHAR(255) NULL AFTER bank_name");
+        await execute("ALTER TABLE settings ADD COLUMN bank_account_title VARCHAR(255) NULL AFTER bank_branch");
+        await execute("ALTER TABLE settings ADD COLUMN bank_account_number VARCHAR(100) NULL AFTER bank_account_title");
+        await execute("ALTER TABLE settings ADD COLUMN bank_iban VARCHAR(100) NULL AFTER bank_account_number");
       }
       logoColumnsEnsured = true;
     } catch {
@@ -204,7 +234,12 @@ export const settingsRepository = {
     const easypaisaNumber = updates.easypaisaNumber ?? current.easypaisaNumber ?? "";
     const jazzcashNumber = updates.jazzcashNumber ?? current.jazzcashNumber ?? "";
     const paymentAccountTitle =
-      updates.paymentAccountTitle ?? current.paymentAccountTitle ?? "Pehalwan Karahi & DeraGhar";
+      updates.paymentAccountTitle ?? current.paymentAccountTitle ?? "Pehlwan Karahi & DeraGhar";
+    const bankName = updates.bankName !== undefined ? updates.bankName : (current.bankName ?? DEFAULT_SETTINGS.bankName);
+    const bankBranch = updates.bankBranch !== undefined ? updates.bankBranch : (current.bankBranch ?? DEFAULT_SETTINGS.bankBranch);
+    const bankAccountTitle = updates.bankAccountTitle !== undefined ? updates.bankAccountTitle : (current.bankAccountTitle ?? DEFAULT_SETTINGS.bankAccountTitle);
+    const bankAccountNumber = updates.bankAccountNumber !== undefined ? updates.bankAccountNumber : (current.bankAccountNumber ?? DEFAULT_SETTINGS.bankAccountNumber);
+    const bankIban = updates.bankIban !== undefined ? updates.bankIban : (current.bankIban ?? DEFAULT_SETTINGS.bankIban);
     const logoUrl = updates.logoUrl !== undefined ? updates.logoUrl : (current.logoUrl ?? "");
     const faviconUrl = updates.faviconUrl !== undefined ? updates.faviconUrl : (current.faviconUrl ?? "");
 
@@ -217,9 +252,10 @@ export const settingsRepository = {
         announcement, is_live_wok_active, is_accepting_orders, announcement_enabled,
         opening_time, closing_time, free_delivery_threshold,
         easypaisa_number, jazzcash_number, payment_account_title,
+        bank_name, bank_branch, bank_account_title, bank_account_number, bank_iban,
         logo_url, favicon_url
       ) VALUES (
-        1, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
+        1, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
       ) ON DUPLICATE KEY UPDATE
         restaurant_name = VALUES(restaurant_name),
         tagline = VALUES(tagline),
@@ -243,6 +279,11 @@ export const settingsRepository = {
         easypaisa_number = VALUES(easypaisa_number),
         jazzcash_number = VALUES(jazzcash_number),
         payment_account_title = VALUES(payment_account_title),
+        bank_name = VALUES(bank_name),
+        bank_branch = VALUES(bank_branch),
+        bank_account_title = VALUES(bank_account_title),
+        bank_account_number = VALUES(bank_account_number),
+        bank_iban = VALUES(bank_iban),
         logo_url = VALUES(logo_url),
         favicon_url = VALUES(favicon_url)`,
       [
@@ -268,6 +309,11 @@ export const settingsRepository = {
         easypaisaNumber,
         jazzcashNumber,
         paymentAccountTitle,
+        bankName,
+        bankBranch,
+        bankAccountTitle,
+        bankAccountNumber,
+        bankIban,
         logoUrl,
         faviconUrl,
       ]
@@ -283,6 +329,11 @@ export const settingsRepository = {
       easypaisaNumber: current.easypaisaNumber,
       jazzcashNumber: current.jazzcashNumber,
       paymentAccountTitle: current.paymentAccountTitle,
+      bankName: current.bankName,
+      bankBranch: current.bankBranch,
+      bankAccountTitle: current.bankAccountTitle,
+      bankAccountNumber: current.bankAccountNumber,
+      bankIban: current.bankIban,
       logoUrl: current.logoUrl,
       faviconUrl: current.faviconUrl,
     });

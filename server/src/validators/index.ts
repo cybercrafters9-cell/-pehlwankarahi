@@ -268,6 +268,7 @@ export const paymentMethodEnum = z.enum([
   "cod",
   "easypaisa",
   "jazzcash",
+  "bank",
 ] as const satisfies readonly [PaymentMethod, ...PaymentMethod[]]);
 
 export const createOrderItemInputSchema = z
@@ -505,6 +506,36 @@ export const updateSettingsSchema = z
       .string()
       .trim()
       .max(255, "Payment account title must not exceed 255 characters")
+      .optional(),
+    bankName: z
+      .string()
+      .trim()
+      .max(255, "Bank name must not exceed 255 characters")
+      .nullable()
+      .optional(),
+    bankBranch: z
+      .string()
+      .trim()
+      .max(255, "Bank branch must not exceed 255 characters")
+      .nullable()
+      .optional(),
+    bankAccountTitle: z
+      .string()
+      .trim()
+      .max(255, "Bank account title must not exceed 255 characters")
+      .nullable()
+      .optional(),
+    bankAccountNumber: z
+      .string()
+      .trim()
+      .max(100, "Bank account number must not exceed 100 characters")
+      .nullable()
+      .optional(),
+    bankIban: z
+      .string()
+      .trim()
+      .max(100, "IBAN must not exceed 100 characters")
+      .nullable()
       .optional(),
     logoUrl: z
       .string()

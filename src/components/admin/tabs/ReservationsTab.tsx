@@ -87,7 +87,7 @@ export function ReservationsTab({ reservations, onUpdateStatus, isLoading }: Res
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
           {filtered.map((res) => {
             const cleanPhone = res.phone.replace(/[^0-9]/g, "");
-            const whatsappUrl = `https://wa.me/${cleanPhone.startsWith("0") ? "92" + cleanPhone.slice(1) : cleanPhone}?text=Assalam-o-Alaikum%20${encodeURIComponent(res.name)},%20your%20Dawat%20reservation%20(${res.id})%20at%20Pehalwan%20Karahi%20is%20ready!`;
+            const whatsappUrl = `https://wa.me/${cleanPhone.startsWith("0") ? "92" + cleanPhone.slice(1) : cleanPhone}?text=Assalam-o-Alaikum%20${encodeURIComponent(res.name)},%20your%20Dawat%20reservation%20(${res.id})%20at%20Pehlwan%20Karahi%20is%20ready!`;
 
             return (
               <div

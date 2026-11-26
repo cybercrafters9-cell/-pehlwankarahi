@@ -107,7 +107,7 @@ export async function exportSeed(): Promise<void> {
   const lines: string[] = [];
   lines.push("-- first import only");
   lines.push("-- ============================================================");
-  lines.push("-- PEHALWAN KARAHI & DERAGHAR — HOSTINGER DATABASE SEED DATA");
+  lines.push("-- PEHLWAN KARAHI & DERAGHAR — HOSTINGER DATABASE SEED DATA");
   lines.push("-- Exported from MySQL Database (Categories, Menu, Settings & Slots)");
   lines.push("-- Run this script in phpMyAdmin on Hostinger MySQL");
   lines.push("-- ============================================================\n");
@@ -187,7 +187,7 @@ WHERE slot_key = 'bento.sub1'
   ${Number(s.free_delivery_threshold || 3000)},
   ${escapeSql(s.easypaisa_number || "03001234567")},
   ${escapeSql(s.jazzcash_number || "03219876543")},
-  ${escapeSql(s.payment_account_title || "Pehalwan Karahi & DeraGhar")}
+  ${escapeSql(s.payment_account_title || "Pehlwan Karahi & DeraGhar")}
 );\n`);
   }
 

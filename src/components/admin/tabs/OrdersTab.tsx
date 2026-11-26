@@ -164,6 +164,8 @@ export function OrdersTab({ orders, onUpdateOrderStatus, isLoading }: OrdersTabP
                           ? "bg-emerald-100 text-emerald-800 border border-emerald-300"
                           : order.paymentMethod === "jazzcash"
                           ? "bg-red-100 text-red-800 border border-red-300"
+                          : order.paymentMethod === "bank"
+                          ? "bg-blue-100 text-blue-800 border border-blue-300"
                           : "bg-amber-100 text-amber-900 border border-amber-300"
                       }`}
                     >
@@ -171,6 +173,8 @@ export function OrdersTab({ orders, onUpdateOrderStatus, isLoading }: OrdersTabP
                         ? "🟢 Easypaisa"
                         : order.paymentMethod === "jazzcash"
                         ? "🔴 JazzCash"
+                        : order.paymentMethod === "bank"
+                        ? "🏦 Bank Transfer"
                         : "💵 Cash on Delivery"}
                     </span>
                   )}
@@ -215,7 +219,7 @@ export function OrdersTab({ orders, onUpdateOrderStatus, isLoading }: OrdersTabP
                   </div>
                   <div className="flex items-center gap-2 shrink-0">
                     <a
-                      href={`https://wa.me/${order.customerPhone.replace(/\D/g, "").startsWith("0") ? "92" + order.customerPhone.replace(/\D/g, "").slice(1) : order.customerPhone.replace(/\D/g, "")}?text=${encodeURIComponent(`Hello ${order.customerName}, regarding your order #${order.id} on Pehalwan Karahi: Please share your payment screenshot so we can verify and start cooking!`)}`}
+                      href={`https://wa.me/${order.customerPhone.replace(/\D/g, "").startsWith("0") ? "92" + order.customerPhone.replace(/\D/g, "").slice(1) : order.customerPhone.replace(/\D/g, "")}?text=${encodeURIComponent(`Hello ${order.customerName}, regarding your order #${order.id} on Pehlwan Karahi: Please share your payment screenshot so we can verify and start cooking!`)}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[11px] transition-colors flex items-center gap-1"

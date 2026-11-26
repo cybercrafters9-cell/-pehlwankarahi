@@ -28,16 +28,25 @@ export default function PaymentPicker({
 }: PaymentPickerProps) {
   const easypaisaNumber = settings?.easypaisaNumber?.trim() || "";
   const jazzcashNumber = settings?.jazzcashNumber?.trim() || "";
+  const bankAccountNumber = settings?.bankAccountNumber?.trim() || "";
+  const bankIban = settings?.bankIban?.trim() || "";
+  const bankName = settings?.bankName?.trim() || "Dubai Islamic Bank";
+  const bankBranch = settings?.bankBranch?.trim() || "Riphah Branch, Faisalabad";
+  const bankAccountTitle =
+    settings?.bankAccountTitle?.trim() ||
+    settings?.paymentAccountTitle?.trim() ||
+    "Muhammad Zuber";
 
   // Available methods strictly based on whether the admin has configured the number
   const displayMethods = useMemo((): DigitalPaymentMethod[] => {
     const available: DigitalPaymentMethod[] = [];
     if (jazzcashNumber) available.push("jazzcash");
     if (easypaisaNumber) available.push("easypaisa");
+    if (bankAccountNumber || bankIban || bankName) available.push("bank");
 
     // Fallback only if absolutely no payment method has been set yet by admin
-    return available.length > 0 ? available : ["jazzcash", "easypaisa"];
-  }, [jazzcashNumber, easypaisaNumber]);
+    return available.length > 0 ? available : ["jazzcash", "easypaisa", "bank"];
+  }, [jazzcashNumber, easypaisaNumber, bankAccountNumber, bankIban, bankName]);
 
   // Ensure selected method is always one of the currently available methods
   useEffect(() => {
@@ -54,10 +63,14 @@ export default function PaymentPicker({
   const rawNumber =
     activeDigital.id === "easypaisa"
       ? easypaisaNumber || "Not configured"
-      : jazzcashNumber || "Not configured";
+      : activeDigital.id === "jazzcash"
+      ? jazzcashNumber || "Not configured"
+      : bankAccountNumber || bankIban || "Not configured";
 
   const accountTitle =
-    settings?.paymentAccountTitle?.trim() || "Pehalwan Karahi & DeraGhar";
+    activeDigital.id === "bank"
+      ? bankAccountTitle
+      : settings?.paymentAccountTitle?.trim() || "Pehlwan Karahi & DeraGhar";
 
   return (
     <div className="space-y-3 pt-2 border-t border-sand-200">
@@ -77,7 +90,7 @@ export default function PaymentPicker({
       </p>
 
       {/* Available Payment Methods (Only shows configured accounts) */}
-      <div className={`grid ${displayMethods.length === 1 ? "grid-cols-1" : "grid-cols-2"} gap-2.5`}>
+      <div className={`grid ${displayMethods.length === 1 ? "grid-cols-1" : displayMethods.length === 2 ? "grid-cols-2" : "grid-cols-3"} gap-2`}>
         {displayMethods.map((key) => {
           const cfg = PAYMENT_ACCOUNTS[key];
           const isSelected = paymentMethod === key;
@@ -86,14 +99,14 @@ export default function PaymentPicker({
             <label
               key={cfg.id}
               onClick={() => setPaymentMethod(cfg.id)}
-              className={`relative p-3 rounded-2xl border-2 flex flex-col justify-between transition-all cursor-pointer ${
+              className={`relative p-2.5 sm:p-3 rounded-2xl border-2 flex flex-col justify-between transition-all cursor-pointer ${
                 isSelected
                   ? `${cfg.theme.cardActiveBorder} ${cfg.theme.cardActiveBg} shadow-sm`
                   : `border-sand-300 bg-white ${cfg.theme.cardHoverBg}`
               }`}
             >
               <div className="flex items-center justify-between">
-                <span className={`text-xs font-extrabold text-white ${cfg.badgeBg} px-2.5 py-0.5 rounded-full`}>
+                <span className={`text-[11px] sm:text-xs font-extrabold text-white ${cfg.badgeBg} px-2 py-0.5 rounded-full`}>
                   {cfg.badgeLabel}
                 </span>
                 <input
@@ -104,12 +117,12 @@ export default function PaymentPicker({
                   className={cfg.theme.radioAccent}
                 />
               </div>
-              <div className="mt-2.5">
-                <p className="font-extrabold text-xs text-charcoal-900">
+              <div className="mt-2">
+                <p className="font-extrabold text-xs text-charcoal-900 truncate">
                   {cfg.name}
                 </p>
-                <p className={`text-[10px] ${cfg.theme.subtitleColor} font-semibold mt-0.5`}>
-                  Mobile Transfer
+                <p className={`text-[10px] ${cfg.theme.subtitleColor} font-semibold mt-0.5 truncate`}>
+                  {cfg.id === "bank" ? "Direct / IBAN" : "Mobile Transfer"}
                 </p>
               </div>
             </label>
@@ -120,38 +133,116 @@ export default function PaymentPicker({
       {/* Digital Account Transfer Details Sub-Panel */}
       <div className={`${activeDigital.theme.panelBg} border ${activeDigital.theme.panelBorder} rounded-2xl p-3.5 space-y-2.5 text-xs animate-in fade-in duration-200`}>
         <div className={`flex items-center justify-between ${activeDigital.theme.headerText} font-bold`}>
-          <span>Official {activeDigital.name} Account:</span>
+          <span>Official {activeDigital.name} Details:</span>
           <span className={`text-[10px] ${activeDigital.theme.badgeBg} text-white px-2 py-0.5 rounded-full`}>
             Verified Merchant
           </span>
         </div>
 
-        <div className={`bg-white rounded-xl p-3 border ${activeDigital.theme.cardBorder} flex items-center justify-between`}>
-          <div>
-            <p className="text-[10px] text-charcoal-600 font-semibold">Account Title</p>
-            <p className="font-bold text-xs text-charcoal-900">{accountTitle}</p>
-            <p className={`font-mono font-extrabold text-sm ${activeDigital.theme.numberColor} mt-0.5`}>
-              {rawNumber}
-            </p>
+        {activeDigital.id === "bank" ? (
+          <div className="space-y-2">
+            <div className={`bg-white rounded-xl p-3 border ${activeDigital.theme.cardBorder} space-y-2`}>
+              <div className="flex items-start justify-between border-b border-sand-100 pb-2">
+                <div>
+                  <p className="text-[10px] text-charcoal-500 font-semibold uppercase tracking-wider">Bank & Branch</p>
+                  <p className="font-extrabold text-xs text-charcoal-900">{bankName}</p>
+                  {bankBranch && (
+                    <p className="text-[10px] text-charcoal-600 font-medium">{bankBranch}</p>
+                  )}
+                </div>
+                <div className="text-right">
+                  <p className="text-[10px] text-charcoal-500 font-semibold uppercase tracking-wider">Account Title</p>
+                  <p className="font-bold text-xs text-charcoal-900">{accountTitle}</p>
+                </div>
+              </div>
+
+              {/* Account Number Row */}
+              {bankAccountNumber && (
+                <div className="flex items-center justify-between pt-1">
+                  <div>
+                    <p className="text-[10px] text-charcoal-500 font-semibold uppercase tracking-wider">Account Number</p>
+                    <p className={`font-mono font-extrabold text-sm ${activeDigital.theme.numberColor}`}>
+                      {bankAccountNumber}
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => onCopy(bankAccountNumber, "bank_acc")}
+                    className={`${activeDigital.theme.copyBtn} font-bold px-2.5 py-1 rounded-lg flex items-center gap-1 text-[11px] cursor-pointer transition-colors`}
+                  >
+                    {copiedAccount === "bank_acc" ? (
+                      <>
+                        <Check className={`w-3.5 h-3.5 ${activeDigital.theme.checkIcon}`} />
+                        <span>Copied</span>
+                      </>
+                    ) : (
+                      <>
+                        <Copy className="w-3.5 h-3.5" />
+                        <span>Copy</span>
+                      </>
+                    )}
+                  </button>
+                </div>
+              )}
+
+              {/* IBAN Row */}
+              {bankIban && (
+                <div className="flex items-center justify-between pt-1 border-t border-sand-100">
+                  <div className="min-w-0 pr-2">
+                    <p className="text-[10px] text-charcoal-500 font-semibold uppercase tracking-wider">IBAN</p>
+                    <p className={`font-mono font-extrabold text-xs sm:text-sm ${activeDigital.theme.numberColor} break-all`}>
+                      {bankIban}
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => onCopy(bankIban, "bank_iban")}
+                    className={`${activeDigital.theme.copyBtn} font-bold px-2.5 py-1 rounded-lg flex items-center gap-1 text-[11px] cursor-pointer transition-colors shrink-0`}
+                  >
+                    {copiedAccount === "bank_iban" ? (
+                      <>
+                        <Check className={`w-3.5 h-3.5 ${activeDigital.theme.checkIcon}`} />
+                        <span>Copied</span>
+                      </>
+                    ) : (
+                      <>
+                        <Copy className="w-3.5 h-3.5" />
+                        <span>Copy</span>
+                      </>
+                    )}
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
-          <button
-            type="button"
-            onClick={() => onCopy(rawNumber, activeDigital.id)}
-            className={`${activeDigital.theme.copyBtn} font-bold px-3 py-1.5 rounded-lg flex items-center gap-1 text-[11px] cursor-pointer transition-colors`}
-          >
-            {copiedAccount === activeDigital.id ? (
-              <>
-                <Check className={`w-3.5 h-3.5 ${activeDigital.theme.checkIcon}`} />
-                <span>Copied</span>
-              </>
-            ) : (
-              <>
-                <Copy className="w-3.5 h-3.5" />
-                <span>Copy</span>
-              </>
-            )}
-          </button>
-        </div>
+        ) : (
+          <div className={`bg-white rounded-xl p-3 border ${activeDigital.theme.cardBorder} flex items-center justify-between`}>
+            <div>
+              <p className="text-[10px] text-charcoal-600 font-semibold">Account Title</p>
+              <p className="font-bold text-xs text-charcoal-900">{accountTitle}</p>
+              <p className={`font-mono font-extrabold text-sm ${activeDigital.theme.numberColor} mt-0.5`}>
+                {rawNumber}
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={() => onCopy(rawNumber, activeDigital.id)}
+              className={`${activeDigital.theme.copyBtn} font-bold px-3 py-1.5 rounded-lg flex items-center gap-1 text-[11px] cursor-pointer transition-colors`}
+            >
+              {copiedAccount === activeDigital.id ? (
+                <>
+                  <Check className={`w-3.5 h-3.5 ${activeDigital.theme.checkIcon}`} />
+                  <span>Copied</span>
+                </>
+              ) : (
+                <>
+                  <Copy className="w-3.5 h-3.5" />
+                  <span>Copy</span>
+                </>
+              )}
+            </button>
+          </div>
+        )}
 
         <div>
           <label className={`block text-[11px] font-bold ${activeDigital.theme.headerText} mb-1 flex items-center justify-between`}>

@@ -37,7 +37,7 @@ export interface CreateOrderPayload {
   address?: string;
   items: CreateOrderItemPayload[];
   spiceLevel?: string;
-  paymentMethod?: "cod" | "easypaisa" | "jazzcash" | string;
+  paymentMethod?: "cod" | "easypaisa" | "jazzcash" | "bank" | string;
   paymentStatus?: "pending" | "paid" | string;
   transactionId?: string;
   notes?: string;
@@ -77,6 +77,11 @@ export interface RestaurantSettings {
   easypaisaNumber?: string;
   jazzcashNumber?: string;
   paymentAccountTitle?: string;
+  bankName?: string;
+  bankBranch?: string;
+  bankAccountTitle?: string;
+  bankAccountNumber?: string;
+  bankIban?: string;
   logoUrl?: string;
   faviconUrl?: string;
 }
@@ -134,7 +139,7 @@ export interface OrderRecord {
     | "out_for_delivery"
     | "delivered"
     | "cancelled";
-  paymentMethod?: "cod" | "easypaisa" | "jazzcash" | string;
+  paymentMethod?: "cod" | "easypaisa" | "jazzcash" | "bank" | string;
   paymentStatus?: "pending" | "paid" | string;
   transactionId?: string;
   estimatedDeliveryMins: number;
@@ -159,12 +164,12 @@ export interface LoyaltyPassSummary {
   discountPercent: number;
 }
 
-const SESSION_KEY = "pehalwan_admin_session";
+const SESSION_KEY = "pehlwan_admin_session";
 
 function getToken(): string | null {
   if (typeof window === "undefined") return null;
   try {
-    const raw = localStorage.getItem(SESSION_KEY);
+    const raw = localStorage.getItem(SESSION_KEY) || localStorage.getItem("pehalwan_admin_session");
     if (!raw) return null;
     const parsed = JSON.parse(raw);
     return typeof parsed?.token === "string" ? parsed.token : null;

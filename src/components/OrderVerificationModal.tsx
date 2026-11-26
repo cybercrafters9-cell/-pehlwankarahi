@@ -27,20 +27,38 @@ export default function OrderVerificationModal() {
 
   const isDigital =
     pendingVerificationOrder.paymentMethod === "easypaisa" ||
-    pendingVerificationOrder.paymentMethod === "jazzcash";
+    pendingVerificationOrder.paymentMethod === "jazzcash" ||
+    pendingVerificationOrder.paymentMethod === "bank";
 
   const digitalKey: DigitalPaymentMethod =
-    pendingVerificationOrder.paymentMethod === "jazzcash" ? "jazzcash" : "easypaisa";
+    pendingVerificationOrder.paymentMethod === "bank"
+      ? "bank"
+      : pendingVerificationOrder.paymentMethod === "jazzcash"
+      ? "jazzcash"
+      : "easypaisa";
 
   const digitalCfg = PAYMENT_ACCOUNTS[digitalKey] || PAYMENT_ACCOUNTS.jazzcash;
+
+  const bankName = settings?.bankName?.trim() || "Dubai Islamic Bank";
+  const bankBranch = settings?.bankBranch?.trim() || "Riphah Branch, Faisalabad";
+  const bankAccountNumber = settings?.bankAccountNumber?.trim() || "0792749002";
+  const bankIban = settings?.bankIban?.trim() || "PK90DUIB0000000792749002";
+  const bankAccountTitle =
+    settings?.bankAccountTitle?.trim() ||
+    settings?.paymentAccountTitle?.trim() ||
+    "Muhammad Zuber";
 
   const rawNumber =
     digitalKey === "easypaisa"
       ? settings?.easypaisaNumber?.trim() || "03001234567"
-      : settings?.jazzcashNumber?.trim() || "03219876543";
+      : digitalKey === "jazzcash"
+      ? settings?.jazzcashNumber?.trim() || "03219876543"
+      : bankAccountNumber;
 
   const accountTitle =
-    settings?.paymentAccountTitle?.trim() || "Pehalwan Karahi & DeraGhar";
+    digitalKey === "bank"
+      ? bankAccountTitle
+      : settings?.paymentAccountTitle?.trim() || "Pehlwan Karahi & DeraGhar";
 
   const rawWa = settings?.whatsapp?.trim() || settings?.phone?.trim() || "03001234567";
   const waTarget = rawWa.replace(/\D/g, "");
@@ -59,8 +77,13 @@ export default function OrderVerificationModal() {
           .join("\n")
       : "• Fresh Karahi & Bar B Q items";
 
+  const paymentDetailsText =
+    digitalKey === "bank"
+      ? `• Bank: ${bankName} (${bankBranch})\n• Beneficiary / Title: ${accountTitle}\n• Account Number: ${bankAccountNumber}\n• IBAN: ${bankIban}`
+      : `• Transferred to: ${digitalCfg.name} (${rawNumber})\n• Account Title: ${accountTitle}`;
+
   const whatsappMessage = encodeURIComponent(
-    `Hello Pehalwan Karahi & DeraGhar,\n\n⚠️ *PAYMENT RECEIPT SUBMISSION (ORDER CONFIRMATION)*\n\nI have placed an order on your website and am sending my payment receipt screenshot to verify and confirm it.\n\n*ORDER DETAILS:*\n• Order ID: #${pendingVerificationOrder.id}\n• Customer Name: ${pendingVerificationOrder.customerName}\n• Contact Phone: ${pendingVerificationOrder.customerPhone}\n• Delivery Address: ${pendingVerificationOrder.address}\n\n*ITEMS ORDERED:*\n${itemsListText}\n\n*BILL SUMMARY:*\n• Subtotal: Rs. ${(pendingVerificationOrder.subtotal ?? pendingVerificationOrder.totalAmount).toLocaleString()}\n• Delivery Fee: ${pendingVerificationOrder.deliveryFee === 0 ? "FREE" : `Rs. ${pendingVerificationOrder.deliveryFee ?? 0}`}\n• *Total Payable: Rs. ${pendingVerificationOrder.totalAmount.toLocaleString()}*\n\n*PAYMENT METHOD:*\n• Transferred to: ${digitalCfg.name} (${rawNumber})\n• Account Title: ${accountTitle}\n• Transaction Reference / TID: ${pendingVerificationOrder.transactionId || "Attached in screenshot"}\n\n*DELIVERY SCHEDULE:*\n• ${deliverySchedule.etaText} (${deliverySchedule.policyNote})\n\n📎 *I have attached my payment receipt screenshot below. Please verify and confirm my order!*`
+    `Hello Pehlwan Karahi & DeraGhar,\n\n⚠️ *PAYMENT RECEIPT SUBMISSION (ORDER CONFIRMATION)*\n\nI have placed an order on your website and am sending my payment receipt screenshot to verify and confirm it.\n\n*ORDER DETAILS:*\n• Order ID: #${pendingVerificationOrder.id}\n• Customer Name: ${pendingVerificationOrder.customerName}\n• Contact Phone: ${pendingVerificationOrder.customerPhone}\n• Delivery Address: ${pendingVerificationOrder.address}\n\n*ITEMS ORDERED:*\n${itemsListText}\n\n*BILL SUMMARY:*\n• Subtotal: Rs. ${(pendingVerificationOrder.subtotal ?? pendingVerificationOrder.totalAmount).toLocaleString()}\n• Delivery Fee: ${pendingVerificationOrder.deliveryFee === 0 ? "FREE" : `Rs. ${pendingVerificationOrder.deliveryFee ?? 0}`}\n• *Total Payable: Rs. ${pendingVerificationOrder.totalAmount.toLocaleString()}*\n\n*PAYMENT METHOD:*\n${paymentDetailsText}\n• Transaction Reference / TID: ${pendingVerificationOrder.transactionId || "Attached in screenshot"}\n\n*DELIVERY SCHEDULE:*\n• ${deliverySchedule.etaText} (${deliverySchedule.policyNote})\n\n📎 *I have attached my payment receipt screenshot below. Please verify and confirm my order!*`
   );
 
   const handleCopy = (text: string, label: string) => {
@@ -121,23 +144,53 @@ export default function OrderVerificationModal() {
                 </span>
               </div>
 
-              <div className="flex items-center justify-between pb-2 border-b border-sand-200">
-                <span className="font-bold text-charcoal-700">Payment Transferred To:</span>
-                <div className="text-right">
+              <div className="flex items-start justify-between pb-2 border-b border-sand-200">
+                <span className="font-bold text-charcoal-700 mt-0.5">Payment Transferred To:</span>
+                <div className="text-right max-w-[240px]">
                   <span className={`text-[10px] font-extrabold text-white ${digitalCfg.badgeBg} px-2 py-0.5 rounded-full`}>
                     {digitalCfg.name}
                   </span>
-                  <p className="font-bold text-charcoal-900 text-xs mt-0.5">{accountTitle}</p>
-                  <div className="flex items-center gap-1.5 justify-end">
-                    <span className="font-mono font-extrabold text-xs text-charcoal-800">{rawNumber}</span>
-                    <button
-                      type="button"
-                      onClick={() => handleCopy(rawNumber, digitalCfg.id)}
-                      className="text-[10px] text-terracotta-600 hover:text-terracotta-700 font-bold cursor-pointer"
-                    >
-                      {copiedAccount === digitalCfg.id ? "Copied" : "Copy"}
-                    </button>
-                  </div>
+                  {digitalKey === "bank" ? (
+                    <div className="mt-1 space-y-1">
+                      <p className="font-bold text-charcoal-900 text-xs">{bankName}</p>
+                      <p className="text-[10px] text-charcoal-600">{bankBranch}</p>
+                      <p className="text-[11px] text-charcoal-800 font-semibold">Title: {accountTitle}</p>
+                      <div className="flex items-center gap-1.5 justify-end pt-0.5">
+                        <span className="font-mono font-extrabold text-xs text-charcoal-900">A/C: {bankAccountNumber}</span>
+                        <button
+                          type="button"
+                          onClick={() => handleCopy(bankAccountNumber, "bank_acc")}
+                          className="text-[10px] text-terracotta-600 hover:text-terracotta-700 font-bold cursor-pointer"
+                        >
+                          {copiedAccount === "bank_acc" ? "Copied" : "Copy"}
+                        </button>
+                      </div>
+                      <div className="flex items-center gap-1.5 justify-end">
+                        <span className="font-mono font-bold text-[10px] text-charcoal-700 break-all">IBAN: {bankIban}</span>
+                        <button
+                          type="button"
+                          onClick={() => handleCopy(bankIban, "bank_iban")}
+                          className="text-[10px] text-terracotta-600 hover:text-terracotta-700 font-bold cursor-pointer shrink-0"
+                        >
+                          {copiedAccount === "bank_iban" ? "Copied" : "Copy"}
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <>
+                      <p className="font-bold text-charcoal-900 text-xs mt-0.5">{accountTitle}</p>
+                      <div className="flex items-center gap-1.5 justify-end">
+                        <span className="font-mono font-extrabold text-xs text-charcoal-800">{rawNumber}</span>
+                        <button
+                          type="button"
+                          onClick={() => handleCopy(rawNumber, digitalCfg.id)}
+                          className="text-[10px] text-terracotta-600 hover:text-terracotta-700 font-bold cursor-pointer"
+                        >
+                          {copiedAccount === digitalCfg.id ? "Copied" : "Copy"}
+                        </button>
+                      </div>
+                    </>
+                  )}
                 </div>
               </div>
 

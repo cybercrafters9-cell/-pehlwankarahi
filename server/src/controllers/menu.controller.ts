@@ -96,7 +96,7 @@ export const createDish = asyncHandler(
 
     res.status(201).json({
       success: true,
-      message: "New dish added to Pehalwan Karahi menu!",
+      message: "New dish added to Pehlwan Karahi menu!",
       data: newDish,
     });
   }

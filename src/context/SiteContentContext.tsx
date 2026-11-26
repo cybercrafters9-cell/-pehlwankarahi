@@ -70,17 +70,19 @@ export function SiteContentProvider({
     };
 
     const handleStorage = (e: StorageEvent) => {
-      if (e.key === "pehalwan_slots_version") {
+      if (e.key === "pehlwan_slots_version" || e.key === "pehalwan_slots_version") {
         refreshSlots();
       }
     };
 
     window.addEventListener("focus", handleFocus);
+    window.addEventListener("pehlwan_slots_updated", handleCustomUpdate);
     window.addEventListener("pehalwan_slots_updated", handleCustomUpdate);
     window.addEventListener("storage", handleStorage);
 
     return () => {
       window.removeEventListener("focus", handleFocus);
+      window.removeEventListener("pehlwan_slots_updated", handleCustomUpdate);
       window.removeEventListener("pehalwan_slots_updated", handleCustomUpdate);
       window.removeEventListener("storage", handleStorage);
     };
@@ -115,7 +117,7 @@ export function useSlot(
 
   const rawUrl = slot?.effectiveUrl || fallback?.url || "";
   const effectiveUrl = resolveImageUrl(rawUrl);
-  const alt = slot?.altText || fallback?.alt || "Pehalwan Karahi";
+  const alt = slot?.altText || fallback?.alt || "Pehlwan Karahi";
   const dishId = slot?.dishId ?? fallback?.dishId ?? null;
   const dishName = slot?.dishName;
 

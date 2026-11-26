@@ -34,7 +34,7 @@ export const login = asyncHandler(async (req: Request, res: Response<ApiResponse
 
   res.json({
     success: true,
-    message: "Authentication successful! Welcome to Pehalwan Console.",
+    message: "Authentication successful! Welcome to Pehlwan Console.",
     data: {
       token,
       user: sanitizedUser,

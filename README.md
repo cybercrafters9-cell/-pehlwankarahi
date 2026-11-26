@@ -1,6 +1,6 @@
-# Pehalwan Karahi & DeraGhar — Full-Stack Restaurant CMS
+# Pehlwan Karahi & DeraGhar — Full-Stack Restaurant CMS
 
-A high-performance, production-grade restaurant web platform and dynamic Content Management System (CMS) built for **Pehalwan Karahi & DeraGhar** (Faisalabad, Pakistan).
+A high-performance, production-grade restaurant web platform and dynamic Content Management System (CMS) built for **Pehlwan Karahi & DeraGhar** (Faisalabad, Pakistan).
 
 Designed specifically for **Hostinger Node.js + MySQL hosting**, featuring zero disk storage dependencies, client-side WebP image compression, in-database BLOB media storage, server-authoritative order pricing, and complete real-time admin control.
 
@@ -112,7 +112,7 @@ Hostinger Cloud & Business hosting provides native Node.js application hosting w
 2. Click **Create Application** (or manage existing):
    - **Node.js Version**: Select **20.x** (or **18.x**)
    - **Application Mode**: `Production`
-   - **Application Root**: Path to your project (e.g., `/home/u123456789/domains/pehalwankarahi.com/public_html`)
+   - **Application Root**: Path to your project (e.g., `/home/u123456789/domains/pehlwankarahi.com/public_html`)
    - **Application Startup File**: `server/dist/index.js`
 3. Under **Environment Variables**, add the following:
 
@@ -127,7 +127,7 @@ Hostinger Cloud & Business hosting provides native Node.js application hosting w
 | `DB_PASSWORD` | `your_db_password` | Your hPanel DB password |
 | `JWT_SECRET` | `generate_a_random_32+_char_string` | Secret for admin authentication |
 | `ADMIN_USERNAME` | `admin` | Initial admin login username |
-| `ADMIN_EMAIL` | `admin@pehalwankarahi.com` | Initial admin email |
+| `ADMIN_EMAIL` | `admin@pehlwankarahi.com` | Initial admin email |
 | `ADMIN_PASSWORD` | `YourSecurePassword2026!` | Used to seed initial admin account on first boot |
 | `CORS_ORIGIN` | `https://yourdomain.com` | Allowed origin for API requests |
 | `TRUST_PROXY` | `1` | Enable reverse proxy trust behind Hostinger (ensures accurate client IP logging & rate limits) |
@@ -261,4 +261,4 @@ Access the management dashboard at `/admin`.
 
 ## 📄 License & Heritage
 
-© 2026 Pehalwan Karahi & DeraGhar. Authentic Pakistani Karahi House. All rights reserved.
+© 2026 Pehlwan Karahi & DeraGhar. Authentic Pakistani Karahi House. All rights reserved.

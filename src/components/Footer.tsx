@@ -51,7 +51,7 @@ export default function Footer() {
             Craving Authentic Sizzling Karahi?
           </h3>
           <p className="text-white/85 text-xs sm:text-sm max-w-xl">
-            Order your favorite Mutton, Chaamp, or Desi Murgh Karahi delivered steaming hot to your doorstep in 30 minutes, or reserve a family takht at our rooftop dera.
+            Order your favorite Mutton, Chaamp, or Desi Murgh Karahi delivered steaming hot to your doorstep in 30 minutes.
           </p>
         </div>
 
@@ -63,10 +63,13 @@ export default function Footer() {
             View Official Menu
           </button>
           <button
-            onClick={() => scrollTo("reservation-section")}
+            onClick={() => {
+              const el = document.getElementById("interactive-menu");
+              if (el) el.scrollIntoView({ behavior: "smooth" });
+            }}
             className="bg-white/20 hover:bg-white text-white hover:text-charcoal-900 font-bold text-xs sm:text-sm px-5 py-3.5 rounded-full transition-all cursor-pointer border border-white/30"
           >
-            Reserve Dawat Table
+            Order Online Now
           </button>
         </div>
       </div>
@@ -86,13 +89,13 @@ export default function Footer() {
                 <div className="mb-2">
                   <img
                     src={resolveImageUrl(settings.logoUrl)}
-                    alt={settings.restaurantName || "Pehalwan Karahi"}
+                    alt={settings.restaurantName || "Pehlwan Karahi"}
                     className="h-10 sm:h-12 w-auto max-w-[200px] object-contain drop-shadow"
                   />
                 </div>
               ) : (
                 <span className="font-serif italic font-bold text-3xl tracking-tight text-white block">
-                  Pehalwan <span className="text-terracotta-500">Karahi.</span>
+                  Pehlwan <span className="text-terracotta-500">Karahi.</span>
                 </span>
               )}
               <span className="text-[11px] font-extrabold uppercase tracking-widest text-saffron-400 block mt-1">
@@ -246,7 +249,7 @@ export default function Footer() {
                   rel="noopener noreferrer"
                   className="block p-2 rounded-xl bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-300 transition-colors font-mono font-bold border border-emerald-500/20"
                 >
-                  <span className="text-[10px] text-emerald-400/80 block font-sans font-medium">WhatsApp Booking:</span>
+                  <span className="text-[10px] text-emerald-400/80 block font-sans font-medium">WhatsApp Orders:</span>
                   {settings.whatsapp}
                 </a>
               )}
@@ -276,6 +279,9 @@ export default function Footer() {
                 <span className="bg-red-600/30 text-red-300 border border-red-500/30 px-2 py-0.5 rounded-full">
                   🔴 JazzCash
                 </span>
+                <span className="bg-blue-600/30 text-blue-300 border border-blue-500/30 px-2 py-0.5 rounded-full">
+                  🏦 Bank Transfer
+                </span>
               </div>
             </div>
           </div>
@@ -286,7 +292,7 @@ export default function Footer() {
             ========================================================= */}
         <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-white/60">
           <div className="flex items-center gap-2">
-            <span>© 2026 Pehalwan Karahi. Authentic Pakistani Karahi House.</span>
+            <span>© 2026 Pehlwan Karahi. Authentic Pakistani Karahi House.</span>
             <span className="hidden sm:inline">•</span>
             <span className="hidden sm:inline text-white/40">Made with ❤️ for Desi Foodies</span>
           </div>

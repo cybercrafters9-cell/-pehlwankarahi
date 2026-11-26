@@ -71,10 +71,10 @@ export function AdminLogin({ onLogin }: AdminLoginProps) {
             <ShieldCheck className="w-8 h-8" />
           </div>
           <h1 className="font-display font-extrabold text-2xl sm:text-3xl text-charcoal-900">
-            Pehalwan <span className="text-terracotta-500">Console.</span>
+            Pehlwan <span className="text-terracotta-500">Console.</span>
           </h1>
           <p className="text-xs text-charcoal-700/75 max-w-xs mx-auto">
-            Authorized management portal for dishes, live orders, prices and customer bookings.
+            Authorized management portal for dishes, live orders, prices and restaurant settings.
           </p>
         </div>
 
@@ -91,7 +91,7 @@ export function AdminLogin({ onLogin }: AdminLoginProps) {
           <Input
             label="Admin Username or Email"
             required
-            placeholder="admin or admin@pehalwankarahi.com"
+            placeholder="admin or admin@pehlwankarahi.com"
             value={username}
             onChange={(e) => {
               setUsername(e.target.value);

@@ -86,6 +86,7 @@ export default function AdminPage() {
   const handleLogout = useCallback((isExpired: boolean | unknown = false) => {
     setIsAuthenticated(false);
     setSessionUser(null);
+    localStorage.removeItem("pehlwan_admin_session");
     localStorage.removeItem("pehalwan_admin_session");
     if (isExpired === true) {
       showToast("Session expired", "error");
@@ -108,7 +109,7 @@ export default function AdminPage() {
   // Mount & Check Session
   useEffect(() => {
     const timer = setTimeout(() => {
-      const stored = localStorage.getItem("pehalwan_admin_session");
+      const stored = localStorage.getItem("pehlwan_admin_session") || localStorage.getItem("pehalwan_admin_session");
       if (stored) {
         try {
           const parsed = JSON.parse(stored);
@@ -117,6 +118,7 @@ export default function AdminPage() {
             setSessionUser(parsed.user);
           }
         } catch {
+          localStorage.removeItem("pehlwan_admin_session");
           localStorage.removeItem("pehalwan_admin_session");
         }
       }
@@ -207,8 +209,8 @@ export default function AdminPage() {
       const data = await api.login(username, pass);
       setIsAuthenticated(true);
       setSessionUser(data.user);
-      localStorage.setItem("pehalwan_admin_session", JSON.stringify(data));
-      showToast(`Welcome back, ${data.user.name || "Master Pehalwan"}!`);
+      localStorage.setItem("pehlwan_admin_session", JSON.stringify(data));
+      showToast(`Welcome back, ${data.user.name || "Master Pehlwan"}!`);
       return { success: true };
     } catch (err: unknown) {
       const errorMsg = err instanceof Error ? err.message : "Invalid Username or Password.";
@@ -415,9 +417,9 @@ export default function AdminPage() {
       setSlots((prev) => prev.map((s) => (s.key === key ? updated : s)));
       setApiConnected(true);
       if (typeof window !== "undefined") {
-        window.dispatchEvent(new Event("pehalwan_slots_updated"));
+        window.dispatchEvent(new Event("pehlwan_slots_updated"));
         try {
-          localStorage.setItem("pehalwan_slots_version", Date.now().toString());
+          localStorage.setItem("pehlwan_slots_version", Date.now().toString());
         } catch {}
       }
       showToast(`Site slot "${updated.label}" updated successfully!`);
@@ -435,7 +437,7 @@ export default function AdminPage() {
         <div className="text-center space-y-2">
           <Loader2 className="w-8 h-8 animate-spin text-terracotta-500 mx-auto" />
           <p className="font-display font-bold text-sm text-charcoal-900">
-            Loading Pehalwan Karahi Console...
+            Loading Pehlwan Karahi Console...
           </p>
         </div>
       </div>
@@ -465,7 +467,7 @@ export default function AdminPage() {
             <div>
               <div className="flex items-center gap-2">
                 <span className="font-serif italic font-bold text-lg sm:text-xl text-white">
-                  Pehalwan <span className="text-terracotta-500">Admin.</span>
+                  Pehlwan <span className="text-terracotta-500">Admin.</span>
                 </span>
                 <span className="text-[10px] uppercase tracking-widest bg-terracotta-500 text-white px-2 py-0.5 rounded-full font-bold">
                   Management Console

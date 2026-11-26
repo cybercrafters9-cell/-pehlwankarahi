@@ -89,7 +89,7 @@ export default function MenuModal() {
             ) : (
               <>
                 <span className="font-serif italic font-bold text-base sm:text-lg tracking-tight text-white block leading-tight">
-                  Pehalwan
+                  Pehlwan
                 </span>
                 <span className="text-[10px] font-extrabold uppercase tracking-widest text-saffron-300 block">
                   Karahi.
@@ -323,7 +323,7 @@ export default function MenuModal() {
           )}
 
           <div className="hidden md:block text-[11px] uppercase tracking-widest text-white/60 font-semibold">
-            Pehalwan Karahi • Authentic Heritage
+            Pehlwan Karahi • Authentic Heritage
           </div>
 
           {totalCartCount > 0 ? (
