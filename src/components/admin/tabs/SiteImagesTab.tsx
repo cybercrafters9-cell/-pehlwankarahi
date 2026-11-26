@@ -9,6 +9,7 @@ import { Badge } from "../ui/Badge";
 import { Modal } from "../ui/Modal";
 import { ImagePicker } from "../ui/ImagePicker";
 import { Input } from "../ui/Input";
+import { FeaturedStripEditor } from "./FeaturedStripEditor";
 import {
   RotateCcw,
   Upload,
@@ -88,6 +89,7 @@ export function SiteImagesTab({
   const [editingSlot, setEditingSlot] = useState<SiteSlot | null>(null);
   const [replaceUrl, setReplaceUrl] = useState("");
   const [replaceMediaId, setReplaceMediaId] = useState<number | null>(null);
+  const [slotLabel, setSlotLabel] = useState("");
   const [altText, setAltText] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -98,6 +100,7 @@ export function SiteImagesTab({
     setEditingSlot(slot);
     setReplaceUrl(slot.effectiveUrl);
     setReplaceMediaId(slot.mediaId);
+    setSlotLabel(slot.label);
     setAltText(slot.altText);
   };
 
@@ -118,6 +121,7 @@ export function SiteImagesTab({
         mediaId: mediaId || null,
         customUrl: !mediaId && replaceUrl ? replaceUrl.trim() : null,
         fallbackUrl: !mediaId && replaceUrl ? replaceUrl.trim() : undefined,
+        label: slotLabel.trim() || editingSlot.label,
         altText: altText.trim() || editingSlot.altText,
       });
       setEditingSlot(null);
@@ -194,7 +198,14 @@ export function SiteImagesTab({
           </p>
         </div>
       ) : (
-        sections.map((sectionKey) => {
+        <>
+          <FeaturedStripEditor
+            slots={slots}
+            dishes={dishes}
+            onUpdateSlot={onUpdateSlot}
+            onOpenImageModal={handleOpenReplace}
+          />
+          {sections.map((sectionKey) => {
           const sectionSlots = slots.filter((s) => s.section === sectionKey);
 
           return (
@@ -361,7 +372,8 @@ export function SiteImagesTab({
               </div>
             </div>
           );
-        })
+        })}
+        </>
       )}
 
       {/* Replace Image Modal */}
@@ -404,10 +416,17 @@ export function SiteImagesTab({
             />
 
             <Input
-              label="Image Accessibility Alt Text"
+              label="Slot Tag / Label"
+              value={slotLabel}
+              onChange={(e) => setSlotLabel(e.target.value)}
+              placeholder="e.g. KARAHI, ROYAL CHAAMP, SPECIAL SHANK"
+            />
+
+            <Input
+              label="Display Title / Alt Text"
               value={altText}
               onChange={(e) => setAltText(e.target.value)}
-              placeholder="Descriptive alt text for screen readers & SEO"
+              placeholder="Descriptive title & alt text"
             />
           </div>
         </Modal>

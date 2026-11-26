@@ -7,7 +7,7 @@ import FeaturedStrip from "@/components/FeaturedStrip";
 import BentoGrid from "@/components/BentoGrid";
 import EditorialShowcase from "@/components/EditorialShowcase";
 import MenuSection from "@/components/MenuSection";
-import ReservationSection from "@/components/ReservationSection";
+// import ReservationSection from "@/components/ReservationSection";
 import Footer from "@/components/Footer";
 import CartDrawer from "@/components/CartDrawer";
 import OrderVerificationModal from "@/components/OrderVerificationModal";
@@ -43,7 +43,7 @@ export default async function Home() {
           <MenuSection />
           <BentoGrid />
           <EditorialShowcase />
-          <ReservationSection />
+          {/* <ReservationSection /> */}
           <Footer />
           <CartDrawer />
           <OrderVerificationModal />

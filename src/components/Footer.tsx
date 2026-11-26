@@ -5,8 +5,6 @@ import { useRestaurant } from "@/context/RestaurantContext";
 import { resolveImageUrl } from "@/lib/media";
 import {
   Phone,
-  MapPin,
-  Clock,
   Flame,
   ShieldCheck,
   ArrowUp,
@@ -15,7 +13,16 @@ import {
 } from "lucide-react";
 
 export default function Footer() {
-  const { setIsMenuModalOpen, settings } = useRestaurant();
+  const { setIsMenuModalOpen, settings, dishes } = useRestaurant();
+
+  const availableDishes = dishes.filter((d) => d.isAvailable !== false).slice(0, 7);
+  const hasEasypaisa = Boolean(settings?.easypaisaNumber?.trim());
+  const hasJazzCash = Boolean(settings?.jazzcashNumber?.trim());
+  const hasBank = Boolean(
+    settings?.bankAccountNumber?.trim() ||
+      settings?.bankIban?.trim() ||
+      settings?.bankName?.trim()
+  );
 
   const cleanPhone = (p: string) => p.replace(/\D/g, "");
   const cleanWa = (p: string) => {
@@ -82,8 +89,8 @@ export default function Footer() {
         <div className="absolute top-0 left-1/4 w-96 h-32 bg-terracotta-500/10 blur-3xl pointer-events-none" />
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-8 lg:gap-10 pb-10 border-b border-white/10">
-          {/* Column 1: Brand Heritage (Span 4) */}
-          <div className="lg:col-span-4 space-y-4">
+          {/* Column 1: Brand Heritage (Span 5) */}
+          <div className="lg:col-span-5 space-y-4">
             <div>
               <div className="mb-3 inline-flex items-center bg-sand-100/95 px-4 py-2.5 rounded-2xl shadow-md">
                 <img
@@ -121,110 +128,39 @@ export default function Footer() {
             </div>
           </div>
 
-          {/* Column 2: Official Karahi Menu (Span 3) */}
-          <div className="lg:col-span-3 space-y-3.5">
+          {/* Column 2: Dynamic Menu Created by Admin (Span 4) */}
+          <div className="lg:col-span-4 space-y-3.5">
             <h4 className="font-display font-bold text-sm uppercase tracking-wider text-saffron-400 flex items-center gap-1.5">
               <CookingPot className="w-4 h-4 text-terracotta-500" />
-              <span>Signature Menu</span>
+              <span>Our Menu</span>
             </h4>
-            <ul className="space-y-2 text-xs text-white/75">
-              <li>
-                <button
-                  onClick={() => setIsMenuModalOpen(true)}
-                  className="hover:text-terracotta-400 transition-colors text-left cursor-pointer"
-                >
-                  Peshawari Mutton Karahi
-                </button>
-              </li>
-              <li>
-                <button
-                  onClick={() => setIsMenuModalOpen(true)}
-                  className="hover:text-terracotta-400 transition-colors text-left cursor-pointer"
-                >
-                  Lahori Desi Ghee Chicken Karahi
-                </button>
-              </li>
-              <li>
-                <button
-                  onClick={() => setIsMenuModalOpen(true)}
-                  className="hover:text-terracotta-400 transition-colors text-left cursor-pointer"
-                >
-                  Royal Mutton Chops Karahi
-                </button>
-              </li>
-              <li>
-                <button
-                  onClick={() => setIsMenuModalOpen(true)}
-                  className="hover:text-terracotta-400 transition-colors text-left cursor-pointer"
-                >
-                  Mutton Muscles (Machli) Karahi
-                </button>
-              </li>
-              <li>
-                <button
-                  onClick={() => setIsMenuModalOpen(true)}
-                  className="hover:text-terracotta-400 transition-colors text-left cursor-pointer"
-                >
-                  Mutton Chops with Mince Karahi
-                </button>
-              </li>
-              <li>
-                <button
-                  onClick={() => setIsMenuModalOpen(true)}
-                  className="hover:text-terracotta-400 transition-colors text-left cursor-pointer"
-                >
-                  Boneless Makhni Chicken Karahi
-                </button>
-              </li>
-              <li>
-                <button
-                  onClick={() => setIsMenuModalOpen(true)}
-                  className="hover:text-terracotta-400 transition-colors text-left cursor-pointer"
-                >
-                  Organic Desi Murgh Karahi
-                </button>
-              </li>
-            </ul>
+            {availableDishes.length > 0 ? (
+              <ul className="space-y-2 text-xs text-white/75">
+                {availableDishes.map((dish) => (
+                  <li key={dish.id}>
+                    <button
+                      onClick={() => setIsMenuModalOpen(true)}
+                      className="w-full flex items-center justify-between gap-3 hover:text-terracotta-400 transition-colors text-left cursor-pointer group"
+                    >
+                      <span className="truncate group-hover:translate-x-0.5 transition-transform">
+                        {dish.name}
+                      </span>
+                      <span className="text-[11px] font-mono text-saffron-400/90 shrink-0">
+                        Rs. {dish.price.toLocaleString()}
+                      </span>
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="text-xs text-white/55">
+                Menu items will appear here once added in Admin Panel.
+              </p>
+            )}
           </div>
 
-          {/* Column 3: Branches & Timings (Span 3) */}
+          {/* Column 3: Helplines & Dynamic Payment Methods (Span 3) */}
           <div className="lg:col-span-3 space-y-3.5">
-            <h4 className="font-display font-bold text-sm uppercase tracking-wider text-saffron-400 flex items-center gap-1.5">
-              <MapPin className="w-4 h-4 text-terracotta-500" />
-              <span>Our Branches</span>
-            </h4>
-
-            <div className="space-y-3 text-xs text-white/75">
-              {(settings?.branches && settings.branches.length > 0
-                ? settings.branches
-                : [
-                    "Kohinoor City Branch",
-                    "Canal Road Rooftop Family Dera",
-                  ]
-              ).map((branch, idx) => (
-                <div
-                  key={idx}
-                  className={`border-l-2 ${
-                    idx % 2 === 0 ? "border-terracotta-500" : "border-saffron-400"
-                  } pl-3 space-y-1`}
-                >
-                  <p className="font-bold text-white">{branch}</p>
-                  <p className="text-[11px] text-white/60">
-                    {idx === 0
-                      ? settings?.address || "Main Boulevard, Kohinoor City, Faisalabad"
-                      : "Canal Road, Family Takht Lawn & Gazebo"}
-                  </p>
-                  <p className="text-[10px] text-saffron-300 font-semibold flex items-center gap-1">
-                    <Clock className="w-3 h-3" />
-                    <span>{settings?.timings || "12:00 PM – 02:00 AM Daily"}</span>
-                  </p>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Column 4: Helplines & Payment Methods (Span 2) */}
-          <div className="lg:col-span-2 space-y-3.5">
             <h4 className="font-display font-bold text-sm uppercase tracking-wider text-saffron-400 flex items-center gap-1.5">
               <Phone className="w-4 h-4 text-terracotta-500" />
               <span>Order Helplines</span>
@@ -268,18 +204,24 @@ export default function Footer() {
                 Payment Methods:
               </span>
               <div className="flex flex-wrap gap-1.5 text-[10px] font-bold">
-                <span className="bg-white/10 px-2 py-0.5 rounded-full text-white/80">
+                <span className="bg-white/10 px-2.5 py-1 rounded-full text-white/85">
                   💵 Cash on Delivery
                 </span>
-                <span className="bg-emerald-600/30 text-emerald-300 border border-emerald-500/30 px-2 py-0.5 rounded-full">
-                  🟢 Easypaisa
-                </span>
-                <span className="bg-red-600/30 text-red-300 border border-red-500/30 px-2 py-0.5 rounded-full">
-                  🔴 JazzCash
-                </span>
-                <span className="bg-blue-600/30 text-blue-300 border border-blue-500/30 px-2 py-0.5 rounded-full">
-                  🏦 Bank Transfer
-                </span>
+                {hasEasypaisa && (
+                  <span className="bg-emerald-600/30 text-emerald-300 border border-emerald-500/30 px-2.5 py-1 rounded-full">
+                    🟢 Easypaisa
+                  </span>
+                )}
+                {hasJazzCash && (
+                  <span className="bg-red-600/30 text-red-300 border border-red-500/30 px-2.5 py-1 rounded-full">
+                    🔴 JazzCash
+                  </span>
+                )}
+                {hasBank && (
+                  <span className="bg-blue-600/30 text-blue-300 border border-blue-500/30 px-2.5 py-1 rounded-full">
+                    🏦 Bank Transfer
+                  </span>
+                )}
               </div>
             </div>
           </div>

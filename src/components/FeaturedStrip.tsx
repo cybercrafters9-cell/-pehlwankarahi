@@ -83,26 +83,47 @@ export default function FeaturedStrip() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 items-center">
           {STRIP_CONFIG.map((cfg, idx) => {
             const currentSlot = slots[idx];
+            const slotRecord = currentSlot?.slot;
             const dish = currentSlot?.dishId
               ? dishes.find((d) => d.id === currentSlot.dishId)
               : null;
-            const effectiveImage = currentSlot?.url || dish?.image || cfg.fallbackUrl;
-            const effectiveName = dish
-              ? dish.name
-              : (currentSlot?.dishName || currentSlot?.alt || cfg.fallbackAlt);
-            const category = dish?.category || cfg.defaultCategory;
+            const hasCustomMedia = Boolean(
+              slotRecord?.mediaId || (slotRecord?.customUrl && slotRecord.customUrl.trim())
+            );
+            const effectiveImage = hasCustomMedia
+              ? currentSlot.url
+              : dish?.image || currentSlot?.url || cfg.fallbackUrl;
+
+            const customTitle = slotRecord?.altText?.trim();
+            const isGenericAlt =
+              !customTitle ||
+              customTitle === "Pehlwan Karahi" ||
+              /^strip\s*\d+$/i.test(customTitle);
+            const effectiveName = !isGenericAlt
+              ? customTitle
+              : dish?.name || currentSlot?.dishName || cfg.fallbackAlt;
+
+            const customLabel = slotRecord?.label?.trim();
+            const isGenericLabel =
+              !customLabel || /^(featured\s*)?strip\s*\d+$/i.test(customLabel);
+            const category = !isGenericLabel
+              ? customLabel
+              : dish?.category || cfg.defaultCategory;
+
+            const handleCardClick = () => {
+              if (dish) {
+                addToCart(dish.id, effectiveName, dish.price, effectiveImage);
+              } else {
+                const el = document.getElementById("interactive-menu");
+                if (el) el.scrollIntoView({ behavior: "smooth" });
+              }
+            };
 
             return (
               <div
                 key={cfg.key}
-                onClick={() => {
-                  if (dish) {
-                    addToCart(dish.id, dish.name, dish.price, effectiveImage);
-                  }
-                }}
-                className={`flex items-center gap-3.5 p-2 rounded-full transition-all ${
-                  dish ? "cursor-pointer group" : ""
-                } ${
+                onClick={handleCardClick}
+                className={`flex items-center gap-3.5 p-2 rounded-full transition-all cursor-pointer group ${
                   cfg.isDarkCard
                     ? "bg-charcoal-900/20 hover:bg-charcoal-900/35"
                     : "bg-white/5 hover:bg-white/15"
