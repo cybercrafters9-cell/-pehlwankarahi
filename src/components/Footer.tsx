@@ -1,12 +1,10 @@
 "use client";
 
-import Link from "next/link";
 import { useRestaurant } from "@/context/RestaurantContext";
 import { resolveImageUrl } from "@/lib/media";
 import {
   Phone,
   Flame,
-  ShieldCheck,
   ArrowUp,
   CookingPot,
   CheckCircle2,
@@ -238,15 +236,6 @@ export default function Footer() {
           </div>
 
           <div className="flex items-center gap-4">
-            {/* Admin Portal Link */}
-            <Link
-              href="/admin"
-              className="text-white/80 hover:text-white font-bold flex items-center gap-1.5 bg-white/5 hover:bg-white/10 px-3.5 py-1.5 rounded-full border border-white/10 transition-colors"
-            >
-              <ShieldCheck className="w-3.5 h-3.5 text-terracotta-400" />
-              <span>Admin Management</span>
-            </Link>
-
             {/* Scroll to Top Button */}
             <button
               onClick={scrollToTop}
