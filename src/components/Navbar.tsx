@@ -33,28 +33,22 @@ export default function Navbar() {
           <span className="truncate">{announcementText}</span>
         </div>
       )}
-      <header className="bg-sand-100/90 backdrop-blur-md rounded-full px-4 sm:px-7 py-2.5 sm:py-3 border border-sand-200/90 shadow-sm transition-all">
-      <div className="flex items-center justify-between">
+      <header className="bg-sand-100/90 backdrop-blur-md rounded-full px-4 sm:px-6 py-1.5 sm:py-2 border border-sand-200/90 shadow-sm transition-all">
+      <div className="flex items-center justify-between gap-3">
         {/* Left: Brand Logo */}
         <a
           href="#"
-          className="flex items-center cursor-pointer select-none group"
+          className="flex items-center cursor-pointer select-none group shrink-0"
           onClick={(e) => {
             e.preventDefault();
             window.scrollTo({ top: 0, behavior: "smooth" });
           }}
         >
-          {settings?.logoUrl ? (
-            <img
-              src={resolveImageUrl(settings.logoUrl)}
-              alt={settings.restaurantName || "Pehalwan Karahi"}
-              className="h-8 sm:h-10 w-auto max-w-[160px] sm:max-w-[200px] object-contain group-hover:opacity-90 transition-opacity"
-            />
-          ) : (
-            <span className="font-serif italic font-bold text-2xl sm:text-3xl tracking-tight text-charcoal-900 group-hover:opacity-90 transition-opacity">
-              Pehalwan <span className="text-terracotta-500">Karahi.</span>
-            </span>
-          )}
+          <img
+            src={settings?.logoUrl ? resolveImageUrl(settings.logoUrl) : "/logo.png"}
+            alt={settings?.restaurantName || "Pehlwan Karahi"}
+            className="h-12 sm:h-14 lg:h-16 w-auto max-w-[190px] sm:max-w-[240px] object-contain group-hover:opacity-95 transition-opacity"
+          />
         </a>
 
         {/* Center: Simplified Navigation (Home & Restaurant Menu) */}

@@ -79,23 +79,14 @@ export default function MenuModal() {
           </button>
 
           {/* Brand Logo in Header Top-Left */}
-          <div className="absolute top-5 left-5 sm:top-7 sm:left-8 text-left hidden xs:block">
-            {settings?.logoUrl ? (
+          <div className="absolute top-4 left-5 sm:top-6 sm:left-8 text-left hidden sm:block">
+            <div className="inline-flex items-center bg-sand-100/95 px-2.5 py-1.5 rounded-xl shadow-md">
               <img
-                src={resolveImageUrl(settings.logoUrl)}
-                alt="Logo"
-                className="h-8 sm:h-9 w-auto max-w-[130px] object-contain drop-shadow"
+                src={settings?.logoUrl ? resolveImageUrl(settings.logoUrl) : "/logo.png"}
+                alt={settings?.restaurantName || "Pehlwan Karahi"}
+                className="h-7 md:h-9 w-auto max-w-[130px] md:max-w-[165px] object-contain"
               />
-            ) : (
-              <>
-                <span className="font-serif italic font-bold text-base sm:text-lg tracking-tight text-white block leading-tight">
-                  Pehlwan
-                </span>
-                <span className="text-[10px] font-extrabold uppercase tracking-widest text-saffron-300 block">
-                  Karahi.
-                </span>
-              </>
-            )}
+            </div>
           </div>
 
           {/* Subtitle & Giant 'MENU' Title matching reference image */}

@@ -85,19 +85,13 @@ export default function Footer() {
           {/* Column 1: Brand Heritage (Span 4) */}
           <div className="lg:col-span-4 space-y-4">
             <div>
-              {settings?.logoUrl ? (
-                <div className="mb-2">
-                  <img
-                    src={resolveImageUrl(settings.logoUrl)}
-                    alt={settings.restaurantName || "Pehlwan Karahi"}
-                    className="h-10 sm:h-12 w-auto max-w-[200px] object-contain drop-shadow"
-                  />
-                </div>
-              ) : (
-                <span className="font-serif italic font-bold text-3xl tracking-tight text-white block">
-                  Pehlwan <span className="text-terracotta-500">Karahi.</span>
-                </span>
-              )}
+              <div className="mb-3 inline-flex items-center bg-sand-100/95 px-4 py-2.5 rounded-2xl shadow-md">
+                <img
+                  src={settings?.logoUrl ? resolveImageUrl(settings.logoUrl) : "/logo.png"}
+                  alt={settings?.restaurantName || "Pehlwan Karahi"}
+                  className="h-14 sm:h-16 w-auto max-w-[240px] object-contain"
+                />
+              </div>
               <span className="text-[11px] font-extrabold uppercase tracking-widest text-saffron-400 block mt-1">
                 Authentic Heritage • Since 1998
               </span>

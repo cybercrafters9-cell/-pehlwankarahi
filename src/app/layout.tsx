@@ -5,6 +5,13 @@ export const metadata: Metadata = {
   title: "Pehlwan Karahi & DeraGhar — Authentic Pakistani Karahi, Bar B Q & Desi Cuisine",
   description:
     "Authentic Peshawari Shinwari Karahi, smoky Charcoal Seekh Kebabs, and Matka Dum Biryani crafted with 100% pure desi ghee and hand-roasted spices.",
+  icons: {
+    icon: [
+      { url: "/favicon.ico", sizes: "any" },
+      { url: "/favicon.png", type: "image/png" },
+    ],
+    apple: [{ url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" }],
+  },
 };
 
 export default function RootLayout({
