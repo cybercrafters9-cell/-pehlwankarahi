@@ -41,7 +41,7 @@ export default async function Home() {
           <Hero />
           <FeaturedStrip />
           <MenuSection />
-          <BentoGrid />
+          
           <EditorialShowcase />
           {/* <ReservationSection /> */}
           <Footer />
