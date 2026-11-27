@@ -39,8 +39,8 @@ interface SettingsTabProps {
 }
 
 const DEFAULT_SETTINGS: RestaurantSettings = {
-  restaurantName: "Pehlwan Karahi & DeraGhar",
-  name: "Pehlwan Karahi & DeraGhar",
+  restaurantName: "Pehlwan Karahi",
+  name: "Pehlwan Karahi",
   tagline: "Authentic Pakistani Karahi, Charcoal Bar B Q & Desi Handi",
   description: "Authentic Pakistani Karahi, Charcoal Bar B Q & Desi Handi",
   phone: "0300-1234567",
@@ -67,7 +67,7 @@ const DEFAULT_SETTINGS: RestaurantSettings = {
   freeDeliveryThreshold: 3000,
   easypaisaNumber: "",
   jazzcashNumber: "",
-  paymentAccountTitle: "Pehlwan Karahi & DeraGhar",
+  paymentAccountTitle: "Pehlwan Karahi",
   bankName: "Dubai Islamic Bank",
   bankBranch: "Riphah Branch, Faisalabad",
   bankAccountTitle: "Muhammad Zuber",
@@ -428,7 +428,7 @@ function SettingsForm({
                       )}
                     </div>
                     <span className="truncate font-medium text-[11px]">
-                      {form.restaurantName || "Pehlwan Karahi & DeraGhar"}
+                      {form.restaurantName || "Pehlwan Karahi"}
                     </span>
                     <span className="text-charcoal-500 ml-auto text-[10px]">✕</span>
                   </div>
@@ -727,8 +727,8 @@ function SettingsForm({
 
                   <Input
                     label="Mobile Wallet Account Title *"
-                    placeholder="e.g. Pehlwan Karahi & DeraGhar"
-                    value={form.paymentAccountTitle || "Pehlwan Karahi & DeraGhar"}
+                    placeholder="e.g. Pehlwan Karahi"
+                    value={form.paymentAccountTitle || "Pehlwan Karahi"}
                     onChange={(e) => setForm({ ...form, paymentAccountTitle: e.target.value })}
                   />
 

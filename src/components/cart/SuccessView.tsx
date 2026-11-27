@@ -44,7 +44,7 @@ export default function SuccessView({ completedOrder, onClose, settings }: Succe
   const accountTitle =
     digitalKey === "bank"
       ? bankAccountTitle
-      : settings?.paymentAccountTitle?.trim() || "Pehlwan Karahi & DeraGhar";
+      : settings?.paymentAccountTitle?.trim() || "Pehlwan Karahi";
 
   const rawWa = settings?.whatsapp?.trim() || settings?.phone?.trim() || "03001234567";
   const waTarget = rawWa.replace(/\D/g, "");
@@ -64,7 +64,7 @@ export default function SuccessView({ completedOrder, onClose, settings }: Succe
       : `• Transferred to: ${digitalCfg.name} (${rawNumber})\n• Account Title: ${accountTitle}`;
 
   const whatsappMessage = encodeURIComponent(
-    `Hello Pehlwan Karahi & DeraGhar,\n\n⚠️ *PAYMENT RECEIPT SUBMISSION (ORDER CONFIRMATION)*\n\nI have placed an order and am sending my payment receipt screenshot to confirm it.\n\n*ORDER DETAILS:*\n• Order ID: #${completedOrder.id}\n• Customer Name: ${completedOrder.customerName}\n• Contact Phone: ${completedOrder.customerPhone}\n• Delivery Address: ${completedOrder.address}\n\n*ITEMS ORDERED:*\n${itemsListText}\n\n*BILL SUMMARY:*\n• Subtotal: Rs. ${(completedOrder.subtotal ?? completedOrder.totalAmount).toLocaleString()}\n• Delivery Fee: ${completedOrder.deliveryFee === 0 ? "FREE" : `Rs. ${completedOrder.deliveryFee ?? 0}`}\n• *Total Payable: Rs. ${completedOrder.totalAmount.toLocaleString()}*\n\n*PAYMENT METHOD:*\n${paymentDetailsText}\n${completedOrder.transactionId ? `• Transaction Reference / TID: ${completedOrder.transactionId}\n` : ""}\n*DELIVERY SCHEDULE:*\n• ${deliverySchedule.etaText} (${deliverySchedule.policyNote})\n\n📎 *I have attached my payment receipt screenshot below. Please verify and confirm my order!*`
+    `Hello Pehlwan Karahi,\n\n⚠️ *PAYMENT RECEIPT SUBMISSION (ORDER CONFIRMATION)*\n\nI have placed an order and am sending my payment receipt screenshot to confirm it.\n\n*ORDER DETAILS:*\n• Order ID: #${completedOrder.id}\n• Customer Name: ${completedOrder.customerName}\n• Contact Phone: ${completedOrder.customerPhone}\n• Delivery Address: ${completedOrder.address}\n\n*ITEMS ORDERED:*\n${itemsListText}\n\n*BILL SUMMARY:*\n• Subtotal: Rs. ${(completedOrder.subtotal ?? completedOrder.totalAmount).toLocaleString()}\n• Delivery Fee: ${completedOrder.deliveryFee === 0 ? "FREE" : `Rs. ${completedOrder.deliveryFee ?? 0}`}\n• *Total Payable: Rs. ${completedOrder.totalAmount.toLocaleString()}*\n\n*PAYMENT METHOD:*\n${paymentDetailsText}\n${completedOrder.transactionId ? `• Transaction Reference / TID: ${completedOrder.transactionId}\n` : ""}\n*DELIVERY SCHEDULE:*\n• ${deliverySchedule.etaText} (${deliverySchedule.policyNote})\n\n📎 *I have attached my payment receipt screenshot below. Please verify and confirm my order!*`
   );
 
   return (

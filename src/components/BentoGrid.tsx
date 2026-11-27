@@ -102,7 +102,7 @@ export default function BentoGrid() {
           {/* Top Floating Tag */}
           <div className="absolute top-5 left-5 flex items-center gap-2 bg-charcoal-900/80 backdrop-blur-md text-white text-xs font-bold px-3.5 py-1.5 rounded-full border border-white/15">
             <span className="w-2 h-2 rounded-full bg-saffron-400" />
-            <span>Chef&apos;s Signature Koyla Platter</span>
+            <span>Chef&apos;s Signature Charcoal Platter</span>
           </div>
 
           {/* Price Pill Top Right */}
@@ -156,13 +156,13 @@ export default function BentoGrid() {
           {/* Left Side */}
           <div className="relative z-10 space-y-2 max-w-[230px]">
             <span className="inline-block text-[10px] font-extrabold uppercase tracking-widest bg-white/15 px-2.5 py-1 rounded-full text-saffron-400">
-              Weekend Dawat Deal
+              Weekend Feast Deal
             </span>
             <h3 className="font-display font-bold text-xl sm:text-2xl leading-tight">
               {nameDeal}
             </h3>
             <p className="text-white/75 text-xs">
-              Fresh 1 Kg dumba meat cooked live in pure animal fat and ripe tomatoes.
+              Fresh 1 Kg lamb meat cooked live in pure butter ghee and ripe tomatoes.
             </p>
             {dishDeal && (
               <button
@@ -183,7 +183,7 @@ export default function BentoGrid() {
           <div className="relative z-10 sm:border-l sm:border-white/20 sm:pl-6 max-w-[240px]">
             <p className="font-serif italic text-saffron-400 text-sm">Fresh Clay Tandoor</p>
             <h4 className="font-display font-bold text-lg sm:text-xl leading-snug mt-0.5">
-              100% Pure Chakki &amp; Desi Ghee Tarka
+              100% Pure Whole Wheat &amp; Desi Ghee Tempering
             </h4>
             <p className="text-white/80 text-xs mt-1.5 leading-relaxed">
               Freshly slaughtered halal meat cooked to order in traditional iron woks over roaring wood fire.

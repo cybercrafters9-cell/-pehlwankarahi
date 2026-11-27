@@ -36,8 +36,8 @@ interface SettingsRow extends RowDataPacket {
 }
 
 export const DEFAULT_SETTINGS: RestaurantSettings = {
-  restaurantName: "Pehlwan Karahi & DeraGhar",
-  name: "Pehlwan Karahi & DeraGhar",
+  restaurantName: "Pehlwan Karahi",
+  name: "Pehlwan Karahi",
   tagline: "Authentic Pakistani Karahi, Charcoal Bar B Q & Desi Handi",
   description: "Authentic Pakistani Karahi, Charcoal Bar B Q & Desi Handi",
   phone: "0300-1234567",
@@ -64,7 +64,7 @@ export const DEFAULT_SETTINGS: RestaurantSettings = {
   freeDeliveryThreshold: 3000,
   easypaisaNumber: "",
   jazzcashNumber: "",
-  paymentAccountTitle: "Pehlwan Karahi & DeraGhar",
+  paymentAccountTitle: "Pehlwan Karahi",
   bankName: "Dubai Islamic Bank",
   bankBranch: "Riphah Branch, Faisalabad",
   bankAccountTitle: "Muhammad Zuber",
@@ -234,7 +234,7 @@ export const settingsRepository = {
     const easypaisaNumber = updates.easypaisaNumber ?? current.easypaisaNumber ?? "";
     const jazzcashNumber = updates.jazzcashNumber ?? current.jazzcashNumber ?? "";
     const paymentAccountTitle =
-      updates.paymentAccountTitle ?? current.paymentAccountTitle ?? "Pehlwan Karahi & DeraGhar";
+      updates.paymentAccountTitle ?? current.paymentAccountTitle ?? "Pehlwan Karahi";
     const bankName = updates.bankName !== undefined ? updates.bankName : (current.bankName ?? DEFAULT_SETTINGS.bankName);
     const bankBranch = updates.bankBranch !== undefined ? updates.bankBranch : (current.bankBranch ?? DEFAULT_SETTINGS.bankBranch);
     const bankAccountTitle = updates.bankAccountTitle !== undefined ? updates.bankAccountTitle : (current.bankAccountTitle ?? DEFAULT_SETTINGS.bankAccountTitle);

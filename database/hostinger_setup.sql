@@ -98,7 +98,7 @@ CREATE TABLE IF NOT EXISTS settings (
   free_delivery_threshold INT NOT NULL DEFAULT 3000,
   easypaisa_number VARCHAR(50) NOT NULL DEFAULT '03001234567',
   jazzcash_number VARCHAR(50) NOT NULL DEFAULT '03219876543',
-  payment_account_title VARCHAR(255) NOT NULL DEFAULT 'Pehlwan Karahi & DeraGhar',
+  payment_account_title VARCHAR(255) NOT NULL DEFAULT 'Pehlwan Karahi',
   bank_name VARCHAR(255) NULL DEFAULT 'Dubai Islamic Bank',
   bank_branch VARCHAR(255) NULL DEFAULT 'Riphah Branch, Faisalabad',
   bank_account_title VARCHAR(255) NULL DEFAULT 'Muhammad Zuber',
@@ -214,7 +214,7 @@ INSERT IGNORE INTO settings (
   bank_name, bank_branch, bank_account_title, bank_account_number, bank_iban
 ) VALUES (
   1,
-  'Pehlwan Karahi & DeraGhar',
+  'Pehlwan Karahi',
   'Authentic Pakistani Karahi, Charcoal Bar B Q & Desi Handi',
   '0300-1234567',
   '0321-9876543',
@@ -235,7 +235,7 @@ INSERT IGNORE INTO settings (
   3000,
   '03001234567',
   '03219876543',
-  'Pehlwan Karahi & DeraGhar',
+  'Pehlwan Karahi',
   'Dubai Islamic Bank',
   'Riphah Branch, Faisalabad',
   'Muhammad Zuber',

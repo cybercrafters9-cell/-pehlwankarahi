@@ -187,7 +187,7 @@ WHERE slot_key = 'bento.sub1'
   ${Number(s.free_delivery_threshold || 3000)},
   ${escapeSql(s.easypaisa_number || "03001234567")},
   ${escapeSql(s.jazzcash_number || "03219876543")},
-  ${escapeSql(s.payment_account_title || "Pehlwan Karahi & DeraGhar")}
+  ${escapeSql(s.payment_account_title || "Pehlwan Karahi")}
 );\n`);
   }
 

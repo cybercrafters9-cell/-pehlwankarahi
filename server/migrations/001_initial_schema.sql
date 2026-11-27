@@ -75,7 +75,7 @@ CREATE TABLE IF NOT EXISTS settings (
   free_delivery_threshold INT NOT NULL DEFAULT 3000,
   easypaisa_number VARCHAR(50) NOT NULL DEFAULT '03001234567',
   jazzcash_number VARCHAR(50) NOT NULL DEFAULT '03219876543',
-  payment_account_title VARCHAR(255) NOT NULL DEFAULT 'Pehlwan Karahi & DeraGhar'
+  payment_account_title VARCHAR(255) NOT NULL DEFAULT 'Pehlwan Karahi'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS orders (
@@ -153,7 +153,7 @@ INSERT INTO settings (
   easypaisa_number, jazzcash_number, payment_account_title
 ) VALUES (
   1,
-  'Pehlwan Karahi & DeraGhar',
+  'Pehlwan Karahi',
   'Authentic Pakistani Karahi, Charcoal Bar B Q & Desi Handi',
   '0300-1234567',
   '0321-9876543',

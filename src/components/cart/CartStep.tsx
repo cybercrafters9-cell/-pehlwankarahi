@@ -128,7 +128,7 @@ export default function CartStep({
       </div>
 
       <div className="px-5 py-2.5 bg-saffron-400/25 border-y border-saffron-400/40 flex items-center justify-between text-xs">
-        <span className="font-bold text-charcoal-900">🌿 Free Fresh Podina Raita &amp; Salad with every order!</span>
+        <span className="font-bold text-charcoal-900">🌿 Free Fresh Mint Raita &amp; Salad with every order!</span>
         <span className="text-[10px] font-extrabold uppercase bg-charcoal-900 text-white px-2 py-0.5 rounded-full">
           Free
         </span>

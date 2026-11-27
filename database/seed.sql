@@ -1,6 +1,6 @@
 -- first import only
 -- ============================================================
--- PEHLWAN KARAHI & DERAGHAR — HOSTINGER DATABASE SEED DATA
+-- PEHLWAN KARAHI — HOSTINGER DATABASE SEED DATA
 -- Exported from MySQL Database (Categories, Menu, Settings & Slots)
 -- Run this script in phpMyAdmin on Hostinger MySQL
 -- ============================================================
@@ -52,7 +52,7 @@ INSERT IGNORE INTO settings (
   easypaisa_number, jazzcash_number, payment_account_title
 ) VALUES (
   1,
-  'Pehlwan Karahi & DeraGhar',
+  'Pehlwan Karahi',
   'Authentic Pakistani Karahi, Charcoal Bar B Q & Desi Handi',
   '0300-1234567',
   '0321-9876543',

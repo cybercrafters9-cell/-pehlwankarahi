@@ -189,7 +189,7 @@ async function bootstrap() {
   server = app.listen(PORT, HOST, () => {
     console.log(`
   ======================================================
-  🔥 PEHLWAN KARAHI & DERA GHAR — EXPRESS BACKEND 🔥
+  🔥 PEHLWAN KARAHI — EXPRESS BACKEND 🔥
   ======================================================
   🚀 Host:             ${HOST}
   🚪 Port:             ${PORT}

@@ -91,7 +91,7 @@ export default function Hero() {
 
           <button
             onClick={() => setIsVideoOpen(true)}
-            title="Watch Live Karahi Tarka"
+            title="Watch Live Karahi Sizzle"
             className="w-10 h-10 rounded-full border border-charcoal-900/20 hover:border-terracotta-500 hover:bg-terracotta-500 hover:text-white flex items-center justify-center text-charcoal-900 transition-all cursor-pointer"
           >
             <Play className="w-3.5 h-3.5 fill-current ml-0.5" />

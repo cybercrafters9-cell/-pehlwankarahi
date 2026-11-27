@@ -58,7 +58,7 @@ export default function OrderVerificationModal() {
   const accountTitle =
     digitalKey === "bank"
       ? bankAccountTitle
-      : settings?.paymentAccountTitle?.trim() || "Pehlwan Karahi & DeraGhar";
+      : settings?.paymentAccountTitle?.trim() || "Pehlwan Karahi";
 
   const rawWa = settings?.whatsapp?.trim() || settings?.phone?.trim() || "03001234567";
   const waTarget = rawWa.replace(/\D/g, "");
@@ -83,7 +83,7 @@ export default function OrderVerificationModal() {
       : `• Transferred to: ${digitalCfg.name} (${rawNumber})\n• Account Title: ${accountTitle}`;
 
   const whatsappMessage = encodeURIComponent(
-    `Hello Pehlwan Karahi & DeraGhar,\n\n⚠️ *PAYMENT RECEIPT SUBMISSION (ORDER CONFIRMATION)*\n\nI have placed an order on your website and am sending my payment receipt screenshot to verify and confirm it.\n\n*ORDER DETAILS:*\n• Order ID: #${pendingVerificationOrder.id}\n• Customer Name: ${pendingVerificationOrder.customerName}\n• Contact Phone: ${pendingVerificationOrder.customerPhone}\n• Delivery Address: ${pendingVerificationOrder.address}\n\n*ITEMS ORDERED:*\n${itemsListText}\n\n*BILL SUMMARY:*\n• Subtotal: Rs. ${(pendingVerificationOrder.subtotal ?? pendingVerificationOrder.totalAmount).toLocaleString()}\n• Delivery Fee: ${pendingVerificationOrder.deliveryFee === 0 ? "FREE" : `Rs. ${pendingVerificationOrder.deliveryFee ?? 0}`}\n• *Total Payable: Rs. ${pendingVerificationOrder.totalAmount.toLocaleString()}*\n\n*PAYMENT METHOD:*\n${paymentDetailsText}\n• Transaction Reference / TID: ${pendingVerificationOrder.transactionId || "Attached in screenshot"}\n\n*DELIVERY SCHEDULE:*\n• ${deliverySchedule.etaText} (${deliverySchedule.policyNote})\n\n📎 *I have attached my payment receipt screenshot below. Please verify and confirm my order!*`
+    `Hello Pehlwan Karahi,\n\n⚠️ *PAYMENT RECEIPT SUBMISSION (ORDER CONFIRMATION)*\n\nI have placed an order on your website and am sending my payment receipt screenshot to verify and confirm it.\n\n*ORDER DETAILS:*\n• Order ID: #${pendingVerificationOrder.id}\n• Customer Name: ${pendingVerificationOrder.customerName}\n• Contact Phone: ${pendingVerificationOrder.customerPhone}\n• Delivery Address: ${pendingVerificationOrder.address}\n\n*ITEMS ORDERED:*\n${itemsListText}\n\n*BILL SUMMARY:*\n• Subtotal: Rs. ${(pendingVerificationOrder.subtotal ?? pendingVerificationOrder.totalAmount).toLocaleString()}\n• Delivery Fee: ${pendingVerificationOrder.deliveryFee === 0 ? "FREE" : `Rs. ${pendingVerificationOrder.deliveryFee ?? 0}`}\n• *Total Payable: Rs. ${pendingVerificationOrder.totalAmount.toLocaleString()}*\n\n*PAYMENT METHOD:*\n${paymentDetailsText}\n• Transaction Reference / TID: ${pendingVerificationOrder.transactionId || "Attached in screenshot"}\n\n*DELIVERY SCHEDULE:*\n• ${deliverySchedule.etaText} (${deliverySchedule.policyNote})\n\n📎 *I have attached my payment receipt screenshot below. Please verify and confirm my order!*`
   );
 
   const handleCopy = (text: string, label: string) => {
@@ -124,7 +124,7 @@ export default function OrderVerificationModal() {
                 WhatsApp Payment Screenshot Compulsory
               </h2>
               <p className="text-xs text-charcoal-700/85 leading-relaxed max-w-md mx-auto">
-                Aapka order <strong className="font-bold text-charcoal-950 font-mono">#{pendingVerificationOrder.id}</strong> submit ho chuka hai. Kitchen cooking shuru karne ke liye apni payment ka screenshot WhatsApp par lazmi send karein.
+                Your order <strong className="font-bold text-charcoal-950 font-mono">#{pendingVerificationOrder.id}</strong> has been submitted. Please send your payment screenshot on WhatsApp to start kitchen preparation.
               </p>
             </div>
 
@@ -213,7 +213,7 @@ export default function OrderVerificationModal() {
 
             {/* Instruction Notice */}
             <div className="p-3 bg-amber-500/15 border border-amber-500/40 rounded-2xl text-[11px] text-amber-950 font-medium leading-relaxed">
-              👉 Neeche diye gaye button par click karein. Aapka WhatsApp automatically open ho jayega jisme order details pehle se likhi hongi. Sirf apna <strong>payment screenshot attach kar ke send karein</strong>.
+              👉 Click the button below. WhatsApp will open automatically with your order details pre-filled. Simply attach and send your <strong>payment screenshot</strong>.
             </div>
 
             {/* Primary Action Button (WhatsApp) */}
@@ -234,7 +234,7 @@ export default function OrderVerificationModal() {
                 onClick={() => setStage("screenshot_sent")}
                 className="w-full py-2.5 text-xs text-charcoal-700 font-bold hover:text-charcoal-900 transition-colors flex items-center justify-center gap-1 cursor-pointer"
               >
-                <span>Maine Screenshot Send Kar Diya Hai (Verify Status)</span>
+                <span>I Have Sent the Screenshot (Verify Status)</span>
                 <ArrowRight className="w-3.5 h-3.5" />
               </button>
             </div>
@@ -257,7 +257,7 @@ export default function OrderVerificationModal() {
               </h2>
 
               <p className="text-xs text-charcoal-700/80 leading-relaxed max-w-sm mx-auto">
-                Shukriya! Aapka Order <strong className="font-mono text-charcoal-900 font-bold">#{pendingVerificationOrder.id}</strong> receive ho gaya hai. Restaurant staff aapka payment screenshot check kar ke order verify karega aur Live Wok me cooking shuru hogi.
+                Thank you! Your Order <strong className="font-mono text-charcoal-900 font-bold">#{pendingVerificationOrder.id}</strong> has been received. Our restaurant staff will verify your payment screenshot and begin cooking in the Live Wok.
               </p>
             </div>
 
@@ -289,7 +289,7 @@ export default function OrderVerificationModal() {
                 </div>
                 <div>
                   <p className="font-bold text-amber-900">Admin Payment Verification</p>
-                  <p className="text-[11px] text-charcoal-600">Verification ke baad khana cook hoga</p>
+                  <p className="text-[11px] text-charcoal-600">Cooking begins once payment is verified</p>
                 </div>
               </div>
 
@@ -298,7 +298,7 @@ export default function OrderVerificationModal() {
                   4
                 </div>
                 <div>
-                  <p className="font-bold text-charcoal-900">Live Koyla Cooking &amp; Dispatch</p>
+                  <p className="font-bold text-charcoal-900">Live Charcoal Cooking &amp; Dispatch</p>
                   <p className="text-[11px] text-charcoal-600">{deliverySchedule.etaText}</p>
                 </div>
               </div>
@@ -312,7 +312,7 @@ export default function OrderVerificationModal() {
                 rel="noopener noreferrer"
                 className="text-xs text-emerald-700 hover:text-emerald-800 font-bold inline-flex items-center gap-1 hover:underline"
               >
-                <span>WhatsApp chat dobara open karein</span>
+                <span>Reopen WhatsApp chat</span>
                 <ExternalLink className="w-3 h-3" />
               </a>
             </div>
@@ -323,7 +323,7 @@ export default function OrderVerificationModal() {
               onClick={handleClose}
               className="w-full bg-charcoal-900 hover:bg-charcoal-800 text-white font-extrabold text-sm py-3.5 rounded-full shadow-md transition-colors cursor-pointer"
             >
-              Theek Hai / Back to Home
+              Done / Back to Home
             </button>
           </>
         )}

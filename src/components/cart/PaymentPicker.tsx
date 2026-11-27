@@ -70,7 +70,7 @@ export default function PaymentPicker({
   const accountTitle =
     activeDigital.id === "bank"
       ? bankAccountTitle
-      : settings?.paymentAccountTitle?.trim() || "Pehlwan Karahi & DeraGhar";
+      : settings?.paymentAccountTitle?.trim() || "Pehlwan Karahi";
 
   return (
     <div className="space-y-3 pt-2 border-t border-sand-200">
@@ -266,7 +266,7 @@ export default function PaymentPicker({
             </p>
           ) : (
             <p className="text-[10px] text-charcoal-600 mt-1">
-              ⚠️ <strong>Compulsory:</strong> Payment verify karwane ke liye apna Transaction ID (TID) ya bhejne wale ka mobile number lazmi likhein.
+              ⚠️ <strong>Compulsory:</strong> Please enter your Transaction ID (TID) or sender mobile number to verify your payment.
             </p>
           )}
         </div>

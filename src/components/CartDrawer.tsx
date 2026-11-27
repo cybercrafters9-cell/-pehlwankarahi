@@ -98,9 +98,9 @@ export default function CartDrawer() {
     }
 
     if (!formData.transactionId.trim()) {
-      errs.transactionId = "Transaction ID ya Sender Mobile Number lazmi darj karein";
+      errs.transactionId = "Please enter your Transaction ID or sender mobile number";
     } else if (formData.transactionId.trim().length < 4) {
-      errs.transactionId = "Transaction ID kam az kam 4 characters ka hona chahiye";
+      errs.transactionId = "Transaction ID must be at least 4 characters";
     }
 
     setErrors(errs);

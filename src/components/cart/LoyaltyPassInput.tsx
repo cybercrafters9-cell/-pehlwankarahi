@@ -24,7 +24,7 @@ export default function LoyaltyPassInput({
   isCheckingLoyalty,
   onCheckLoyalty,
   onRemoveLoyalty,
-  title = "Shahi VIP Loyalty Pass",
+  title = "Royal VIP Loyalty Pass",
   autofillPhone,
   containerClassName = "bg-sand-100 border-b border-sand-200 px-5 py-3",
 }: LoyaltyPassInputProps) {

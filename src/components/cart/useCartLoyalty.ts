@@ -25,7 +25,7 @@ export function useCartLoyalty() {
         setLoyaltyPhone(target);
         setLoyaltyMessage({
           type: "success",
-          text: `👑 ${pass.tier || "Shahi VIP"} verified! ${pass.discountPercent}% Karahi discount applied.`,
+          text: `👑 ${pass.tier || "Royal VIP"} verified! ${pass.discountPercent}% Karahi discount applied.`,
         });
       } else {
         setLoyaltyPass(null);

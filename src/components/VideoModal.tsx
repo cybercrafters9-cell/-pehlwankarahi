@@ -38,7 +38,7 @@ export default function VideoModal() {
                 Live Kitchen Cam
               </span>
               <h3 className="font-display font-bold text-2xl mt-2">
-                Peshawari Iron Wok &amp; Koyla Pit
+                Peshawari Iron Wok &amp; Charcoal Pit
               </h3>
             </div>
           </div>

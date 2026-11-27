@@ -21,7 +21,7 @@ export default function ReservationSection() {
   const [form, setForm] = useState({
     name: "",
     phone: "",
-    guests: "5-8 Guests (Rooftop Koyla Lawn)",
+    guests: "5-8 Guests (Rooftop Charcoal Lawn)",
     time: "Tonight — 9:30 PM (Peak BBQ)",
   });
 
@@ -39,7 +39,7 @@ export default function ReservationSection() {
       setForm({
         name: "",
         phone: "",
-        guests: "5-8 Guests (Rooftop Koyla Lawn)",
+        guests: "5-8 Guests (Rooftop Charcoal Lawn)",
         time: "Tonight — 9:30 PM (Peak BBQ)",
       });
     } finally {
@@ -49,16 +49,16 @@ export default function ReservationSection() {
 
   return (
     <section id="reservation-section" className="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-10">
-      {/* Bottom-Left Card: Soft Cream Dawat / Table Booking Card */}
+      {/* Bottom-Left Card: Soft Cream Table Booking Card */}
       <div className="lg:col-span-6 bg-sand-50 border border-sand-200 rounded-4xl p-6 sm:p-8 shadow-card flex flex-col justify-between">
         <div>
           <div className="flex items-center justify-between gap-2">
             <div>
               <span className="text-xs font-bold uppercase tracking-widest text-charcoal-700/70">
-                Family Hall &amp; Rooftop Dera
+                Family Hall &amp; Rooftop Lounge
               </span>
               <h3 className="font-display font-extrabold text-2xl sm:text-3xl text-terracotta-500 mt-0.5">
-                Reserve Your Dawat
+                Reserve Your Table
               </h3>
             </div>
             <span className="bg-terracotta-500 text-white text-xs font-extrabold px-3.5 py-1.5 rounded-full shadow">
@@ -67,7 +67,7 @@ export default function ReservationSection() {
           </div>
 
           <p className="text-xs sm:text-sm text-charcoal-700/80 mt-2">
-            Book a private Charpai Takht or air-conditioned family cabin for birthdays, corporate dinners, or weekend Karahi nights.
+            Book a private traditional lounge or air-conditioned family cabin for birthdays, corporate dinners, or weekend Karahi nights.
           </p>
 
           {/* Interactive Booking Form Fields */}
@@ -114,8 +114,8 @@ export default function ReservationSection() {
                 className="w-full bg-sand-100 border border-sand-300 rounded-xl px-3.5 py-2.5 text-xs font-semibold focus:outline-none focus:border-terracotta-500"
               >
                 <option value="2-4 Guests (Indoor Family Hall)">2–4 Guests (Family Hall)</option>
-                <option value="5-8 Guests (Rooftop Koyla Lawn)">5–8 Guests (Rooftop Koyla Lawn)</option>
-                <option value="10+ Guests (Shahi Dera Takht)">10+ Guests (Shahi Dera Takht)</option>
+                <option value="5-8 Guests (Rooftop Charcoal Lawn)">5–8 Guests (Rooftop Charcoal Lawn)</option>
+                <option value="10+ Guests (Royal Lounge Seating)">10+ Guests (Royal Lounge Seating)</option>
               </select>
             </div>
             <div>

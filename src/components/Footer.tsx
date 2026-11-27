@@ -50,13 +50,13 @@ export default function Footer() {
         <div className="relative z-10 space-y-1.5 text-center md:text-left">
           <div className="inline-flex items-center gap-2 bg-white/15 backdrop-blur-md px-3 py-1 rounded-full text-xs font-bold text-saffron-300">
             <Flame className="w-3.5 h-3.5 fill-current" />
-            <span>Live Wok &amp; Koyla Grill Active Daily</span>
+            <span>Live Wok &amp; Charcoal Grill Active Daily</span>
           </div>
           <h3 className="font-display font-extrabold text-2xl sm:text-3xl text-white tracking-tight">
             Craving Authentic Sizzling Karahi?
           </h3>
           <p className="text-white/85 text-xs sm:text-sm max-w-xl">
-            Order your favorite Mutton, Chaamp, or Desi Murgh Karahi before 7:00 PM to get your order confirmed and delivered the next day.
+            Order your favorite Mutton, Chops, or Desi Chicken Karahi before 7:00 PM to get your order confirmed and delivered the next day.
           </p>
         </div>
 
@@ -117,7 +117,7 @@ export default function Footer() {
               </div>
               <div className="flex items-center gap-2 text-white/90">
                 <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-                <span>Pure Desi Ghee &amp; Makhan Tarka</span>
+                <span>Pure Desi Ghee &amp; Butter Tempering</span>
               </div>
               <div className="flex items-center gap-2 text-white/90">
                 <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
